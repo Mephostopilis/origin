@@ -39,10 +39,18 @@ public class UIPanelController : MonoBehaviour
 
     public void OnLoginCommit()
     {
-        account = GameObject.Find("AccountIFText").GetComponent<Text>().text;
-        password = GameObject.Find("PwdIFText").GetComponent<Text>().text;
-        Debug.Assert(account.Length > 6);
-        Debug.Assert(password.Length > 6);
+        account = GameObject.Find("AccountIF").GetComponent<InputField>().text;
+        password = GameObject.Find("PwdIF").GetComponent<InputField>().text;
+        if (account.Length < 6)
+        {
+            Debug.Log("you shoud give me a");
+            return;
+        }
+        if (password.Length < 6)
+        {
+            Debug.Log("you should give me a.");
+            return;
+        }
         if (login != null)
         {
             login = GameObject.Find("Login").GetComponent<ClientLogin>();
@@ -56,6 +64,10 @@ public class UIPanelController : MonoBehaviour
     {
         if (ok)
         {
+            Debug.Log("login");
+            //GameObject.Find("LoginPanel").SetActive(false);
+            //GameObject.Find("SignupPanel").SetActive(false);
+            //GameObject.Find("Start").SetActive(false);
             string ip = "192.168.1.239";
             int port = 8888;
             u = new User();
@@ -69,12 +81,20 @@ public class UIPanelController : MonoBehaviour
         }
         else
         {
-
+            Debug.Log("auth failture");
         }
     }
 
     public void OnAuthCallback(bool ok, object ud, byte[] subid, byte[] secret)
     {
+        if (ok)
+        {
+            Debug.Log("auth success.");
+        }
+        else
+        {
+
+        }
     }
 
     public void OnSignupBtnClick()
@@ -114,11 +134,17 @@ public class UIPanelController : MonoBehaviour
     {
         if (ok)
         {
-
+            var g = GameObject.Find("Start");
+            g.SetActive(false);
+            g = GameObject.Find("SignupPanel");
+            g.SetActive(false);
         }
         else
         {
-
+            Debug.Log("please enter your username.");
+            GameObject.Find("AccountIF").GetComponent<InputField>().text = string.Empty;
+            GameObject.Find("PwdIF").GetComponent<InputField>().text = string.Empty;
+            GameObject.Find("CfmPwdIF").GetComponent<InputField>().text = string.Empty;
         }
     }
 }
