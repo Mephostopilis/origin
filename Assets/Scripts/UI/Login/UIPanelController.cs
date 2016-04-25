@@ -17,6 +17,9 @@ public class UIPanelController : MonoBehaviour
     private string password;
     private ClientLogin login;
     private User u;
+    public GameObject startPanel;
+    public GameObject signupPanel;
+    public GameObject loginPanel;
 
     // Use this for initialization
     void Start()
@@ -31,10 +34,8 @@ public class UIPanelController : MonoBehaviour
 
     public void OnLoginBtnClick()
     {
-        var g = GameObject.Find("Start");
-        g.SetActive(false);
-        g = GameObject.Find("SignupPanel");
-        g.SetActive(false);
+        startPanel.SetActive(false);
+        signupPanel.SetActive(false);
     }
 
     public void OnLoginCommit()
@@ -60,10 +61,11 @@ public class UIPanelController : MonoBehaviour
         login.Auth(ip, port, "sample", account, password, null, OnLoginCallback);
     }
 
-    public void OnLoginCallback(bool ok, object ud, byte[] subid, byte[] secret)
+    public void OnLoginCallback(bool ok, object ud, byte[] uid, byte[] subid, byte[] secret)
     {
         if (ok)
         {
+            Debug.Log(string.Format("{0},{1}", uid, subid));
             Debug.Log("login");
             //GameObject.Find("LoginPanel").SetActive(false);
             //GameObject.Find("SignupPanel").SetActive(false);
@@ -75,6 +77,7 @@ public class UIPanelController : MonoBehaviour
             u.Account = account;
             u.Password = password;
             u.Secret = secret;
+            u.Uid = uid;
             u.Subid = subid;
             var client = GameObject.Find("Agent").GetComponent<ClientSocket>();
             client.Auth(ip, port, u, null, OnAuthCallback);
@@ -99,11 +102,8 @@ public class UIPanelController : MonoBehaviour
 
     public void OnSignupBtnClick()
     {
-        state = State.SSignup;
-        var g = GameObject.Find("Start");
-        g.SetActive(false);
-        g = GameObject.Find("LoginPanel");
-        g.SetActive(false);
+        startPanel.SetActive(false);
+        loginPanel.SetActive(false);
     }
 
     public void OnSignupCommit()
@@ -130,14 +130,12 @@ public class UIPanelController : MonoBehaviour
         }
     }
 
-    public void OnSignupCallback(bool ok, object ud, byte[] subid, byte[] secret)
+    public void OnSignupCallback(bool ok, object ud, byte[] uid, byte[] subid, byte[] secret)
     {
         if (ok)
         {
-            var g = GameObject.Find("Start");
-            g.SetActive(false);
-            g = GameObject.Find("SignupPanel");
-            g.SetActive(false);
+            startPanel.SetActive(true);
+            loginPanel.SetActive(true);
         }
         else
         {
