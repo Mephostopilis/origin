@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Text;
 
 public class UIPanelController : MonoBehaviour
 {
@@ -61,17 +62,24 @@ public class UIPanelController : MonoBehaviour
         login.Auth(ip, port, "sample", account, password, null, OnLoginCallback);
     }
 
-    public void OnLoginCallback(bool ok, object ud, byte[] uid, byte[] subid, byte[] secret)
+    public void OnLoginCallback(bool ok, object ud, byte[] secret, string dummy)
     {
         if (ok)
         {
+            int _1 = dummy.IndexOf(':');
+            int _2 = dummy.IndexOf('@', _1);
+            int _3 = dummy.IndexOf('#', _2);
+            string uen = dummy.Substring(_1 + 1, _2 - _1 - 1);
+            byte[] uid = Crypt.base64decode(Encoding.ASCII.GetBytes(uen));
+            string sen = dummy.Substring(_2+1, _3-_2-1);
+            byte[] subid = Crypt.base64decode(Encoding.ASCII.GetBytes(sen));
+            string gated = dummy.Substring(_3 + 1);
+            
             Debug.Log(string.Format("{0},{1}", uid, subid));
             Debug.Log("login");
-            //GameObject.Find("LoginPanel").SetActive(false);
-            //GameObject.Find("SignupPanel").SetActive(false);
-            //GameObject.Find("Start").SetActive(false);
-            string ip = "192.168.1.239";
-            int port = 8888;
+            var s = gated.Split(':');
+            string ip = s[0];
+            int port = int.Parse(s[1]);
             u = new User();
             u.Server = "sample";
             u.Account = account;
@@ -130,7 +138,7 @@ public class UIPanelController : MonoBehaviour
         }
     }
 
-    public void OnSignupCallback(bool ok, object ud, byte[] uid, byte[] subid, byte[] secret)
+    public void OnSignupCallback(bool ok, object ud, byte[] secret, string dummy)
     {
         if (ok)
         {
