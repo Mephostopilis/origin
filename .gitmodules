@@ -1,3 +1,6 @@
 [submodule "Assets/skynet-client"]
 	path = Assets/skynet-client
 	url = https://github.com/mephostopilis/skynet-client
+[submodule "Assets/Excel2Unity"]
+	path = Assets/Excel2Unity
+	url = https://github.com/qinyuanpei/Excel2Unity
