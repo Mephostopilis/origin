@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace sp
+namespace Maria
 {
-    public class controller
+    public class Controller
     {
-        private env _env = null;
+        private Env _env = null;
 
-        public controller(env env)
+        public Controller(Env env)
         {
             Debug.Assert(env != null);
             _env = env;

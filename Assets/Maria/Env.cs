@@ -3,14 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace sp
+namespace Maria
 {
-    public class env
+    public class Env
     {
         private Thread _worker = null;
         private Queue<worker_param> _queue = new Queue<worker_param>();
 
-        public env()
+        public Env()
         {
             _worker = new Thread(new ThreadStart(worker));
             _worker.Start();

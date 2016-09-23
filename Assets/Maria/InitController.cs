@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace sp
+namespace Maria
 {
-    public class initcontroller : controller
+    public class InitController : Controller
     {
-        public initcontroller(env env)
+        public InitController(Env env)
             : base(env)
         {
         }
