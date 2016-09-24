@@ -2,29 +2,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Maria.Network;
+using System;
+using Sproto;
 
 namespace Maria
 {
     public class Context
     {
-        private Thread _worker = null;
-        private Queue<Message> _queue = new Queue<Message>();
+        protected Thread _worker = null;
+        protected Queue<Message> _queue = new Queue<Message>();
+        protected Dictionary<string, Controller> _hash = new Dictionary<string, Controller>();
+        protected ClientLogin _login = null;
+        protected ClientSocket _client = null;
 
         public Context()
         {
             _worker = new Thread(new ThreadStart(Worker));
             _worker.Start();
+
+            _login = new ClientLogin(this);
+            _client = new ClientSocket(this);
         }
 
         // Use this for initialization
         public void Start()
         {
-
+            
         }
 
         // Update is called once per frame
         public void Update(float delta)
         {
+            _login.Update();
+            _client.Update();
         }
 
         public void Enqueue(Message msg)
@@ -56,6 +67,21 @@ namespace Maria
                     Thread.Sleep(1000);
                 }
             }
+        }
+
+        public T GetController<T>(string name) where T : Controller
+        {
+            return (T)_hash[name];
+        }
+
+        public void SendReq<T>(String callback, SprotoTypeBase obj)
+        {
+            _client.SendReq<T>(callback, obj);
+        }
+
+        public void Auth()
+        {
+
         }
     }
 }

@@ -5,12 +5,12 @@ namespace Maria
 {
     public class Controller
     {
-        private Context _env = null;
+        protected Context _ctx = null;
 
-        public Controller(Context env)
+        public Controller(Context ctx)
         {
-            Debug.Assert(env != null);
-            _env = env;
+            Debug.Assert(ctx != null);
+            _ctx = ctx;
         }
 
         // Use this for initialization
