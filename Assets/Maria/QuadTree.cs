@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Assets.Scripts
+namespace Maria
 {
     class QuadTree
     {
-        class QuadNode
+        public class QuadNode
         {
             public QuadNode()
             {
@@ -37,7 +37,8 @@ namespace Assets.Scripts
         }
 
 
-        public void Init(QuadNode parent, int depth) {
+        public void Init(QuadNode parent, int depth)
+        {
             depth--;
             if (depth == 0)
             {

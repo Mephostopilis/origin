@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
+using Maria.Network;
+using Maria.Encrypt;
 
 public class UIPanelController : MonoBehaviour
 {

@@ -5,9 +5,9 @@ namespace Maria
 {
     public class Controller
     {
-        private Env _env = null;
+        private Context _env = null;
 
-        public Controller(Env env)
+        public Controller(Context env)
         {
             Debug.Assert(env != null);
             _env = env;

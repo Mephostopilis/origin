@@ -5,8 +5,8 @@ namespace Maria
 {
     public class InitController : Controller
     {
-        public InitController(Env env)
-            : base(env)
+        public InitController(Context ctx)
+            : base(ctx)
         {
         }
     }

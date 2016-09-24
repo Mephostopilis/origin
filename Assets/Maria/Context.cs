@@ -5,52 +5,51 @@ using System.Threading;
 
 namespace Maria
 {
-    public class Env
+    public class Context
     {
         private Thread _worker = null;
-        private Queue<worker_param> _queue = new Queue<worker_param>();
+        private Queue<Message> _queue = new Queue<Message>();
 
-        public Env()
+        public Context()
         {
-            _worker = new Thread(new ThreadStart(worker));
+            _worker = new Thread(new ThreadStart(Worker));
             _worker.Start();
         }
 
         // Use this for initialization
-        void start()
+        public void Start()
         {
 
         }
 
         // Update is called once per frame
-        void update()
+        public void Update(float delta)
         {
-
         }
 
-        public void enqueue(worker_param param)
+        public void Enqueue(Message msg)
         {
             lock (_queue)
             {
-                _queue.Enqueue(param);
+                _queue.Enqueue(msg);
             }
         }
 
-        private void worker()
+        private void Worker()
         {
             while (true)
             {
-                worker_param param = null;
+                Message msg = null;
                 lock (_queue)
                 {
                     if (_queue.Count > 0)
                     {
-                        param = _queue.Dequeue();
+                        msg = _queue.Dequeue();
                     }
                 }
-                if (param != null)
+                if (msg != null)
                 {
-                    param.execute();
+                    msg.execute();
                 }
                 else
                 {
