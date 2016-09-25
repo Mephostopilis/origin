@@ -11,5 +11,22 @@ namespace Maria.App
         public GameController(Context ctx) : base(ctx)
         {
         }
+
+        // 进入房间
+        public void Enter()
+        {
+
+        }
+
+
+        public void Exit()
+        {
+
+        }
+
+        public void Shullle()
+        {
+
+        }
     }
 }

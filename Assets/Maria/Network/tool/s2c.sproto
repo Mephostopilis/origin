@@ -1,0 +1,110 @@
+.package {
+	type 0 : integer
+	session 1 : integer
+}
+
+.achi {
+    csv_id 0 : integer
+    finished 1 : integer
+}
+
+.role {
+    csv_id 0 : integer
+    is_possessed 1 : boolean
+    star 2 : integer
+    u_us_prop_num 3 : integer
+    property_id1 4 : integer
+    value1 5 : integer
+    property_id2 6 : integer
+    value2 7 : integer
+    property_id3 8 : integer
+    value3 9 : integer
+    property_id4 10 : integer
+    value4 11 : integer
+    property_id5 12 : integer
+    value5 13 : integer
+}
+
+.kungfu_content {
+    csv_id 1 : integer
+    k_level 2 : integer
+    k_type 3 : integer
+    k_sp_num 4 : integer 
+}
+
+.equipment {
+    csv_id 0 : integer
+    level 1 : integer
+    combat 2 : integer
+    defense 3 : integer
+    critical_hit 4 : integer
+    king 5 : integer
+    critical_hit_probability 6 : integer
+    combat_probability 7 : integer
+    defense_probability 8 : integer
+    king_probability 9 : integer
+    enhance_success_rate 10 : integer
+}
+
+.user {
+    uname 0 : string 
+    uviplevel 1 : integer
+    config_sound 2 : boolean
+    config_music 3 : boolean
+    avatar 4 : integer
+    sign 5 : string
+    c_role_id 6 : integer
+    level 7 : integer
+    recharge_rmb 8 : integer
+    recharge_diamond 9 : integer
+    uvip_progress 10 : integer
+    cp_hanging_id 11 : integer
+    uexp 12 : integer
+    gold 13 : integer
+    diamond 14 : integer
+    love 15 : integer
+    equipment_list 16 : *equipment
+    kungfu_list 17 : *kungfu_content
+    rolelist 18 : *role
+    cp_chapter 19 : integer
+    lilian_level 20 : integer
+    ara_rnk 21 : integer
+}
+
+heartbeat 1 {}
+
+mail 2 {
+    request {
+        from 0 : integer
+        to 1 : integer
+        head 2 : string
+        msg 3 : string   
+    }
+    response {
+        errorcode 0 : integer
+        msg 1 : string
+    }
+}
+
+finish_achi 3 {
+    request {
+        which 0 : achi
+    }
+    response {
+        errorcode 0 : integer
+        msg 1 : string
+    }
+}
+
+lilian_update 4 {
+    response {
+        errorcode 0 : integer
+        msg 1 : string
+    }
+}
+
+login 5 {
+    request {
+        u 0 : user
+    }
+}
