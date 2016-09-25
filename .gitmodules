@@ -1,3 +1,6 @@
 [submodule "Assets/Excel2Unity"]
 	path = Assets/Excel2Unity
 	url = https://github.com/qinyuanpei/Excel2Unity
+[submodule "Assets/Maria/Network/sproto-Csharp"]
+	path = Assets/Maria/Network/sproto-Csharp
+	url = https://github.com/lvzixun/sproto-Csharp

@@ -5,10 +5,18 @@ using System.Text;
 
 namespace Maria.App
 {
-    class Player
+    public class Player
     {
-        private uint _uid;
-        private
+        public enum Orientation
+        {
+        }
 
+        private uint _uid;
+        private Orientation _orient;
+
+        public Player()
+        {
+
+        }
     }
 }

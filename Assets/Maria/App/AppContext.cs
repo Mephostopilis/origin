@@ -7,6 +7,9 @@ namespace Maria.App
 {
     public class AppContext : Context
     {
+        private List<Card> _cards = new List<Card>();
+        private int _idx = 0;
+
         public AppContext()
             :base()
         {
@@ -14,6 +17,14 @@ namespace Maria.App
             _hash["game"] = gctl;
             LoginController lctl = new LoginController(this);
             _hash["login"] = lctl;
+
+
+        }
+
+        public Card Next()
+        {
+            var card = _cards[_idx];
+            return card;
         }
     }
 }

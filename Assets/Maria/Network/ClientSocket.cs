@@ -336,33 +336,26 @@ namespace Maria.Network
             request[str] = new ReqAction { Action = req, Ud = ud };
         }
 
-<<<<<<< HEAD
         /// <summary>
         /// 注册请求
         /// </summary>
         /// <param name="req"></param>
         /// <param name="str"></param>
         public void RegisterRequest(RespCb resp, String str)
-=======
-    /// <summary>
-    /// 注册请求
-    /// </summary>
-    /// <param name="req"></param>
-    /// <param name="str"></param>
-    public void RegisterRequest(RespCb resp, String str)
-    {
-        if (response.ContainsKey(str))
->>>>>>> 8e6fcdaba6713a90c987b0721b73e81304239d1b
         {
-            if (request.ContainsKey(str))
+            if (response.ContainsKey(str))
             {
-                response[str].Ud = resp;
-            }
-            else
-            {
-                response.Add(str, new RespAction { Action = resp, Ud = ud });
+                if (request.ContainsKey(str))
+                {
+                    response[str].Ud = resp;
+                }
+                else
+                {
+                    response.Add(str, new RespAction { Action = resp, Ud = ud });
+                }
             }
         }
+
         /// <summary>
         /// 发送请求
         /// </summary>
