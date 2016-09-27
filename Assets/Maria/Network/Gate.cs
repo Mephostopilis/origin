@@ -4,103 +4,89 @@ using System.Net.Sockets;
 
 namespace Maria.Network
 {
-
-
-    public interface IProxy
-    {
-        void OnConnect(int id, bool connected);
-        void OnRecvive(int id, byte[] buffer);
-        void OnDisconnect(int id, SocketError socketError, PackageSocketError packageSocketError);
-    }
-
-    // singlen
     public class Gate
     {
-        enum SOCKET_TYPE
+        public enum SocketType
         {
-            SOCKET_DATA,
-            SOCKET_CLOSE,
-            SOCKET_OPEN,
-            SOCKET_ACCEPT,
-            SOCKET_ERROR,
-            SOCKET_EXIT,
-            SOCKET_UDP,
+            ST_DATA,
+            ST_CLOSE,
+            ST_OPEN,
+            ST_ACCEPT,
+            ST_ERROR,
+            ST_EXIT,
+            ST_UDP,
         }
 
-        class SOCKET_MESSAGE
+        public class SocketMsg
         {
-            public SOCKET_TYPE Type { get; set; }
-            public int Id { get; set; }
-            public IProxy Opaque { get; set; }
+            public SocketType Type { get; set; }
+            public IPackageSocket From { get; set; }
+            public IProxySocket To { get; set; }
             public byte[] Buffer { get; set; }
         }
 
-        private enum CMD
+        public enum CMD
         {
-            S, // Start socket
-            B, // Bind socket
-            L, // Listen socket
-            K, // Close socket
+            S, // Start Socket
+            B, // Bind Socket
+            L, // Listen Socket
+            K, // Close Socket
             O, // Connect to (Open)
         }
 
-        class Req
+        public class Req
         {
-            public CMD cmd { get; set; }
+            public CMD CMD { get; set; }
         }
 
-        class ROpen : Req
+        public class ROpen : Req
         {
             public object opaque { get; set; }
             public string addr { get; set; }
             public int port { get; set; }
         }
 
-        class RStart : Req
+        public class RStart : Req
         {
             public object opaque { get; set; }
             public int id { get; set; }
         }
 
-        private Queue<SOCKET_MESSAGE> smq = new Queue<SOCKET_MESSAGE>();
-        private Queue<Req> rq = new Queue<Req>();
-        private int index = 0;
-        private Dictionary<int, IProxy> slot = new Dictionary<int, IProxy>();
-        private Dictionary<IProxy, int> proxy = new Dictionary<IProxy, int>();
-        private List<ProxySocket> socks = new List<ProxySocket>();
 
-        public Gate()
+        private Context _ctx = null;
+        private Queue<SocketMsg> _smq = new Queue<SocketMsg>();
+        private Queue<Req> _rq = new Queue<Req>();
+
+        private Dictionary<IPackageSocket, IProxySocket> _slot = new Dictionary<IPackageSocket, IProxySocket>();
+        private Dictionary<IProxySocket, IPackageSocket> _proxy = new Dictionary<IProxySocket, IPackageSocket>();
+        
+        public Gate(Context ctx)
         {
-            var t = new Thread(new ThreadStart(run));
-            t.IsBackground = true;
-            t.Start();
+            _ctx = ctx;
         }
 
         // 主线程调用
         void Update()
         {
-            if (smq.Count > 0)
+            if (_smq.Count > 0)
             {
-                SOCKET_MESSAGE sm = smq.Dequeue();
+                SocketMsg sm = _smq.Dequeue();
+                IProxySocket ps = sm.To;
                 switch (sm.Type)
                 {
-                    case SOCKET_TYPE.SOCKET_DATA:
-                        sm.Opaque.OnRecvive(sm.Id, sm.Buffer);
+                    case SocketType.ST_DATA:
                         break;
-                    case SOCKET_TYPE.SOCKET_CLOSE:
-                        sm.Opaque.OnDisconnect(sm.Id, SocketError.AccessDenied, PackageSocketError.None);
+                    case SocketType.ST_CLOSE:
                         break;
-                    case SOCKET_TYPE.SOCKET_OPEN:
-                        sm.Opaque.OnConnect(sm.Id, true);
+                    case SocketType.ST_OPEN:
                         break;
-                    case SOCKET_TYPE.SOCKET_ACCEPT:
+                    case SocketType.ST_ACCEPT:
                         break;
-                    case SOCKET_TYPE.SOCKET_ERROR:
-                        sm.Opaque.OnDisconnect(sm.Id, SocketError.AccessDenied, PackageSocketError.None);
+                    case SocketType.ST_ERROR:
                         break;
-                    case SOCKET_TYPE.SOCKET_EXIT:
+                    case SocketType.ST_EXIT:
                         break;
-                    case SOCKET_TYPE.SOCKET_UDP:
+                    case SocketType.ST_UDP:
                         break;
                     default:
                         break;
@@ -108,72 +94,31 @@ namespace Maria.Network
             }
         }
 
-        public void Start(object opaque, int id)
+        public int Command(Req r)
         {
-            var R = new RStart();
-            R.cmd = CMD.S;
-            R.opaque = opaque;
-            R.id = id;
-            rq.Enqueue(R);
-        }
-
-        public int Connect(object opaque, string addr, int port)
-        {
-            var R = new ROpen();
-            R.cmd = CMD.O;
-            R.opaque = opaque;
-            R.addr = addr;
-            R.port = port;
-            rq.Enqueue(R);
             return 0;
         }
 
-        private int Command(CMD cmd, Req r)
+        public void Run()
         {
-            switch (cmd)
+            if (_rq.Count > 0)
             {
-                case CMD.S:
-                    return StartSocket();
-                case CMD.B:
-                    break;
-                case CMD.L:
-                    break;
-                case CMD.K:
-                    break;
-                case CMD.O:
-                    return OpenSocket();
-                default:
-                    break;
-            }
-            return 0;
-        }
-
-        private int StartSocket()
-        {
-            return 0;
-        }
-
-        private int OpenSocket()
-        {
-            index++;
-            PackageSocket sock = new PackageSocket();
-            //slot[index] = new Socket() { ID = index, P = sock };
-
-            return 0;
-        }
-
-        private void run()
-        {
-            while (true)
-            {
-                if (rq.Count > 0)
+                Req r = _rq.Dequeue();
+                CMD cmd = r.CMD;
+                switch (cmd)
                 {
-                    Req r = rq.Dequeue();
-                    Command(r.cmd, r);
-                }
-                foreach (var item in socks)
-                {
-                    //item.Update();
+                    case CMD.S:
+                        break;
+                    case CMD.B:
+                        break;
+                    case CMD.L:
+                        break;
+                    case CMD.K:
+                        break;
+                    case CMD.O:
+                        break;
+                    default:
+                        break;
                 }
             }
         }

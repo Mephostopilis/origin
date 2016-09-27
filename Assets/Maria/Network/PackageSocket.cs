@@ -15,6 +15,7 @@ namespace Maria.Network
 
     public enum PackageSocketType
     {
+        None,
         Line,
         Header,
     }
@@ -59,7 +60,7 @@ namespace Maria.Network
         private DateTime NextSendPingTime;
 
         private bool IsEnabledPing;
-        private PackageSocketType PgType = PackageSocketType.Header;
+        private PackageSocketType PgType = PackageSocketType.None;
         private int id;
 
         const int MaxSizePerSend = 1024 * 4;
@@ -186,7 +187,7 @@ namespace Maria.Network
         {
             var now = DateTime.Now;
 
-            // http://www.dpull.com/blog/csharp_socket/
+            // http://www.dpull.com/blog/csharp__socket/
             CurSocket.Poll(0, SelectMode.SelectWrite);
 
             if (!CurSocket.Connected && CheckTimeout < now)

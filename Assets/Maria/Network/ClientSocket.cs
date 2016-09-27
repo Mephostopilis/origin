@@ -11,22 +11,10 @@ namespace Maria.Network
 {
     public class ClientSocket
     {
-        public delegate void CB(bool ok, object ud, byte[] subid, byte[] secret);
+        public delegate void CB(bool ok, byte[] subid, byte[] secret);
 
-        public delegate void RespCb(uint session, SprotoTypeBase responseObj, object ud);
-        public delegate void ReqCb(uint session, SprotoTypeBase requestObj, SprotoRpc.ResponseFunction Response, object ud);
-
-        private class ReqAction
-        {
-            public object Ud { get; set; }
-            public ReqCb Action { get; set; }
-        }
-
-        private class RespAction
-        {
-            public object Ud { get; set; }
-            public RespCb Action { get; set; }
-        }
+        public delegate void RspCb(uint session, SprotoTypeBase responseObj);
+        public delegate SprotoTypeBase ReqCb(uint session, SprotoTypeBase requestObj);
 
         private class ReqPg
         {
@@ -34,92 +22,99 @@ namespace Maria.Network
             public string Protocol { get; set; }
             public byte[] Buffer { get; set; }
             public int Version { get; set; }  // nonsence
-            public uint Index { get; set; }   // 
+            public int Index { get; set; }   // 
         }
 
-        private class RespPg
+        private class RspPg
         {
             public uint Session { get; set; }
             public string Protocol { get; set; }
             public byte[] Buffer { get; set; }
             public int Version { get; set; }
-            public uint Index { get; set; }
+            public int Index { get; set; }
         }
 
         private Context _ctx;
-        private PackageSocket sock = new PackageSocket();
-        private string ip = String.Empty;
-        private int port = 0;
-        private User user = null;
-        private int step = 0;
-        private bool handshake = false;
-        private object ud = null;
-        private CB callback = null;
+        private PackageSocket _tcp = new PackageSocket();
+        private PackageSocketUdp _udp = null;
+        private User _user = new User();
 
-        private uint index = 0;
-        private uint session = 0;
-        private SprotoRpc host = null;
-        private SprotoRpc.RpcRequest send_request = null;
+        private string _ip = String.Empty;
+        private int _port = 0;
+        private int _step = 0;
+        private bool _handshake = false;
+        private CB _callback = null;
 
+        private int _index = 0;
+        private int _version = 0;
+        private uint _session = 0;
+        private SprotoRpc _host = null;
+        private SprotoRpc.RpcRequest _sendRequest = null;
 
         private const int c2s_req_tag = 1 << 0;
         private const int c2s_resp_tag = 1 << 1;
         private const int s2c_req_tag = 1 << 2;
         private const int s2c_resp_tag = 1 << 3;
 
-        private Dictionary<string, RespAction> response = new Dictionary<string, RespAction>();
-        private Dictionary<string, ReqAction> request = new Dictionary<string, ReqAction>();
-        private Dictionary<string, ReqPg> request_pg = new Dictionary<string, ReqPg>();      /*protocal -> pg */
-        private Dictionary<string, RespPg> response_pg = new Dictionary<string, RespPg>();   /*protocal -> pg */
+        private Request _request = null;
+        private Response _response = null;
+        private Dictionary<string, ReqCb> _req = new Dictionary<string, ReqCb>();
+        private Dictionary<string, RspCb> _rsp = new Dictionary<string, RspCb>();
+
+        private Dictionary<string, ReqPg> _reqPg = new Dictionary<string, ReqPg>();
+        private Dictionary<string, RspPg> _rspPg = new Dictionary<string, RspPg>();
 
         public ClientSocket(Context ctx)
         {
             _ctx = ctx;
 
-            host = new SprotoRpc(S2cProtocol.Instance);
-            send_request = host.Attach(C2sProtocol.Instance);
-            sock.OnConnect = OnConnect;
-            sock.OnRecvive = OnRecvive;
-            sock.OnDisconnect = OnDisconnect;
-            sock.SetEnabledPing(true);
-            sock.SetPackageSocketType(PackageSocketType.Header);
+            _tcp.OnConnect = OnConnect;
+            _tcp.OnRecvive = OnRecvive;
+            _tcp.OnDisconnect = OnDisconnect;
+            _tcp.SetEnabledPing(true);
+            _tcp.SetPackageSocketType(PackageSocketType.Header);
+
+            _host = new SprotoRpc(S2cProtocol.Instance);
+            _sendRequest = _host.Attach(C2sProtocol.Instance);
+
+            _request = new Request(_ctx);
+            _response = new Response(_ctx);
             RegisterProtocol();
         }
 
         // Use this for initialization
         public void Start()
         {
-            
         }
 
         // Update is called once per frame
         public void Update()
         {
-            sock.Update();
+            _tcp.Update();
         }
 
         private void DoAuth()
         {
             byte[] token = WriteToken();
-            byte[] hmac = Crypt.base64encode(Crypt.hmac64(Crypt.hashkey(token), user.Secret));
+            byte[] hmac = Crypt.base64encode(Crypt.hmac64(Crypt.hashkey(token), _user.Secret));
             byte[] tmp = new byte[token.Length + hmac.Length + 1];
             Array.Copy(token, 0, tmp, 0, token.Length);
             tmp[token.Length] = Encoding.ASCII.GetBytes(":")[0];
             Array.Copy(hmac, 0, tmp, token.Length + 1, hmac.Length);
-            sock.Send(tmp, 0, tmp.Length);
-            step++;
+            _tcp.Send(tmp, 0, tmp.Length);
+            _step++;
         }
 
         public void OnConnect(bool connected)
         {
             if (connected)
             {
-                if (handshake)
+                if (_handshake)
                     DoAuth();
             }
             else
             {
-                Auth(ip, port, user, ud, null);
+                Auth(_ip, _port, _user, null);
             }
         }
 
@@ -127,26 +122,26 @@ namespace Maria.Network
         {
             if (length <= 0)
                 return;
-            if (handshake)
+            if (_handshake)
             {
                 byte[] buffer = new byte[length];
                 Array.Copy(data, start, buffer, 0, length);
-                if (step == 1)
+                if (_step == 1)
                 {
-                    step = 0;
-                    handshake = false;
+                    _step = 0;
+                    _handshake = false;
                     string str = Encoding.ASCII.GetString(buffer);
                     int code = Int32.Parse(str.Substring(0, 3));
                     string msg = str.Substring(4);
                     if (code == 200)
                     {
                         Debug.Log(string.Format("{0},{1}", code, msg));
-                        callback(true, ud, user.Subid, user.Secret);
+                        _callback(true, _user.Subid, _user.Secret);
                     }
                     else
                     {
                         Debug.LogError(string.Format("error code : {0}, {1}", code, msg));
-                        callback(false, ud, user.Subid, user.Secret);
+                        _callback(false, _user.Subid, _user.Secret);
                     }
                 }
             }
@@ -163,36 +158,28 @@ namespace Maria.Network
                 Array.Copy(data, start, buffer, 0, length - 5);
                 if (tag == c2s_resp_tag)
                 {
-                    SprotoRpc.RpcInfo sinfo = host.Dispatch(buffer);
+                    SprotoRpc.RpcInfo sinfo = _host.Dispatch(buffer);
                     Debug.Assert(sinfo.type == SprotoRpc.RpcType.RESPONSE);
                     Debug.Assert(sinfo.session != null);
                     Debug.Assert(sinfo.session == session);
-                    string key = id_to_hex(session);
-                    RespPg pg = response_pg[key];
-                    var rpc = response[pg.Protocol];
-                    rpc.Action(session, sinfo.responseObj, rpc.Ud);
+                    string key = idToHex(session);
+                    RspPg pg = _rspPg[key];
+                    var cb = _rsp[pg.Protocol];
+                    cb(session, sinfo.responseObj);
                 }
                 else if (tag == s2c_req_tag)
                 {
-                    SprotoRpc.RpcInfo sinfo = host.Dispatch(buffer);
+                    SprotoRpc.RpcInfo sinfo = _host.Dispatch(buffer);
                     Debug.Assert(sinfo.type == SprotoRpc.RpcType.REQUEST);
                     Debug.Assert(sinfo.session != null);
                     Debug.Assert(sinfo.session == session);
                     Debug.Assert(sinfo.tag != null);
 
-                    /**********************************/
-                    string key = id_to_hex(session);
-                    ReqPg pg = new ReqPg();
-                    pg.Session = session;
-                    pg.Protocol = sinfo.ToString();
-                    pg.Index = index;
-                    pg.Buffer = buffer;
-                    pg.Version = 0;
-                    request_pg[key] = pg;
-
-                    /************************************/
-                    var rpc = request[pg.Protocol];
-                    rpc.Action(session, sinfo.requestObj, sinfo.Response, rpc.Ud);
+                    // 新建一个请求包
+                    var cb = _req[sinfo.ToString()];
+                    SprotoTypeBase rsp = cb(session, sinfo.requestObj);
+                    byte[] d = sinfo.Response(rsp);
+                    Write(d, session, s2c_resp_tag);
                 }
             }
         }
@@ -203,10 +190,10 @@ namespace Maria.Network
 
         private byte[] WriteToken()
         {
-            string u = Encoding.ASCII.GetString(Crypt.base64encode(user.Uid));
-            string s = Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(user.Server)));
-            string sid = Encoding.ASCII.GetString(Crypt.base64encode(user.Subid));
-            string token = string.Format("{0}@{1}#{2}:{3}", u, s, sid, index);
+            string u = Encoding.ASCII.GetString(Crypt.base64encode(_user.Uid));
+            string s = Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(_user.Server)));
+            string sid = Encoding.ASCII.GetString(Crypt.base64encode(_user.Subid));
+            string token = string.Format("{0}@{1}#{2}:{3}", u, s, sid, _index);
             Debug.Log(token);
             return Encoding.ASCII.GetBytes(token);
         }
@@ -222,7 +209,7 @@ namespace Maria.Network
             return r;
         }
 
-        private void Wirte(byte[] buffer, uint session, byte tag)
+        private void Write(byte[] buffer, uint session, byte tag)
         {
             int l = buffer.Length + 5;
             byte[] tmp = new byte[l];
@@ -234,31 +221,36 @@ namespace Maria.Network
             }
             Array.Copy(s, 0, tmp, buffer.Length, 4);
             tmp[l - 1] = tag;
-            sock.Send(tmp, 0, l);
+            _tcp.Send(tmp, 0, l);
         }
 
-        private void Send(object ud, uint id, byte[] buffer, string protocol)
+        public void SendReq<T>(string name, SprotoTypeBase obj)
         {
-            RespPg pg = new RespPg();
+            uint id = genSession();
+            byte[] d = _sendRequest.Invoke<T>(obj, id);
+            Debug.Assert(d != null);
+
+            RspPg pg = new RspPg();
             pg.Session = id;
-            pg.Buffer = buffer;
-            pg.Index = index;
-            pg.Protocol = protocol;
-            pg.Version = 0;
-            string key = id_to_hex(id);
-            response_pg[key] = pg;
-            Wirte(buffer, id, c2s_req_tag);
+            pg.Buffer = d;
+            pg.Index = _index;
+            pg.Protocol = name;
+            pg.Version = _version;
+            string key = idToHex(id);
+            _rspPg[key] = pg;
+
+            Write(d, id, c2s_req_tag);
         }
 
         private uint genSession()
         {
-            ++session;
-            if (session == 0)
-                session++;
-            return session;
+            ++_session;
+            if (_session == 0)
+                _session++;
+            return _session;
         }
 
-        private string id_to_hex(uint id)
+        private string idToHex(uint id)
         {
             byte[] tmp = new byte[9];
             byte[] hex = new byte[16] { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70 };
@@ -270,60 +262,29 @@ namespace Maria.Network
             return Encoding.ASCII.GetString(tmp);
         }
 
-        public void Auth(string ipstr, int pt, User u, object d, CB cb)
+        public void Auth(string ipstr, int pt, User u, CB cb)
         {
-            index++;   // index increment.
-            ip = ipstr;
-            port = pt;
-            user = u;
-            ud = u;
-            callback = cb;
-            handshake = true;
-            sock.Connect(ip, port);
+            _index++;   // index increment.
+            _ip = ipstr;
+            _port = pt;
+            _user = u;
+            _callback = cb;
+            _handshake = true;
+            _tcp.Connect(_ip, _port);
         }
 
         public void Reset()
         {
-            user = null;
-            step = 0;
-            ud = null;
-            callback = null;
-            handshake = false;
+            _user = null;
+            _step = 0;
+            _callback = null;
+            _handshake = false;
         }
 
         private void RegisterProtocol()
         {
-            /*********************************/
-            response["role_info"] = new RespAction { Action = role_info, Ud = null };
-
-            /*********************************/
-            request["finish_achi"] = new ReqAction { Action = finish_achi, Ud = null };
-        }
-
-        public void send_role_info(Dictionary<string, object> args)
-        {
-            C2sSprotoType.role_info.request requestObj = new C2sSprotoType.role_info.request();
-            requestObj.role_id = (Int32)args["role_id"];
-            uint id = genSession();
-            byte[] req = send_request.Invoke<C2sProtocol.role_info>(requestObj, id);
-            Debug.Assert(req != null);
-            Send(null, id, req, "role_info");
-        }
-
-        public void role_info(uint session, SprotoTypeBase o, object ud)
-        {
-            C2sSprotoType.role_info.response responseObj = (C2sSprotoType.role_info.response)o;
-            // TODO:
-        }
-
-        public void finish_achi(uint session, SprotoTypeBase requestObj, SprotoRpc.ResponseFunction Response, object ud)
-        {
-            // TODO:
-
-            Debug.Assert(Response != null);
-            S2cSprotoType.finish_achi.response responseObj = new finish_achi.response();
-            byte[] resp = Response(responseObj);
-            Wirte(resp, session, s2c_resp_tag);
+            RegisterResponse();
+            RegisterRequest();
         }
 
         /// <summary>
@@ -331,9 +292,9 @@ namespace Maria.Network
         /// </summary>
         /// <param name="req"></param>
         /// <param name="str"></param>
-        public void RegisterResponse(ReqCb req, String str, object ud)
+        private void RegisterResponse()
         {
-            request[str] = new ReqAction { Action = req, Ud = ud };
+            _rsp["role_info"] = _response.role_info;
         }
 
         /// <summary>
@@ -341,58 +302,16 @@ namespace Maria.Network
         /// </summary>
         /// <param name="req"></param>
         /// <param name="str"></param>
-        public void RegisterRequest(RespCb resp, String str)
+        private void RegisterRequest()
         {
-            if (response.ContainsKey(str))
-            {
-                if (request.ContainsKey(str))
-                {
-                    response[str].Ud = resp;
-                }
-                else
-                {
-                    response.Add(str, new RespAction { Action = resp, Ud = ud });
-                }
-            }
+            _req["role_info"] = _request.role_info;
         }
 
-        /// <summary>
-        /// 发送请求
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="resp"></param>
-        /// <param name="requestObj"></param>
-        /// <param name="str"></param>
-        /// <param name="ud"></param>
-        public void Resquest<T>(RespCb resp, SprotoTypeBase requestObj, String str, object ud)
+        public void send_role_info(Dictionary<string, object> args)
         {
-            //request[str].Ud = new RespAction { Action = resp,Ud = ud};
-            RegisterRequest(resp, str);
-            SendReq<T>(str, requestObj);
-        }
-        /// <summary>
-        /// 发送推送后的结果
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="requestObj"></param>
-        /// <param name="response"></param>
-        /// <param name="ud"></param>
-        public void Response(uint session, SprotoTypeBase requestObj, SprotoRpc.ResponseFunction response, object ud)
-        {
-            Debug.Assert(response != null);
-            SendResp(requestObj, response);
-        }
-        public void SendReq<T>(String callback, SprotoTypeBase obj)
-        {
-            uint id = genSession();
-            byte[] req = send_request.Invoke<T>(obj, id);
-            Debug.Assert(req != null);
-            Send(null, id, req, callback);
-        }
-        public void SendResp(SprotoTypeBase requestObj, SprotoRpc.ResponseFunction Response)
-        {
-            byte[] resp = Response(requestObj);
-            Wirte(resp, session, s2c_resp_tag);
+            C2sSprotoType.role_info.request requestObj = new C2sSprotoType.role_info.request();
+            requestObj.role_id = (Int32)args["role_id"];
+            SendReq<C2sProtocol.role_info>("role_info", requestObj);
         }
     }
 }

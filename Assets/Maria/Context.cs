@@ -15,11 +15,14 @@ namespace Maria
         protected Dictionary<string, Controller> _hash = new Dictionary<string, Controller>();
         protected ClientLogin _login = null;
         protected ClientSocket _client = null;
+        protected Gate _gate = null;
 
         public Context()
         {
             _worker = new Thread(new ThreadStart(Worker));
             _worker.Start();
+
+            _gate = new Gate(this);
 
             _login = new ClientLogin(this);
             _client = new ClientSocket(this);
@@ -50,6 +53,8 @@ namespace Maria
         {
             while (true)
             {
+                _gate.Run();
+
                 Message msg = null;
                 lock (_queue)
                 {
