@@ -10,10 +10,17 @@ namespace Maria.App
 {
     class LoginController : Controller
     {
+        private GameObject _scene = null;
+
         public LoginController(Context ctx) : base(ctx)
         {
         }
 
+        public void Enter()
+        {
+            _scene = GameObject.Find("Root");
+        }
+        
         public void Login(string username, string password)
         {
             //C2sSprotoType.role_info.request requestObj = new C2sSprotoType.role_info.request();

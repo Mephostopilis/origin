@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace Maria.App
 {
@@ -11,9 +12,11 @@ namespace Maria.App
         private int _type;
         private int _num;
         private int _idx;
+        private GameObject _go = null;
 
-        public Card(int v)
+        public Card(int v, GameObject go)
         {
+            _go = go;
             _value = v;
         }
 
@@ -25,6 +28,10 @@ namespace Maria.App
         public int GetIdx()
         {
             return _idx;
+        }
+
+        public void SetPosition()
+        {
         }
     }
 }

@@ -7,6 +7,7 @@ public class App : MonoBehaviour
 {
     private AppContext _ctx = new AppContext();
     private Stack<GameObject> _stack = new Stack<GameObject>();
+    public GameObject _stackGo = null;
     public GameObject _cur = null;
 
     // Use this for initialization
@@ -31,7 +32,9 @@ public class App : MonoBehaviour
 
     public void Push(string name)
     {
+        _cur.transform.SetParent(_stackGo.transform);
         _cur.SetActive(false);
+        _stack.Push(_cur);
 
         string path = "Prefabs/Ball/";
         string pathname = path + name;
@@ -51,6 +54,7 @@ public class App : MonoBehaviour
         if (_stack.Count > 0)
         {
             transform.DetachChildren();
+            Destroy(_cur);
 
             GameObject go = _stack.Pop();
             _cur = go;

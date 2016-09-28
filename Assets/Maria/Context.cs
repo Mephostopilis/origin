@@ -5,7 +5,6 @@ using Maria.Network;
 using System;
 using Sproto;
 using Maria.Ball;
-using Maria.Encrypt;
 using System.Text;
 
 namespace Maria
@@ -20,9 +19,12 @@ namespace Maria
         protected Gate _gate = null;
         protected User _user = new User();
         private ClientLogin.CB _loginCb;
+        protected  App _app;
 
-        public Context()
+        public Context(App app)
         {
+            _app = app;
+
             _worker = new Thread(new ThreadStart(Worker));
             _worker.Start();
 
