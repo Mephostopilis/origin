@@ -6,15 +6,16 @@ using Maria.Network;
 
 namespace Maria.Ball
 {
-    class AppContext : Context
+    public class AppContext : Context
     {
         
         public AppContext()
             : base()
         {
-            this.TimeSync = new TimeSync();
+            TimeSync = new TimeSync();
         }
 
         public TimeSync TimeSync { get; set; }
+        
     }
 }

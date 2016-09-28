@@ -1,0 +1,28 @@
+﻿  lua-crypt.c
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(409): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(390): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(430): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(442): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(453): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(462): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(469): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(530): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(544): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(560): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(711): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(810): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(829): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(842): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(857): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(873): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(935): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(963): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(976): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(987): warning C4267: “=”: 从“size_t”转换到“int32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lua-crypt.c(918): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  lsha1.c
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lsha1.c(198): warning C4267: “+=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+d:\git\origin\assets\maria\encrypt\plugins\crypt\lsha1.c(199): warning C4267: “+=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  正在生成代码...
+    正在创建库 D:\git\origin\Assets\Maria\Encrypt\Plugins\crypt\x64\Debug\crypt.lib 和对象 D:\git\origin\Assets\Maria\Encrypt\Plugins\crypt\x64\Debug\crypt.exp
+  crypt.vcxproj -> D:\git\origin\Assets\Maria\Encrypt\Plugins\crypt\x64\Debug\crypt.dll

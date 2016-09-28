@@ -6,12 +6,13 @@ using Sproto;
 using S2cSprotoType;
 using System.Net.Sockets;
 using Maria.Encrypt;
+using Maria.Ball;
 
 namespace Maria.Network
 {
     public class ClientSocket
     {
-        public delegate void CB(bool ok, byte[] subid, byte[] secret);
+        public delegate void CB(bool ok);
 
         public delegate void RspCb(uint session, SprotoTypeBase responseObj);
         public delegate SprotoTypeBase ReqCb(uint session, SprotoTypeBase requestObj);
@@ -71,7 +72,7 @@ namespace Maria.Network
             _tcp.OnConnect = OnConnect;
             _tcp.OnRecvive = OnRecvive;
             _tcp.OnDisconnect = OnDisconnect;
-            _tcp.SetEnabledPing(true);
+            _tcp.SetEnabledPing(false);
             _tcp.SetPackageSocketType(PackageSocketType.Header);
 
             _host = new SprotoRpc(S2cProtocol.Instance);
@@ -128,20 +129,24 @@ namespace Maria.Network
                 Array.Copy(data, start, buffer, 0, length);
                 if (_step == 1)
                 {
-                    _step = 0;
-                    _handshake = false;
                     string str = Encoding.ASCII.GetString(buffer);
                     int code = Int32.Parse(str.Substring(0, 3));
                     string msg = str.Substring(4);
                     if (code == 200)
                     {
+                        _step = 0;
+                        _handshake = false;
+                        _tcp.SetEnabledPing(true);
                         Debug.Log(string.Format("{0},{1}", code, msg));
-                        _callback(true, _user.Subid, _user.Secret);
+                        _callback(true);
                     }
                     else
                     {
+                        Debug.Assert(false);
+                        _step = 0;
+                        DoAuth();
                         Debug.LogError(string.Format("error code : {0}, {1}", code, msg));
-                        _callback(false, _user.Subid, _user.Secret);
+                        _callback(false);
                     }
                 }
             }

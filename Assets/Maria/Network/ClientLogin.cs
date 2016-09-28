@@ -8,33 +8,30 @@ namespace Maria.Network
 {
     public class ClientLogin
     {
-        public delegate void CB(bool ok, object ud, byte[] secret, string dummy);
+        public delegate void CB(bool ok, byte[] _secret, string dummy);
 
         private Context _ctx;
-        private PackageSocket sock = new PackageSocket();
-        private string ip = String.Empty;
-        private int port = 0;
-        private string server = null;
-        private string user = null;
-        private string password = null;
-        private byte[] challenge = null;
-        private byte[] clientkey = null;
-        private byte[] secret = null;
-        private byte[] uid = null;
-        private byte[] subid = null;
-        private int step = 0;
-        private bool handshake = false;
-        private object ud = null;
-        private CB callback = null;
+        private PackageSocket _sock = new PackageSocket();
+        private string _ip = String.Empty;
+        private int _port = 0;
+        private string _server = null;
+        private string _user = null;
+        private string _password = null;
+        private byte[] _challenge = null;
+        private byte[] _clientkey = null;
+        private byte[] _secret = null;
+        private int _step = 0;
+        private bool _handshake = false;
+        private CB _callback = null;
 
         public ClientLogin(Context ctx)
         {
             _ctx = ctx;
-            sock.OnConnect = OnConnect;
-            sock.OnDisconnect = OnDisconnect;
-            sock.OnRecvive = OnRecvive;
-            sock.SetEnabledPing(false);
-            sock.SetPackageSocketType(PackageSocketType.Line);
+            _sock.OnConnect = OnConnect;
+            _sock.OnDisconnect = OnDisconnect;
+            _sock.OnRecvive = OnRecvive;
+            _sock.SetEnabledPing(false);
+            _sock.SetPackageSocketType(PackageSocketType.Line);
         }
 
         // Use this for initialization
@@ -45,48 +42,52 @@ namespace Maria.Network
         // Update is called once per frame
         public void Update()
         {
-            sock.Update();
+            _sock.Update();
         }
 
         void OnConnect(bool connected)
         {
-            if (handshake)
-                step++;
+            if (_handshake)
+                _step++;
         }
 
         void OnRecvive(byte[] data, int start, int length)
         {
             byte[] buffer = new byte[length];
             Array.Copy(data, start, buffer, 0, length);
-            if (step == 1)
+            if (_step == 1)
             {
-                challenge = Crypt.base64decode(buffer);
-                clientkey = Crypt.randomkey();
-                var buf = Crypt.base64encode(Crypt.dhexchange(clientkey));
-                sock.SendLine(buf, 0, buf.Length);
-                step++;
+                _challenge = Crypt.base64decode(buffer);
+                _clientkey = Crypt.randomkey();
+                var buf = Crypt.base64encode(Crypt.dhexchange(_clientkey));
+                _sock.SendLine(buf, 0, buf.Length);
+                _step++;
             }
-            else if (step == 2)
+            else if (_step == 2)
             {
                 byte[] key = Crypt.base64decode(buffer);
-                secret = Crypt.dhsecret(key, clientkey);
-                Debug.Log("sceret is " + Encoding.ASCII.GetString(Crypt.hexencode(secret)));
-                byte[] hmac = Crypt.hmac64(challenge, secret);
+                _secret = Crypt.dhsecret(key, _clientkey);
+                Debug.Log("sceret is " + Encoding.ASCII.GetString(Crypt.hexencode(_secret)));
+                byte[] hmac = Crypt.hmac64(_challenge, _secret);
                 var buf = Crypt.base64encode(hmac);
-                sock.SendLine(buf, 0, buf.Length);
-                WriteToke(server, user, password);
-                step++;
+                _sock.SendLine(buf, 0, buf.Length);
+                WriteToke(_server, _user, _password);
+                _step++;
             }
-            else if (step == 3)
+            else if (_step == 3)
             {
                 string str = Encoding.ASCII.GetString(buffer);
                 int code = Int32.Parse(str.Substring(0, 3));
                 string msg = str.Substring(4);
                 if (code == 200)
                 {
-                    callback(true, ud, secret, msg);
-                    handshake = false;
-                    sock.Close();
+                    byte[] buf = Encoding.ASCII.GetBytes(msg);
+                    buf = Crypt.base64decode(buf);
+                    string pg = Encoding.ASCII.GetString(buf);
+
+                    _callback(true, _secret, pg);
+                    _handshake = false;
+                    _sock.Close();
                     Reset();
                 }
                 else
@@ -94,67 +95,64 @@ namespace Maria.Network
                     Debug.LogError(string.Format("error code : {0}, {1}", code, msg));
                     if (code == 406)
                     {
-                        callback(true, ud, secret, msg);
+                        _callback(true, _secret, msg);
                     }
                     else
                     {
-                        callback(false, ud, secret, msg);
+                        _callback(false, _secret, msg);
                     }
 
-                    handshake = false;
-                    sock.Close();
+                    _handshake = false;
+                    _sock.Close();
                     Reset();
                 }
             }
         }
 
-        void OnDisconnect(SocketError socketError, PackageSocketError packageSocketError)
+        void OnDisconnect(SocketError _socketError, PackageSocketError packageSocketError)
         {
-            if (handshake)
+            if (_handshake)
             {
-                callback(false, ud, secret, string.Empty);
+                _callback(false, _secret, string.Empty);
                 Reset();
             }
         }
 
-        protected void WriteToke(string server, string user, string password)
+        protected void WriteToke(string _server, string _user, string _password)
         {
-            string str = String.Format("{0}@{1}:{2}", Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(user))),
-                Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(server))),
-                Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(password))));
-            byte[] etoken = Crypt.desencode(secret, Encoding.ASCII.GetBytes(str));
+            string str = String.Format("{0}@{1}:{2}", Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(_user))),
+                Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(_server))),
+                Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(_password))));
+            byte[] etoken = Crypt.desencode(_secret, Encoding.ASCII.GetBytes(str));
             byte[] b = Crypt.base64encode(etoken);
-            sock.SendLine(b, 0, b.Length);
+            _sock.SendLine(b, 0, b.Length);
         }
 
         private void Reset()
         {
-            ip = null;
-            port = 0;
-            server = null;
-            user = null;
-            password = null;
-            challenge = null;
-            clientkey = null;
-            secret = null;
-            subid = null;
-            step = 0;
-            handshake = false;
-            ud = null;
-            callback = null;
+            _ip = null;
+            _port = 0;
+            _server = null;
+            _user = null;
+            _password = null;
+            _challenge = null;
+            _clientkey = null;
+            _secret = null;
+            _step = 0;
+            _handshake = false;
+            _callback = null;
         }
 
-        public void Auth(string ipstr, int pt, string s, string u, string pwd, object d, CB cb)
+        public void Auth(string ipstr, int pt, string s, string u, string pwd, CB cb)
         {
-            ip = ipstr;
-            port = pt;
-            server = s;
-            user = u;
-            password = pwd;
-            ud = d;
-            callback = cb;
-            handshake = true;
-            sock.Connect(ip, port);
+            _ip = ipstr;
+            _port = pt;
+            _server = s;
+            _user = u;
+            _password = pwd;
+            _callback = cb;
+            _handshake = true;
+            _sock.Connect(_ip, _port);
         }
     }
 

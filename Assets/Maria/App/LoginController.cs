@@ -24,9 +24,9 @@ namespace Maria.App
 
         public void LoginCallback()
         {
-            var go = GameObject.Find("LoginScene");
-            var co = go.GetComponent<LoginSceneBehaviourScript>();
-            co.CloseLogin();
+            //var go = GameObject.Find("LoginScene");
+            //var co = go.GetComponent<LoginSceneBehaviourScript>();
+            //co.CloseLogin();
         }
     }
 }

@@ -1,13 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Maria.Network
 {
-    class TimeSync
+    public class TimeSync
     {
+        public class Lag
+        {
+            public int L { get; set; }
+            public double E { get; set; }
+        }
+
         private ulong _startTime = 0;
         private int _timeElapse = 0;
         private int _timeShift = 0;
@@ -30,15 +33,21 @@ namespace Maria.Network
             return t;
         }
 
-        public ulong LocalTime()
+        public int LocalTime()
         {
             ulong ct = GetTime();
-            return ct - _startTime;
+            return (int)(ct - _startTime);
         }
 
-        public ulong[] Sync(int requestTime, int globalTime)
+        /// <summary>
+        /// 更正globaltime
+        /// </summary>
+        /// <param name="requestTime">c2s时候的localtime</param>
+        /// <param name="globalTime">s的</param>
+        /// <returns></returns>
+        public Lag Sync(int requestTime, int globalTime)
         {
-            ulong[] res = new ulong[2];
+            Lag res = new Lag();
             ulong now = GetTime();
             int localTime = (int)(now - _startTime);
             int lag = (int)(localTime - requestTime);
@@ -82,14 +91,21 @@ namespace Maria.Network
                     }
                 }
             }
-            res[0] = (ulong)lag / 2;
-            res[1] = (ulong)( _timeShift / _timeElapse);
+            res.L = lag / 2;
+            if (_timeShift == 0 || _timeElapse <= 0)
+            {
+                res.E = 0;
+            }
+            else
+            {
+                res.E = (double)(_timeShift / _timeElapse);
+            }
             return res;
         }
 
-        public ulong[] GlobalTime()
+        public int[] GlobalTime()
         {
-            ulong[] res = new ulong[2];
+            int[] res = new int[2];
             if (_timeElapse < 0)
             {
                 return res;
@@ -98,8 +114,8 @@ namespace Maria.Network
             int localTime = (int)(now - _startTime);
             int lag = (_estimateTo - _estimateFrom) / 2;
             int estimate = _estimateFrom + lag + (localTime - _timeSync);
-            res[0] = (ulong)estimate;
-            res[1] = (ulong)lag;
+            res[0] = estimate;
+            res[1] = lag;
             return res;
         }
 
