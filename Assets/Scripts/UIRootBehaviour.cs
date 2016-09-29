@@ -5,12 +5,11 @@ using Maria.Ball;
 
 public class UIRootBehaviour : MonoBehaviour
 {
-
-    public App _app;
     //public GameObject _startPanel;
     public GameObject _signupPanel;
     public GameObject _loginPanel;
 
+    private App _app = null;
     private string _username = null;
     private string _password = null;
 
@@ -46,8 +45,9 @@ public class UIRootBehaviour : MonoBehaviour
         {
             return;
         }
-        AppContext ctx = _app.AppContext;
         string server = "sample";
+        InitApp();
+        AppContext ctx = _app.AppContext;
         ctx.AuthLogin(server, username, password, OnLoginCallback);
     }
 
@@ -55,7 +55,9 @@ public class UIRootBehaviour : MonoBehaviour
     {
         if (ok)
         {
-            _app.Push("GameScene");
+            InitApp();   
+            AppContext ctx = _app.AppContext;
+            ctx.Push("game");
         }
         else
         {
@@ -106,6 +108,15 @@ public class UIRootBehaviour : MonoBehaviour
             //GameObject.Find("AccountIF").GetComponent<InputField>().text = string.Empty;
             //GameObject.Find("PwdIF").GetComponent<InputField>().text = string.Empty;
             //GameObject.Find("CfmPwdIF").GetComponent<InputField>().text = string.Empty;
+        }
+    }
+
+    private void InitApp()
+    {
+        if (_app == null)
+        {
+            _app = GameObject.Find("App").GetComponent<App>();
+            Debug.Assert(_app != null);
         }
     }
 }

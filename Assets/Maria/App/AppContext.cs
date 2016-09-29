@@ -13,8 +13,8 @@ namespace Maria.App
         private Assets _assets = new Assets();
         private GameObject _cardsParent = null;
 
-        public AppContext()
-            : base()
+        public AppContext(global::App app)
+            : base(app)
         {
             GameController gctl = new GameController(this);
             _hash["game"] = gctl;

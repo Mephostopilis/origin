@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 namespace Maria
 {
     public class Controller
     {
         protected Context _ctx = null;
+        protected GameObject _scene = null;
 
         public Controller(Context ctx)
         {
@@ -14,13 +16,42 @@ namespace Maria
         }
 
         // Use this for initialization
-        void start()
+        internal void start()
         {
 
         }
 
         // Update is called once per frame
-        void update()
+        internal void update()
+        {
+
+        }
+
+        protected void LoadScene(string name)
+        {
+            //SceneManager.LoadScene(name);
+            SceneManager.LoadSceneAsync(name);
+            _scene = GameObject.Find("Root");
+        }
+
+        public GameObject InitScene()
+        {
+            if (_scene == null)
+            {
+                _scene = GameObject.Find("Root");
+                Debug.Assert(_scene != null);
+            }
+            var com = _scene.GetComponent<RootBehaviour>();
+            com.OnEnter(_ctx, this);
+            return _scene;
+        }
+
+        public virtual void Enter()
+        {
+
+        }
+
+        public virtual void Exit()
         {
 
         }

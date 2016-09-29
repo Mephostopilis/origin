@@ -12,7 +12,7 @@ namespace Maria.Network
 {
     public class ClientSocket
     {
-        public delegate void CB(bool ok);
+        public delegate void CB(int ok);
 
         public delegate void RspCb(uint session, SprotoTypeBase responseObj);
         public delegate SprotoTypeBase ReqCb(uint session, SprotoTypeBase requestObj);
@@ -138,7 +138,13 @@ namespace Maria.Network
                         _handshake = false;
                         _tcp.SetEnabledPing(true);
                         Debug.Log(string.Format("{0},{1}", code, msg));
-                        _callback(true);
+                        _callback(code);
+                    }
+                    else if (code == 403)
+                    {
+                        _step = 0;
+                        _handshake = false;
+                        _callback(code);
                     }
                     else
                     {
@@ -146,7 +152,7 @@ namespace Maria.Network
                         _step = 0;
                         DoAuth();
                         Debug.LogError(string.Format("error code : {0}, {1}", code, msg));
-                        _callback(false);
+                        _callback(code);
                     }
                 }
             }
@@ -269,6 +275,7 @@ namespace Maria.Network
 
         public void Auth(string ipstr, int pt, User u, CB cb)
         {
+            _step = 0;
             _index++;   // index increment.
             _ip = ipstr;
             _port = pt;
@@ -317,6 +324,11 @@ namespace Maria.Network
             C2sSprotoType.role_info.request requestObj = new C2sSprotoType.role_info.request();
             requestObj.role_id = (Int32)args["role_id"];
             SendReq<C2sProtocol.role_info>("role_info", requestObj);
+        }
+
+        public void AuthUdp()
+        {
+
         }
     }
 }

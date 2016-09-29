@@ -10,5 +10,16 @@ namespace Maria.Ball
         public GameController(Context ctx) : base(ctx)
         {
         }
+
+        public override void Enter()
+        {
+            base.Enter();
+            LoadScene("game");
+        }
+
+        public override void Exit()
+        {
+            base.Exit();
+        }
     }
 }

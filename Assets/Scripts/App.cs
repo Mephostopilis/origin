@@ -5,22 +5,27 @@ using System.Collections.Generic;
 
 public class App : MonoBehaviour
 {
-    private AppContext _ctx = new AppContext();
+    private AppContext _ctx = null;
     private Stack<GameObject> _stack = new Stack<GameObject>();
     public GameObject _stackGo = null;
     public GameObject _cur = null;
+    private GameObject _root = null;
 
     // Use this for initialization
     void Start()
     {
-  
+        DontDestroyOnLoad(this);
+        _ctx = new AppContext(this);
     }
 
     // Update is called once per frame
     void Update()
     {
         float deltaTime = Time.deltaTime;
-        _ctx.Update(deltaTime);
+        if (_ctx != null)
+        {
+            _ctx.Update(deltaTime);
+        }
     }
 
     public T GetController<T>(string name) where T : Controller

@@ -11,6 +11,15 @@ namespace Maria
         {
         }
 
+        public override void Enter()
+        {
+            base.Enter();
+            LoadScene("login");
+        }
 
+        public override void Exit()
+        {
+            base.Exit();
+        }
     }
 }

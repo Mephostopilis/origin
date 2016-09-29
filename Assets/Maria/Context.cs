@@ -6,22 +6,37 @@ using System;
 using Sproto;
 using Maria.Ball;
 using System.Text;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 namespace Maria
 {
     public class Context
     {
+        private class Timer
+        {
+            public string Name { get; set; }
+            public float CD { get; set; }
+            public CountdownCb CB { get; set; }
+        }
+
+        public delegate void CountdownCb();
+
         protected Thread _worker = null;
         protected Queue<Message> _queue = new Queue<Message>();
         protected Dictionary<string, Controller> _hash = new Dictionary<string, Controller>();
+        protected Stack<Controller> _stack = new Stack<Controller>();
+        protected Controller _cur;
         protected ClientLogin _login = null;
         protected ClientSocket _client = null;
         protected Gate _gate = null;
         protected User _user = new User();
         private ClientLogin.CB _loginCb;
-        protected  App _app;
+        protected readonly global::App _app;
+        private Dictionary<string, Timer> _timer = new Dictionary<string, Timer>();
 
-        public Context(App app)
+
+        public Context(global::App app)
         {
             _app = app;
 
@@ -34,6 +49,11 @@ namespace Maria
             _client = new ClientSocket(this);
 
             Config = new Config();
+
+            _hash["start"] = new StartController(this);
+
+            Push("start");
+
         }
 
         // Use this for initialization
@@ -45,11 +65,42 @@ namespace Maria
         // Update is called once per frame
         public void Update(float delta)
         {
+
             _login.Update();
             _client.Update();
+
+            foreach (var item in _timer)
+            {
+                Timer tm = item.Value as Timer;
+                if (tm != null)
+                {
+                    if (tm.CD > 0)
+                    {
+                        Debug.Log(tm.CD);
+                        tm.CD -= delta;
+                        if (tm.CD < 0)
+                        {
+                            tm.CB();
+                            //_timer.Remove()
+                            //_timer.Remove(tm.Name);
+                        }
+                    }
+                    else
+                    {
+                        //_timer.Remove(tm.Name);
+                    }
+                }
+            }
+
+            if (_cur != null)
+            {
+                _cur.update();
+            }
         }
 
         public Config Config { get; set; }
+
+        public global::App App { get { return _app; } }
 
         public void Enqueue(Message msg)
         {
@@ -132,10 +183,40 @@ namespace Maria
             }
         }
 
-        public void AuthGateCB(bool ok)
+        public void AuthGateCB(int ok)
         {
-            string dummy = string.Empty;
-            _loginCb(ok, _user.Secret, dummy);
+            if (ok == 200)
+            {
+                string dummy = string.Empty;
+                _loginCb(true, _user.Secret, dummy);
+            }
+            else if (ok == 403)
+            {
+                AuthLogin(_user.Server, _user.Username, _user.Password, _loginCb);
+            }
+        }
+
+        public void AuthUdp()
+        {
+            //_client.au
+        }
+
+        public void Push(string name)
+        {
+            var ctr = _hash[name];
+            Debug.Assert(ctr != null);
+            _stack.Push(ctr);
+            _cur = ctr;
+            _cur.Enter();
+        }
+
+        public void Countdown(string name, float cd, CountdownCb cb)
+        {
+            var tm = new Timer();
+            tm.Name = name;
+            tm.CD = cd;
+            tm.CB = cb;
+            _timer[name] = tm;
         }
     }
 }
