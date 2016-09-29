@@ -61,7 +61,6 @@ namespace Maria.Network
 
         private bool IsEnabledPing;
         private PackageSocketType PgType = PackageSocketType.None;
-        private int id;
 
         const int MaxSizePerSend = 1024 * 4;
 

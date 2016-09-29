@@ -28,9 +28,7 @@ namespace Maria.Network
         {
             ulong t = 0;
             DateTime dt = DateTime.Now;
-            t = (ulong)dt.Second * 100;
-            t += (ulong)dt.Millisecond / 10;
-            return t;
+            return (ulong)(dt.Ticks / 10 / 1000 / 10);
         }
 
         public int LocalTime()

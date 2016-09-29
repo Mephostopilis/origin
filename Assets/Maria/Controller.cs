@@ -22,7 +22,7 @@ namespace Maria
         }
 
         // Update is called once per frame
-        internal void update()
+        internal virtual void Update(float delta)
         {
 
         }

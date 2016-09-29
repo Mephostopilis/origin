@@ -6,42 +6,13 @@ using System.Collections.Generic;
 public class S2cProtocol : ProtocolBase {
 	public static  S2cProtocol Instance = new S2cProtocol();
 	private S2cProtocol() {
-		Protocol.SetProtocol<finish_achi> (finish_achi.Tag);
-		Protocol.SetRequest<S2cSprotoType.finish_achi.request> (finish_achi.Tag);
-		Protocol.SetResponse<S2cSprotoType.finish_achi.response> (finish_achi.Tag);
-
-		Protocol.SetProtocol<heartbeat> (heartbeat.Tag);
-
-		Protocol.SetProtocol<lilian_update> (lilian_update.Tag);
-		Protocol.SetResponse<S2cSprotoType.lilian_update.response> (lilian_update.Tag);
-
-		Protocol.SetProtocol<login> (login.Tag);
-		Protocol.SetRequest<S2cSprotoType.login.request> (login.Tag);
-
-		Protocol.SetProtocol<mail> (mail.Tag);
-		Protocol.SetRequest<S2cSprotoType.mail.request> (mail.Tag);
-		Protocol.SetResponse<S2cSprotoType.mail.response> (mail.Tag);
+		Protocol.SetProtocol<handshake> (handshake.Tag);
+		Protocol.SetResponse<S2cSprotoType.handshake.response> (handshake.Tag);
 
 	}
 
-	public class finish_achi {
-		public const int Tag = 3;
-	}
-
-	public class heartbeat {
+	public class handshake {
 		public const int Tag = 1;
-	}
-
-	public class lilian_update {
-		public const int Tag = 4;
-	}
-
-	public class login {
-		public const int Tag = 5;
-	}
-
-	public class mail {
-		public const int Tag = 2;
 	}
 
 }

@@ -330,5 +330,35 @@ namespace Maria.Encrypt
             }
         }
 
+        public static byte[] hmac_hash(byte[] key, byte[] data)
+        {
+            try
+            {
+                Debug.Assert(key.Length == 8);
+                IntPtr keyp = Marshal.AllocHGlobal(key.Length);
+                Marshal.Copy(key, 0, keyp, key.Length);
+                Crypt_CSharp.PACKAGE key_pg;
+                key_pg.src = keyp;
+                key_pg.len = key.Length;
+                IntPtr datap = Marshal.AllocHGlobal(data.Length);
+                Marshal.Copy(data, 0, datap, data.Length);
+                Crypt_CSharp.PACKAGE data_pg;
+                data_pg.src = datap;
+                data_pg.len = data.Length;
+                Crypt_CSharp.PACKAGE pg;
+                pg = Crypt_CSharp.hmac_hash(key_pg, data_pg);
+                byte[] res = new byte[pg.len];
+                Marshal.Copy(pg.src, res, 0, pg.len);
+                Marshal.FreeHGlobal(key_pg.src);
+                Marshal.FreeHGlobal(data_pg.src);
+                Marshal.FreeHGlobal(pg.src);
+                return res;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }

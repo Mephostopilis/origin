@@ -1,24 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Maria.Network;
+﻿using Maria.Network;
 
 namespace Maria.Ball
 {
     public class AppContext : Context
     {
+        private float _cd = 2;
+        private float _v = 2;
 
         public AppContext(global::App app)
             : base(app)
         {
-            TimeSync = new TimeSync();
-
             _hash["login"] = new LoginController(this);
             _hash["game"] = new GameController(this);
+
+            TiSync = new TimeSync();
         }
 
-        public TimeSync TimeSync { get; set; }
+        public TimeSync TiSync { get; set; }
 
+        public override void Update(float delta)
+        {
+            base.Update(delta);
+
+            if (_auth)
+            {
+                if (_cd > 0)
+                {
+                    _cd -= delta;
+                    if (_cd <= 0)
+                    {
+                        SendReq<C2sProtocol.handshake>("handshake", null);
+                    }
+                }
+            }
+        }
     }
 }

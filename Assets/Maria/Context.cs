@@ -6,8 +6,6 @@ using System;
 using Sproto;
 using Maria.Ball;
 using System.Text;
-using UnityEngine.SceneManagement;
-using System.Collections;
 
 namespace Maria
 {
@@ -34,7 +32,7 @@ namespace Maria
         private ClientLogin.CB _loginCb;
         protected readonly global::App _app;
         private Dictionary<string, Timer> _timer = new Dictionary<string, Timer>();
-
+        protected bool _auth = false;
 
         public Context(global::App app)
         {
@@ -54,6 +52,7 @@ namespace Maria
 
             Push("start");
 
+            AuthUdpFlag = false;
         }
 
         // Use this for initialization
@@ -63,7 +62,7 @@ namespace Maria
         }
 
         // Update is called once per frame
-        public void Update(float delta)
+        public virtual void Update(float delta)
         {
 
             _login.Update();
@@ -94,13 +93,15 @@ namespace Maria
 
             if (_cur != null)
             {
-                _cur.update();
+                _cur.Update(delta);
             }
         }
 
         public Config Config { get; set; }
 
         public global::App App { get { return _app; } }
+
+        public bool AuthUdpFlag { get; set; }
 
         public void Enqueue(Message msg)
         {
@@ -187,6 +188,7 @@ namespace Maria
         {
             if (ok == 200)
             {
+                _auth = true;
                 string dummy = string.Empty;
                 _loginCb(true, _user.Secret, dummy);
             }
@@ -198,7 +200,20 @@ namespace Maria
 
         public void AuthUdp()
         {
-            //_client.au
+            if (!AuthUdpFlag)
+            {
+                _client.AuthUdp();
+            }
+        }
+
+        public void SendUdp(byte[] data)
+        {
+            _client.SendUdp(data);
+        }
+
+        public void ConnectUdp(long session, string ip, int port)
+        {
+            _client.ConnectUdp(session, ip, port);
         }
 
         public void Push(string name)

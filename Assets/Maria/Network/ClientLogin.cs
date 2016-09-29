@@ -93,15 +93,15 @@ namespace Maria.Network
                 else
                 {
                     Debug.LogError(string.Format("error code : {0}, {1}", code, msg));
-                    if (code == 406)
+                    if (code == 403)
                     {
-                        _callback(true, _secret, msg);
+                        _ctx.AuthLogin(_server, _user, _password, _callback);
+                        return;
                     }
                     else
                     {
                         _callback(false, _secret, msg);
                     }
-
                     _handshake = false;
                     _sock.Close();
                     Reset();
