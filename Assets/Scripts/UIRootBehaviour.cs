@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
-using Maria.Encrypt;
-using Maria.Ball;
+using Maria;
+using Maria.App;
 
 public class UIRootBehaviour : MonoBehaviour
 {
@@ -47,7 +46,7 @@ public class UIRootBehaviour : MonoBehaviour
         }
         string server = "sample";
         InitApp();
-        AppContext ctx = _app.AppContext;
+        Context ctx = _app.AppContext;
         ctx.AuthLogin(server, username, password, OnLoginCallback);
     }
 
@@ -56,8 +55,9 @@ public class UIRootBehaviour : MonoBehaviour
         if (ok)
         {
             InitApp();   
-            AppContext ctx = _app.AppContext;
-            ctx.Push("game");
+            Context ctx = _app.AppContext;
+            var gtc = ctx.GetController<GameController>("game");
+            gtc.Run();
         }
         else
         {

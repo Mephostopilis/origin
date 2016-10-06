@@ -89,6 +89,7 @@ namespace Maria.Network
                     _handshake = false;
                     _sock.Close();
                     Reset();
+
                 }
                 else
                 {

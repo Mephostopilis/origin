@@ -10,10 +10,10 @@ namespace Maria.Ball
         public AppContext(global::App app)
             : base(app)
         {
-            _hash["login"] = new LoginController(this);
             _hash["game"] = new GameController(this);
 
             TiSync = new TimeSync();
+            Config = new AppConfig();
         }
 
         public TimeSync TiSync { get; set; }
@@ -34,5 +34,7 @@ namespace Maria.Ball
                 }
             }
         }
+
+        public Config Config { get; set; }
     }
 }

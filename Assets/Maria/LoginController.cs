@@ -21,5 +21,15 @@ namespace Maria
         {
             base.Exit();
         }
+
+        public void RunGame()
+        {
+            _ctx.Push("game");
+        }
+
+        public override void Run()
+        {
+            _ctx.Push("login");
+        }
     }
 }

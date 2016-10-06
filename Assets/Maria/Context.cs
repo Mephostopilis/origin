@@ -4,7 +4,6 @@ using System.Threading;
 using Maria.Network;
 using System;
 using Sproto;
-using Maria.Ball;
 using System.Text;
 
 namespace Maria
@@ -37,6 +36,8 @@ namespace Maria
         public Context(global::App app)
         {
             _app = app;
+            var go = GameObject.Find("Assets");
+            Assets = go;
 
             _worker = new Thread(new ThreadStart(Worker));
             _worker.Start();
@@ -46,11 +47,10 @@ namespace Maria
             _login = new ClientLogin(this);
             _client = new ClientSocket(this);
 
-            Config = new Config();
-
             _hash["start"] = new StartController(this);
+            _hash["login"] = new LoginController(this);
 
-            Push("start");
+            _hash["start"].Run();
 
             AuthUdpFlag = false;
         }
@@ -100,6 +100,8 @@ namespace Maria
         public Config Config { get; set; }
 
         public global::App App { get { return _app; } }
+
+        public GameObject Assets { get; set; }
 
         public bool AuthUdpFlag { get; set; }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Maria.App
@@ -18,10 +15,9 @@ namespace Maria.App
         {
             GameController gctl = new GameController(this);
             _hash["game"] = gctl;
-            LoginController lctl = new LoginController(this);
-            _hash["login"] = lctl;
-
+            
             _cardsParent = new GameObject();
+            _cardsParent.transform.SetParent(Assets.transform);
             for (int i = 0; i < 3; i++)
             {
                 GameObject go = _assets.GetCard("Card");
@@ -31,6 +27,8 @@ namespace Maria.App
                 Card c = new Card(i, go);
                 _cards.Add(c);
             }
+
+            Config = new AppConfig();
         }
 
         public void Put()
@@ -42,5 +40,7 @@ namespace Maria.App
             var card = _cards[_idx];
             return card;
         }
+
+        
     }
 }

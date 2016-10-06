@@ -45,5 +45,11 @@ namespace Maria.Ball
         {
             base.Exit();
         }
+
+        public override void Run()
+        {
+            base.Run();
+            _ctx.Push("game");
+        }
     }
 }

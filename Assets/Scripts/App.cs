@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Maria.Ball;
+using Maria.App;
 using Maria;
 using System.Collections.Generic;
 
@@ -10,12 +10,12 @@ public class App : MonoBehaviour
     public GameObject _stackGo = null;
     public GameObject _cur = null;
     private GameObject _root = null;
-
+    
     // Use this for initialization
     void Start()
     {
         DontDestroyOnLoad(this);
-        _ctx = new AppContext(this);
+        _ctx = new AppContext(this);    
     }
 
     // Update is called once per frame

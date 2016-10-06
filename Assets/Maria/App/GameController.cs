@@ -31,5 +31,11 @@ namespace Maria.App
         {
 
         }
+
+        public override void Run()
+        {
+            base.Run();
+            _ctx.Push("game");
+        }
     }
 }

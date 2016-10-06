@@ -55,5 +55,10 @@ namespace Maria
         {
 
         }
+
+        public virtual void Run()
+        {
+
+        }
     }
 }
