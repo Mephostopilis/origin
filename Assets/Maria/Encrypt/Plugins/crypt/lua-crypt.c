@@ -996,6 +996,12 @@ b64decode(PACKAGE data) {
 	return rt;
 }
 
+CRYPT_API void __stdcall
+pfree(PACKAGE data) {
+	if (data.src != NULL && data.len > 0) {
+		free(data.src);
+	}
+}
 
 // defined in lsha1.c
 //int lsha1(lua_State *L);

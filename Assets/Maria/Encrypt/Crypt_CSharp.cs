@@ -61,5 +61,8 @@ namespace Maria.Encrypt
 
         [DllImport("crypt", EntryPoint = "hmac_sha1", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
         public static extern PACKAGE hmac_sha1(PACKAGE src);
+
+        [DllImport("crypt", EntryPoint = "pfree", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
+        public static extern void pfree(PACKAGE src);
     }
 }

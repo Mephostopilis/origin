@@ -36,7 +36,7 @@ namespace Maria
         public Context(global::App app)
         {
             _app = app;
-            var go = GameObject.Find("Assets");
+            var go = GameObject.Find("/Assets");
             Assets = go;
 
             _worker = new Thread(new ThreadStart(Worker));

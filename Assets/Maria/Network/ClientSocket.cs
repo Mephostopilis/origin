@@ -154,7 +154,7 @@ namespace Maria.Network
                             _callback(code);
                         }
                         
-                        _ctx.AuthUdp();
+                        //_ctx.AuthUdp();
                     }
                     else if (code == 403)
                     {
@@ -359,14 +359,14 @@ namespace Maria.Network
 
         private void RegisterResponse()
         {
-            _rsp["role_info"] = _response.role_info;
-            _rsp["join"] = _response.join;
-            _rsp["handshake"] = _response.handshake;
+            //_rsp["role_info"] = _response.role_info;
+            //_rsp["join"] = _response.join;
+            //_rsp["handshake"] = _response.handshake;
         }
 
         private void RegisterRequest()
         {
-            _req["role_info"] = _request.role_info;
+            //_req["role_info"] = _request.role_info;
         }
 
         public void AuthUdp()
