@@ -28,7 +28,7 @@ namespace Maria
         protected ClientSocket _client = null;
         protected Gate _gate = null;
         protected User _user = new User();
-        private ClientLogin.CB _loginCb;
+        private ClientSocket.CB _authcb;
         protected readonly global::App _app;
         private Dictionary<string, Timer> _timer = new Dictionary<string, Timer>();
         protected bool _auth = false;
@@ -143,14 +143,20 @@ namespace Maria
             return (T)_hash[name];
         }
 
+        public Controller GetCurController()
+        {
+            return _cur;
+        }
+
         public void SendReq<T>(String callback, SprotoTypeBase obj)
         {
             _client.SendReq<T>(callback, obj);
         }
 
-        public void AuthLogin(string s, string u, string pwd, ClientLogin.CB cb)
+        public void AuthLogin(string s, string u, string pwd, ClientSocket.CB cb)
         {
-            _loginCb = cb;
+            _authcb = cb;
+            
             _user.Server = s;
             _user.Username = u;
             _user.Password = pwd;
@@ -186,17 +192,23 @@ namespace Maria
             }
         }
 
+        public void AuthGate(ClientSocket.CB cb)
+        {
+            _authcb = cb;
+            _client.Auth(Config.GateIp, Config.GatePort, _user, AuthGateCB);
+        }
+
         public void AuthGateCB(int ok)
         {
             if (ok == 200)
             {
                 _auth = true;
                 string dummy = string.Empty;
-                _loginCb(true, _user.Secret, dummy);
+                _authcb(ok);
             }
             else if (ok == 403)
             {
-                AuthLogin(_user.Server, _user.Username, _user.Password, _loginCb);
+                AuthLogin(_user.Server, _user.Username, _user.Password, _authcb);
             }
         }
 
@@ -225,6 +237,11 @@ namespace Maria
             _stack.Push(ctr);
             _cur = ctr;
             _cur.Enter();
+        }
+
+        public void Pop()
+        {
+
         }
 
         public void Countdown(string name, float cd, CountdownCb cb)

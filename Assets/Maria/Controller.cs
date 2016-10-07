@@ -60,5 +60,10 @@ namespace Maria
         {
 
         }
+
+        public virtual void OnDisconnect()
+        {
+
+        }
     }
 }

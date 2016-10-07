@@ -6,7 +6,6 @@ using Sproto;
 using S2cSprotoType;
 using System.Net.Sockets;
 using Maria.Encrypt;
-using Maria.Ball;
 
 namespace Maria.Network
 {
@@ -35,7 +34,7 @@ namespace Maria.Network
             public int Index { get; set; }
         }
 
-        private AppContext _ctx;
+        private Context _ctx = null;
         private PackageSocket _tcp = null;
         private PackageSocketUdp _udp = null;
         private User _user = new User();
@@ -67,7 +66,7 @@ namespace Maria.Network
 
         public ClientSocket(Context ctx)
         {
-            _ctx = ctx as AppContext;
+            _ctx = ctx;
 
             _tcp = new PackageSocket();
             _tcp.OnConnect = OnConnect;
@@ -153,7 +152,7 @@ namespace Maria.Network
                         {
                             _callback(code);
                         }
-                        
+
                         //_ctx.AuthUdp();
                     }
                     else if (code == 403)
@@ -216,7 +215,8 @@ namespace Maria.Network
                         byte[] d = sinfo.Response(rsp);
                         Write(d, session, s2c_resp_tag);
                     }
-                } else
+                }
+                else
                 {
                     byte[] buffer = new byte[length];
                     Array.Copy(data, start, buffer, 0, length);
@@ -239,7 +239,7 @@ namespace Maria.Network
                         RspPg pg = _rspPg[key];
                         var cb = _rsp[pg.Protocol];
                         cb(session, sinfo.responseObj);
-                    }      
+                    }
                 }
             }
         }
@@ -253,7 +253,9 @@ namespace Maria.Network
             _tcp.SetEnabledPing(false);
             _tcp.SetPackageSocketType(PackageSocketType.Header);
 
-            Auth(_ip, _port, _user, null);
+            var ctr = _ctx.GetCurController();
+            ctr.OnDisconnect();
+            //Auth(_ip, _port, _user, null);
         }
 
         private byte[] WriteToken()
@@ -380,7 +382,8 @@ namespace Maria.Network
         {
             if (_udp == null)
             {
-                _udp = new PackageSocketUdp(_user.Secret, session, _ctx.TiSync);
+                TimeSync ts = null;
+                _udp = new PackageSocketUdp(_user.Secret, session, ts);
                 _udp.OnRecviveUdp = OnRecviveUdp;
                 Debug.Assert(_udp != null);
                 _udp.Connect(ip, port);

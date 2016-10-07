@@ -81,30 +81,32 @@ namespace Maria.Network
                 string msg = str.Substring(4);
                 if (code == 200)
                 {
+                    _handshake = false;
+                    _sock.Close();
+
                     byte[] buf = Encoding.ASCII.GetBytes(msg);
                     buf = Crypt.base64decode(buf);
                     string pg = Encoding.ASCII.GetString(buf);
 
                     _callback(true, _secret, pg);
-                    _handshake = false;
-                    _sock.Close();
                     Reset();
-
                 }
                 else
                 {
+                    _handshake = false;
+                    _sock.Close();
+
                     Debug.LogError(string.Format("error code : {0}, {1}", code, msg));
                     if (code == 403)
                     {
-                        _ctx.AuthLogin(_server, _user, _password, _callback);
+                        Auth(_ip, _port, _server, _user, _password, _callback);
+                        //_ctx.AuthLogin(_server, _user, _password, _callback);
                         return;
                     }
                     else
                     {
                         _callback(false, _secret, msg);
                     }
-                    _handshake = false;
-                    _sock.Close();
                     Reset();
                 }
             }
