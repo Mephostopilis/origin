@@ -1,8 +1,11 @@
-﻿namespace Maria.Ball
+﻿using Maria;
+
+namespace Application
 {
     class AppConfig : Config
     {
         public AppConfig()
+            : base()
         {
             _loginIp = "192.168.199.239";
             _loginPort = 3002;

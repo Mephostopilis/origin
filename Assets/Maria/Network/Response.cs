@@ -24,16 +24,16 @@ namespace Maria.Network
             if (responseObj != null)
             {
                 C2sSprotoType.join.response o = responseObj as C2sSprotoType.join.response;
-
                 string host = o.host;
                 int port = (int)o.port;
-                _ctx.ConnectUdp(o.session, host, port);
+                _ctx.AuthUdpCb(o.session, host, port);
             }
         }
 
         public void handshake(uint session, SprotoTypeBase responseObj)
         {
-            Debug.Log("handshake");
+            C2sSprotoType.handshake.response o = responseObj as C2sSprotoType.handshake.response;
+            Debug.Log(string.Format("handshake {0}", o.errorcode));
         }
     }
 }

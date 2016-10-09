@@ -34,6 +34,7 @@ namespace Maria.Network
 
         public PackageSocketUdp(byte[] secret, long session, TimeSync ts)
         {
+            Debug.Assert(ts != null);
             _secret = secret;
             _session = session;
             _timeSync = ts;
@@ -61,9 +62,9 @@ namespace Maria.Network
         {
             int now = _timeSync.LocalTime();
             byte[] buffer = new byte[12];
-            Pack(buffer, 0, (uint)now);
-            Pack(buffer, 4, 0xffffffff);
-            Pack(buffer, 8, (uint)_session);
+            PackL(buffer, 0, (uint)now);
+            PackL(buffer, 4, 0xffffffff);
+            PackL(buffer, 8, (uint)_session);
             byte[] head = Crypt.hmac_hash(_secret, buffer);
             byte[] data = new byte[8 + buffer.Length];
             Array.Copy(head, data, 8);
@@ -75,9 +76,9 @@ namespace Maria.Network
         {
             int now = _timeSync.LocalTime();
             byte[] buffer = new byte[12 + data.Length];
-            Pack(buffer, 0, (uint)now);
-            Pack(buffer, 4, 0xffffffff);
-            Pack(buffer, 8, (uint)_session);
+            PackL(buffer, 0, (uint)now);
+            PackL(buffer, 4, 0xffffffff);
+            PackL(buffer, 8, (uint)_session);
             Array.Copy(data, 0, buffer, 12, data.Length);
             byte[] head = Crypt.hmac_hash(_secret, buffer);
             byte[] send = new byte[8 + buffer.Length];
@@ -110,10 +111,10 @@ namespace Maria.Network
                         _head = 0;
                         _tail = _tail = _tail - _head;
                     }
-                    int globaltime = UnpackInt(_buffer, _head);
-                    int localtime = UnpackInt(_buffer, _head + 4);
-                    int eventtime = UnpackInt(_buffer, _head + 8);
-                    int session = UnpackInt(_buffer, _head + 12);
+                    int globaltime = UnpackIntL(_buffer, _head);
+                    int localtime = UnpackIntL(_buffer, _head + 4);
+                    int eventtime = UnpackIntL(_buffer, _head + 8);
+                    int session = UnpackIntL(_buffer, _head + 12);
                     if (session == _session)
                     {
                         _timeSync.Sync(localtime, globaltime);
@@ -147,17 +148,39 @@ namespace Maria.Network
             Debug.Assert(start + 4 <= buffer.Length);
             for (int i = 0; i < 4; i++)
             {
-                buffer[start + i] = (byte)(n >> i & 0xff);
+                buffer[start + i] = (byte)(n >> (8 * (3-i)) & 0xff);
+            }
+        }
+
+        private void PackL(byte[] buffer, int start, uint n)
+        {
+            int t = 1;
+            int tt = t >> 1;    // 0
+            int ttt = t << 1;   // 2
+            Debug.Assert(start + 4 <= buffer.Length);
+            for (int i = 0; i < 4; i++)
+            {
+                buffer[start + i] = (byte)(n >> (8 * i) & 0xff);
             }
         }
 
         private int UnpackInt(byte[] buffer, int offset)
         {
             int res = 0;
-            res |= buffer[offset] & 0xff;
-            res |= buffer[offset + 1] & 0xff << 1;
-            res |= buffer[offset + 2] & 0xff << 2;
-            res |= buffer[offset + 3] & 0xff << 3;
+            res |= buffer[offset] & 0xff << (3 * 8);
+            res |= buffer[offset + 1] & 0xff << (2 * 8);
+            res |= buffer[offset + 2] & 0xff << (1 * 8);
+            res |= buffer[offset + 3] & 0xff << (0 * 8);
+            return res;
+        }
+
+        private int UnpackIntL(byte[] buffer, int offset)
+        {
+            int res = 0;
+            res |= buffer[offset] & 0xff << (0 * 8);
+            res |= buffer[offset + 1] & 0xff << (1 * 8);
+            res |= buffer[offset + 2] & 0xff << (2 * 8);
+            res |= buffer[offset + 3] & 0xff << (3 * 8);
             return res;
         }
     }

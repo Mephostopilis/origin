@@ -31,7 +31,10 @@ namespace Maria
         private ClientSocket.CB _authcb;
         protected readonly global::App _app;
         private Dictionary<string, Timer> _timer = new Dictionary<string, Timer>();
-        protected bool _auth = false;
+        protected bool _authtcp = false;
+        protected Config _config = null;
+        protected TimeSync _ts = null;
+        private float _handshakecd = 5f;
 
         public Context(global::App app)
         {
@@ -52,7 +55,8 @@ namespace Maria
 
             _hash["start"].Run();
 
-            AuthUdpFlag = false;
+            _config = new Config();
+            _ts = new TimeSync();
         }
 
         // Use this for initialization
@@ -95,15 +99,17 @@ namespace Maria
             {
                 _cur.Update(delta);
             }
+
+            Handshake(delta);
         }
 
-        public Config Config { get; set; }
+        public Config Config { get { return _config; } set { _config = value; } }
+
+        public TimeSync TiSync { get { return _ts; } set { _ts = value; } }
 
         public global::App App { get { return _app; } }
 
         public GameObject Assets { get; set; }
-
-        public bool AuthUdpFlag { get; set; }
 
         public void Enqueue(Message msg)
         {
@@ -155,8 +161,9 @@ namespace Maria
 
         public void AuthLogin(string s, string u, string pwd, ClientSocket.CB cb)
         {
+            _authtcp = false;
             _authcb = cb;
-            
+
             _user.Server = s;
             _user.Username = u;
             _user.Password = pwd;
@@ -202,7 +209,7 @@ namespace Maria
         {
             if (ok == 200)
             {
-                _auth = true;
+                _authtcp = true;
                 string dummy = string.Empty;
                 _authcb(ok);
             }
@@ -212,12 +219,9 @@ namespace Maria
             }
         }
 
-        public void AuthUdp()
+        public void AuthUdp(ClientSocket.CB cb)
         {
-            if (!AuthUdpFlag)
-            {
-                _client.AuthUdp();
-            }
+            _client.AuthUdp(cb);
         }
 
         public void SendUdp(byte[] data)
@@ -225,9 +229,9 @@ namespace Maria
             _client.SendUdp(data);
         }
 
-        public void ConnectUdp(long session, string ip, int port)
+        public void AuthUdpCb(long session, string ip, int port)
         {
-            _client.ConnectUdp(session, ip, port);
+            _client.AuthUdpCb(session, ip, port);
         }
 
         public void Push(string name)
@@ -251,6 +255,22 @@ namespace Maria
             tm.CD = cd;
             tm.CB = cb;
             _timer[name] = tm;
+        }
+
+        public void Handshake(float delta)
+        {
+            if (_authtcp)
+            {
+                if (_handshakecd > 0)
+                {
+                    _handshakecd -= delta;
+                    if (_handshakecd <= 0)
+                    {
+                        _handshakecd = 5f;
+                        SendReq<C2sProtocol.handshake>("handshake", null);
+                    }
+                }
+            }
         }
     }
 }

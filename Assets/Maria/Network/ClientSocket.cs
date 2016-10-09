@@ -35,8 +35,8 @@ namespace Maria.Network
         }
 
         private Context _ctx = null;
+        private bool _tcpflag = false;
         private PackageSocket _tcp = null;
-        private PackageSocketUdp _udp = null;
         private User _user = new User();
 
         private string _ip = String.Empty;
@@ -64,16 +64,19 @@ namespace Maria.Network
         private Dictionary<string, ReqPg> _reqPg = new Dictionary<string, ReqPg>();
         private Dictionary<string, RspPg> _rspPg = new Dictionary<string, RspPg>();
 
+        private Queue<byte[]> _sendBuffer = new Queue<byte[]>();
+
+        // udp
+        private PackageSocketUdp _udp = null;
+        private CB _udpauthcb = null;
+        private long _udpsession = 0;
+        private string _udpip = null;
+        private int _udpport = 0;
+        private bool _udpflag = false;
+
         public ClientSocket(Context ctx)
         {
             _ctx = ctx;
-
-            _tcp = new PackageSocket();
-            _tcp.OnConnect = OnConnect;
-            _tcp.OnRecvive = OnRecvive;
-            _tcp.OnDisconnect = OnDisconnect;
-            _tcp.SetEnabledPing(false);
-            _tcp.SetPackageSocketType(PackageSocketType.Header);
 
             _host = new SprotoRpc(S2cProtocol.Instance);
             _sendRequest = _host.Attach(C2sProtocol.Instance);
@@ -91,17 +94,14 @@ namespace Maria.Network
         // Update is called once per frame
         public void Update()
         {
-            _tcp.Update();
+            if (_tcp != null)
+            {
+                _tcp.Update();
+            }
             if (_udp != null)
             {
                 _udp.Update();
             }
-
-            if (true)
-            {
-
-            }
-
         }
 
         private void DoAuth()
@@ -144,16 +144,16 @@ namespace Maria.Network
                     string msg = str.Substring(4);
                     if (code == 200)
                     {
+                        _tcpflag = true;
                         _step = 0;
                         _handshake = false;
                         _tcp.SetEnabledPing(true);
+                        _tcp.SendPing();
                         Debug.Log(string.Format("{0},{1}", code, msg));
                         if (_callback != null)
                         {
                             _callback(code);
                         }
-
-                        //_ctx.AuthUdp();
                     }
                     else if (code == 403)
                     {
@@ -246,16 +246,11 @@ namespace Maria.Network
 
         void OnDisconnect(SocketError socketError, PackageSocketError packageSocketError)
         {
-            _tcp = new PackageSocket();
-            _tcp.OnConnect = OnConnect;
-            _tcp.OnRecvive = OnRecvive;
-            _tcp.OnDisconnect = OnDisconnect;
-            _tcp.SetEnabledPing(false);
-            _tcp.SetPackageSocketType(PackageSocketType.Header);
+            _tcpflag = false;
+            _tcp = null;
 
             var ctr = _ctx.GetCurController();
             ctr.OnDisconnect();
-            //Auth(_ip, _port, _user, null);
         }
 
         private byte[] WriteToken()
@@ -309,7 +304,20 @@ namespace Maria.Network
             string key = idToHex(id);
             _rspPg[key] = pg;
 
-            _tcp.Send(d, 0, d.Length);
+            if (_tcpflag)
+            {
+                while (_sendBuffer.Count > 0)
+                {
+                    byte[] b = _sendBuffer.Dequeue();
+                    _tcp.Send(b, 0, b.Length);
+                }
+                _tcp.Send(d, 0, d.Length);
+            }
+            else
+            {
+                _sendBuffer.Enqueue(d);
+            }
+
             //Write(d, id, c2s_req_tag);
         }
 
@@ -342,6 +350,14 @@ namespace Maria.Network
             _user = u;
             _callback = cb;
             _handshake = true;
+
+            Debug.Assert(_tcp == null);
+            _tcp = new PackageSocket();
+            _tcp.OnConnect = OnConnect;
+            _tcp.OnRecvive = OnRecvive;
+            _tcp.OnDisconnect = OnDisconnect;
+            _tcp.SetEnabledPing(false);
+            _tcp.SetPackageSocketType(PackageSocketType.Header);
             _tcp.Connect(_ip, _port);
         }
 
@@ -361,34 +377,50 @@ namespace Maria.Network
 
         private void RegisterResponse()
         {
-            //_rsp["role_info"] = _response.role_info;
-            //_rsp["join"] = _response.join;
-            //_rsp["handshake"] = _response.handshake;
+            _rsp["role_info"] = _response.role_info;
+            _rsp["join"] = _response.join;
+            _rsp["handshake"] = _response.handshake;
         }
 
         private void RegisterRequest()
         {
-            //_req["role_info"] = _request.role_info;
+            _req["role_info"] = _request.role_info;
         }
 
-        public void AuthUdp()
+        public void AuthUdp(CB cb)
         {
+            _udpflag = false;
+            _udp = null;
+            _udpauthcb = cb;
             C2sSprotoType.join.request requestObj = new C2sSprotoType.join.request();
             requestObj.room = 1;
-            SendReq<C2sProtocol.join>("join", requestObj);
+            try
+            {
+                SendReq<C2sProtocol.join>("join", requestObj);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                Debug.LogError(ex.Message);
+                throw;
+            }
         }
 
-        public void ConnectUdp(long session, string ip, int port)
+        public void AuthUdpCb(long session, string ip, int port)
         {
+            Debug.Assert(_udpflag == false);
+            Debug.Assert(_udp == null);
+            _udpsession = session;
+            _udpip = ip;
+            _udpport = port;
             if (_udp == null)
             {
-                TimeSync ts = null;
+                TimeSync ts = _ctx.TiSync;
                 _udp = new PackageSocketUdp(_user.Secret, session, ts);
                 _udp.OnRecviveUdp = OnRecviveUdp;
                 Debug.Assert(_udp != null);
                 _udp.Connect(ip, port);
                 _udp.Sync();
-                _ctx.AuthUdpFlag = true;
+                _udpflag = true;
             }
         }
 
@@ -402,6 +434,7 @@ namespace Maria.Network
 
         public void SendUdp(byte[] data)
         {
+            Debug.Assert(_udpflag);
             _udp.Send(data);
         }
     }

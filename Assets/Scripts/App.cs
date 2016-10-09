@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using Maria.App;
 using Maria;
 using System.Collections.Generic;
+using Application;
 
 public class App : MonoBehaviour
 {
