@@ -1,8 +1,5 @@
-﻿using Sproto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Bacon;
+using Sproto;
 using UnityEngine;
 
 namespace Maria.Network
@@ -34,6 +31,12 @@ namespace Maria.Network
         {
             C2sSprotoType.handshake.response o = responseObj as C2sSprotoType.handshake.response;
             Debug.Log(string.Format("handshake {0}", o.errorcode));
+        }
+
+        public void born(uint session, SprotoTypeBase responseObj)
+        {
+            GameController ctr = _ctx.GetController<GameController>("game");
+            //ctr.Born()
         }
     }
 }
