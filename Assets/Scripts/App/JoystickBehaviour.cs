@@ -38,7 +38,4 @@ public class JoystickBehaviour : MonoBehaviour {
         //Camera.current.WorldToScreenPoint();
 
     }
-
-    
-
 }
