@@ -1,1 +1,4 @@
 
+[submodule "Maria"]
+	path = Maria
+	url = https://github.com/Mephostopilis/Maria
