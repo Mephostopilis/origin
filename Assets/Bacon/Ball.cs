@@ -8,7 +8,7 @@ namespace Bacon
         protected GameObject _arrow = null;
         protected float _radis = 0;
         protected Vector3 _direction = new Vector3(0, 0, 0);
-        
+
         public Ball(GameObject o, float radis)
         {
             Debug.Assert(o != null);
@@ -22,28 +22,26 @@ namespace Bacon
 
         public void MoveBy(Vector2 v)
         {
-            Vector3 shift = new Vector3(v.x, v.y, 0);
-            Vector3 origin = _ball.transform.localPosition;
-            Vector3 dst = origin + shift;
-            _ball.transform.Translate(dst);
+            Vector3 shift = new Vector3(v.x, 0, v.y);
+            MoveBy(shift);
         }
 
         public void MoveBy(Vector3 v)
         {
-            Vector3 origin = _ball.transform.localPosition;
-            Vector3 dst = origin + v;
-            _ball.transform.Translate(dst);
+            Debug.Assert(_ball != null);
+            _ball.transform.Translate(v);
         }
 
         public void MoveTo(Vector2 v)
         {
-            Vector3 shift = new Vector3(v.x, v.y, 0);
-            _ball.transform.Translate(shift);
+            var position = _ball.transform.localPosition;
+            Vector3 shift = new Vector3(v.x, position.y, v.y);
+            MoveTo(shift);
         }
 
         public void MoveTo(Vector3 v)
         {
-            _ball.transform.Translate(v);
+            _ball.transform.localPosition = v;
         }
 
         protected void CalArrowPosition()

@@ -12,9 +12,10 @@ namespace Bacon
         private Vector3 _min = new Vector3(0, 0, 0);
         private Vector3 _max = new Vector3(1000, 1000, 0);
 
-        public Map()
+        public Map(GameObject o)
         {
-
+            _map = o;
+            _map.transform.localPosition = Vector3.zero;
         }
 
         public void Start()
