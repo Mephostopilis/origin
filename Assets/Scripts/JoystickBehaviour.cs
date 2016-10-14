@@ -12,7 +12,7 @@ public class JoystickBehaviour : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         _ctx = _root.App.AppContext;
-        _controller = _ctx.GetCurController() as GameController;
+        _controller = _ctx.Top() as GameController;
 	}
 	
 	// Update is called once per frame

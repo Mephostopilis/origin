@@ -9,13 +9,12 @@ namespace Bacon
     class Map
     {
         private GameObject _map = null;
-        private Vector3 _min = new Vector3(0, 0, 0);
-        private Vector3 _max = new Vector3(1000, 1000, 0);
+        private AABB _aabb = null;
 
         public Map(GameObject o)
         {
             _map = o;
-            _map.transform.localPosition = Vector3.zero;
+            _aabb = new AABB(new Vector3(0, 0, 0), new Vector3(100, 100, 100));
         }
 
         public void Start()
@@ -28,15 +27,12 @@ namespace Bacon
 
         }
 
-        // 边界碰撞在本地
-        public void CheckBorder()
+        public AABB AABB
         {
-        }
-
-        public MyBall Born(float radis, Vector3 position, Vector3 direction)
-        {
-
-            return null;
+            get
+            {
+                return _aabb;
+            }
         }
     }
 }

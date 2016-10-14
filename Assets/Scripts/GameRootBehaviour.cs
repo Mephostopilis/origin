@@ -4,21 +4,21 @@ using Bacon;
 
 public class GameRootBehaviour : MonoBehaviour {
 
-    public GameObject _root = null;
+    public RootBehaviour _root = null;
     public GameObject _mainCamera = null;
     public GameObject _map = null;
-    public GameObject _ball = null;
 
 	// Use this for initialization
 	void Start () {
         var com = _root.GetComponent<RootBehaviour>();
         GameController controller = com.Controller as GameController;
 
+        controller.SetupMap(_map);
+        
         var camera = _mainCamera.GetComponent<Camera>();
         controller.SetupCamera(camera);
 
-        controller.SetupMap(_map);
-        controller.SetupMyBall(_ball);
+        controller.SetupScene(gameObject);
 	}
 	
 	// Update is called once per frame
