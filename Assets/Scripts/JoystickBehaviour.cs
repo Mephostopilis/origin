@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Bacon;
 using Maria;
 
@@ -17,7 +16,6 @@ public class JoystickBehaviour : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
 	}
 
     public void OnMoveStart()
@@ -37,6 +35,5 @@ public class JoystickBehaviour : MonoBehaviour {
     public void OnMoveEnd()
     {
         //Camera.current.WorldToScreenPoint();
-
     }
 }

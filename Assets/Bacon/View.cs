@@ -6,22 +6,32 @@ using UnityEngine;
 
 namespace Bacon
 {
-    class View
+    public class View
     {
-        private Camera _camera = null;
+        private Scene _scene = null;
+
+        private GameObject _camera = null;
+
+        private Vector3 _pos = Vector3.zero;
         private AABB _aabb = null;
 
-        public View(Camera camera)
+        public View(Scene scene, GameObject camera)
         {
+            _scene = scene;
+
             _camera = camera;
+            _pos = _camera.transform.localPosition;
+
+            var vp = _camera.transform.FindChild("Main Camera");
 
             Quaternion q = Quaternion.AngleAxis(90, new Vector3(1.0f, 0.0f, 0.0f));
-            _camera.transform.localRotation = q;
+           vp.transform.localRotation = q;
 
-            float aspect = camera.aspect;
-            float fov = camera.fieldOfView;
-            float near = camera.nearClipPlane;
-            float depth = camera.transform.localPosition.y;
+            Camera c = vp.GetComponent<Camera>();
+            float aspect = c.aspect;
+            float fov = c.fieldOfView;
+            float near = c.nearClipPlane;
+            float depth = c.transform.localPosition.y;
             depth = 20;
             float yMax = Mathf.Tan(fov / 2.0f / 180 * Mathf.PI) * depth;
             float yMin = -yMax;
@@ -37,6 +47,9 @@ namespace Bacon
             Vector3 max = new Vector3(maxm.m03, maxm.m13, maxm.m23);
 
             _aabb = new AABB(min, max);
+
+            var com = _camera.gameObject.GetComponent<AABBBehaviour>();
+            com.AABB = _aabb;
         }
 
         public AABB AABB
@@ -45,6 +58,10 @@ namespace Bacon
             {
                 return _aabb;
             }
+        }
+
+        public GameObject Go {
+            get { return _camera; }
         }
 
         public void Translate(Vector3 t)

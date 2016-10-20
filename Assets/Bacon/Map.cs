@@ -6,25 +6,19 @@ using UnityEngine;
 
 namespace Bacon
 {
-    class Map
+    public class Map
     {
+        private Scene _scene = null;
+
         private GameObject _map = null;
         private AABB _aabb = null;
 
-        public Map(GameObject o)
+        public Map(Scene scene, GameObject o)
         {
+            _scene = scene;
+
             _map = o;
             _aabb = new AABB(new Vector3(0, 0, 0), new Vector3(100, 100, 100));
-        }
-
-        public void Start()
-        {
-
-        }
-
-        public void Close()
-        {
-
         }
 
         public AABB AABB

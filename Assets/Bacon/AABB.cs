@@ -2,7 +2,7 @@
 
 namespace Bacon
 {
-    class AABB
+    public class AABB
     {
         public Vector3 _min;
         public Vector3 _max;
@@ -128,7 +128,7 @@ namespace Bacon
             }
         }
 
-        void transform(Matrix4x4 mat)
+        public void transform(Matrix4x4 mat)
         {
             Vector3[] corners = new Vector3[8];
             // Near face, specified counter-clockwise

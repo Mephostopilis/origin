@@ -7,9 +7,11 @@ using UnityEngine;
 
 namespace Bacon
 {
-    class Scene
+    public class Scene
     {
         private AppContext _ctx = null;
+        private GameObject _world = null;
+
         private Dictionary<uint, Ball> _uballs = new Dictionary<uint, Ball>();
         private Dictionary<uint, Ball> _sessionBalls = new Dictionary<uint, Ball>();
         private List<Ball> _balls = new List<Ball>();
@@ -17,31 +19,70 @@ namespace Bacon
         private View _view = null;
         private Map _map = null;
 
-        public Scene(Context ctx, View view, Map map)
+        public Scene(Context ctx, GameObject go)
         {
             Debug.Assert(ctx != null);
-            Debug.Assert(view != null);
-            Debug.Assert(map != null);
+            
             _ctx = ctx as AppContext;
-            _view = view;
-            _map = map;
+            _world = go;
 
-            AABB maabb = _map.AABB;
-            AABB vaabb = _view.AABB;
-            Vector2 offset = new Vector2();
-            if (maabb.containAABB2D(vaabb, out offset))
-            {
-            }
-            else
-            {
-                Vector3 t = new Vector3(offset.x, offset.y, 0);
-                _view.Translate(t);
-            }
+            _view = null;
+            _map = null;
+
+            //AABB maabb = _map.AABB;
+            //AABB vaabb = _view.AABB;
+            //Vector2 offset = new Vector2();
+            //if (maabb.containAABB2D(vaabb, out offset))
+            //{
+            //}
+            //else
+            //{
+            //    Vector3 t = new Vector3(offset.x, offset.y, 0);
+            //    _view.Translate(t);
+            //}
+        }
+
+        internal void Update(float delta) {
+            //Ball myball = _sessionBalls[_mysession];
+            //Debug.Assert(myball != null);
+            //foreach (var item in _balls) {
+            //    if (myball.AABB.intersects(item.AABB)) {
+
+            //    }
+            //}
+        }
+
+        public Map CreateMap(GameObject go) {
+            _map = new Map(this, go);
+            return _map;
+        }
+
+        public View View { get { return _view; } set { _view = value; } }
+
+        public Map Map { get { return _map; } set { _map = value; } }
+
+        public View SetupView(GameObject go) {
+            _view = new View(this, go);
+            var com = go.GetComponent<ViewBehaviour>();
+            com.SetupView(_view);
+            return _view;
+        }
+
+        public Map SetupMap(GameObject go) {
+            _map = new Map(this, go);
+            var com = go.GetComponent<MapBehaviour>();
+            com.SetupMap(_map);
+            return _map;
         }
 
         public Ball SetupBall(uint uid, uint session, float radis, float length, float width, float height, Vector3 position, Vector3 dir, float vel, GameObject o)
         {
-            Ball ball = new Ball(o, radis, length, width, height);
+            Ball ball = null;
+            if (session == (uint)_ctx.Session) {
+                ball = new MyBall(this, o, radis, length, width, height);
+            } else {
+                ball = new Ball(this, o, radis, length, width, height);
+            }
             ball.MoveTo(position);
             ball.Dir = dir;
             ball.Vel = vel;
@@ -50,16 +91,23 @@ namespace Bacon
             _uballs[uid] = ball;
             _sessionBalls[session] = ball;
             _balls.Add(ball);
+
+            o.transform.SetParent(_world.transform);
+            var com = o.GetComponent<BallBehaviour>();
+            com.SetupBall(ball);
             return ball;
         }
 
-        public void Update(uint session, Vector3 pos, Vector3 dir)
+        public void UpdateBall(uint session, Vector3 pos, Vector3 dir)
         {
             try
             {
                 var ball = _sessionBalls[session];
                 ball.MoveTo(pos);
                 ball.Dir = dir;
+
+                // 检测碰撞
+
             }
             catch (KeyNotFoundException ex)
             {

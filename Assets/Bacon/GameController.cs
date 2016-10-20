@@ -14,7 +14,6 @@ namespace Bacon
         private float _synccd1 = 1;
         private byte[] _syncmsg1 = null;
 
-        private GameObject _word = null;
         private Ball _myball = null;
         private Map _map = null;
         private View _view = null;
@@ -32,6 +31,9 @@ namespace Bacon
         internal override void Update(float delta)
         {
             base.Update(delta);
+            if (_scene != null) {
+                _scene.Update(delta);
+            }
             Sync1(delta);
         }
 
@@ -47,8 +49,8 @@ namespace Bacon
                         _synccd1 = 1.0f;
                         int[] e = _ctx.TiSync.GlobalTime();
                         Debug.Log(string.Format("globaltime: {0}", e[0]));
-                        byte[] pos = _myball.PackPosition();
-                        byte[] dir = _myball.PackDirection();
+                        byte[] pos = _myball.PackPos();
+                        byte[] dir = _myball.PackDir();
                         Debug.Assert(pos.Length == 12);
                         Array.Copy(pos, 0, _syncmsg1, 4, pos.Length);
                         Debug.Assert(dir.Length == 12);
@@ -97,34 +99,27 @@ namespace Bacon
             string path = "Prefabs/Ball";
             UnityEngine.Object o = Resources.Load(path, typeof(GameObject));
             GameObject go = UnityEngine.Object.Instantiate(o) as GameObject;
-            go.transform.SetParent(_word.transform);
+
             Ball ball = _scene.SetupBall(uid, session, radis, length, width, height, position, dir, vel, go);
             return ball;
         }
 
-        public void SetupCamera(Camera camera)
+        public void SetupCamera(GameObject go)
         {
             // 无论_camera == null,新场景启动都要重置
-            _view = new View(camera);
+            Debug.Assert(_scene != null);
+            _view = _scene.SetupView(go);
         }
 
         public void SetupMap(GameObject map)
         {
-            // 如果是第一次，可能这里是空
-            if (_map == null)
-            {
-                _map = new Map(map);
-            }
-            else
-            {
-                _map = new Map(map);
-            }
+            Debug.Assert(_scene != null);
+            _map = _scene.SetupMap(map);
         }
 
         public void SetupScene(GameObject word)
         {
-            _word = word;
-            _scene = new Scene(_ctx, _view, _map);
+            _scene = new Scene(_ctx, word);
         }
 
         public void OnMoveStart()
@@ -149,6 +144,7 @@ namespace Bacon
         }
 
         // 游戏协议
+        // 主要是同步场景中已经加入的其他玩家
         public void Join(SprotoTypeBase responseObj)
         {
             if (responseObj != null)
@@ -188,6 +184,35 @@ namespace Bacon
             }
         }
 
+        public void Born(SprotoTypeBase responseObj) {
+            C2sSprotoType.born.response obj = responseObj as C2sSprotoType.born.response;
+            if (obj != null && obj.errorcode == Errorcode.SUCCESS) {
+                var item = obj.b;
+                uint uid = (uint)item.uid;
+                uint session = (uint)item.session;
+                float radis = item.radis;
+                float length = item.length;
+                float width = item.width;
+                float height = item.height;
+                float pos_x = (float)BitConverter.Int64BitsToDouble(item.px);
+                float pos_y = (float)BitConverter.Int64BitsToDouble(item.py);
+                float pos_z = (float)BitConverter.Int64BitsToDouble(item.pz);
+                Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+                float dir_x = (float)BitConverter.Int64BitsToDouble(item.dx);
+                float dir_y = (float)BitConverter.Int64BitsToDouble(item.dy);
+                float dir_z = (float)BitConverter.Int64BitsToDouble(item.dz);
+                Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
+                float vel = (float)BitConverter.Int64BitsToDouble(item.vel);
+                if (session == (uint)_ctx.Session) {
+                    _myball = SetupBall(uid, session, radis, length, width, height, pos, dir, vel);
+                    _myball.MoveTo(new Vector2(10, 10));
+                } else {
+                    Debug.Assert(false);
+                    SetupBall(uid, session, radis, length, width, height, pos, dir, vel);
+                }
+            }
+        }
+
         public SprotoTypeBase OnBorn(SprotoTypeBase requestObj)
         {
             S2cSprotoType.born.request obj = requestObj as S2cSprotoType.born.request;
@@ -218,39 +243,6 @@ namespace Bacon
             else
             {
                 throw new System.Exception("request obj is null");
-            }
-        }
-
-        public void Born(SprotoTypeBase responseObj)
-        {
-            C2sSprotoType.born.response obj = responseObj as C2sSprotoType.born.response;
-            if (obj != null && obj.errorcode == Errorcode.SUCCESS)
-            {
-                var item = obj.b;
-                uint uid = (uint)item.uid;
-                uint session = (uint)item.session;
-                float radis = item.radis;
-                float length = item.length;
-                float width = item.width;
-                float height = item.height;
-                float pos_x = (float)BitConverter.Int64BitsToDouble(item.px);
-                float pos_y = (float)BitConverter.Int64BitsToDouble(item.py);
-                float pos_z = (float)BitConverter.Int64BitsToDouble(item.pz);
-                Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-                float dir_x = (float)BitConverter.Int64BitsToDouble(item.dx);
-                float dir_y = (float)BitConverter.Int64BitsToDouble(item.dy);
-                float dir_z = (float)BitConverter.Int64BitsToDouble(item.dz);
-                Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
-                float vel = (float)BitConverter.Int64BitsToDouble(item.vel);
-                if (session == (uint)_ctx.Session)
-                {
-                    _myball = SetupBall(uid, session, radis, length, width, height, pos, dir, vel);
-                }
-                else
-                {
-                    Debug.Assert(false);
-                    SetupBall(uid, session, radis, length, width, height, pos, dir, vel);
-                }
             }
         }
 
@@ -292,7 +284,7 @@ namespace Bacon
                         float dy = NetUnpack.Unpacklf(r.Data, 16);
                         float dz = NetUnpack.Unpacklf(r.Data, 20);
                         uint ok = NetUnpack.UnpacklI(r.Data, 24);
-                        _scene.Update((uint)r.Session, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
+                        _scene.UpdateBall((uint)r.Session, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
                     }
                 }
                 else
@@ -304,7 +296,7 @@ namespace Bacon
                     float dy = NetUnpack.Unpacklf(r.Data, 16);
                     float dz = NetUnpack.Unpacklf(r.Data, 20);
                     uint ok = NetUnpack.UnpacklI(r.Data, 24);
-                    _scene.Update((uint)r.Session, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
+                    _scene.UpdateBall((uint)r.Session, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
                 }
             }
         }
