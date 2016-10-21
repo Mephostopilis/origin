@@ -1,19 +1,14 @@
 ﻿using Maria;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
-namespace Bacon
-{
+namespace Bacon {
     public class Scene
     {
         private AppContext _ctx = null;
         private GameObject _world = null;
 
-        private Dictionary<uint, Ball> _uballs = new Dictionary<uint, Ball>();
-        private Dictionary<uint, Ball> _sessionBalls = new Dictionary<uint, Ball>();
+        private Dictionary<long, Ball> _ballidBalls = new Dictionary<long, Ball>();
         private List<Ball> _balls = new List<Ball>();
 
         private View _view = null;
@@ -75,7 +70,7 @@ namespace Bacon
             return _map;
         }
 
-        public Ball SetupBall(uint uid, uint session, float radis, float length, float width, float height, Vector3 position, Vector3 dir, float vel, GameObject o)
+        public Ball SetupBall(long ballid, uint uid, uint session, float radis, float length, float width, float height, Vector3 position, Vector3 dir, float vel, GameObject o)
         {
             Ball ball = null;
             if (session == (uint)_ctx.Session) {
@@ -88,8 +83,8 @@ namespace Bacon
             ball.Vel = vel;
             ball.Uid = uid;
             ball.Session = session;
-            _uballs[uid] = ball;
-            _sessionBalls[session] = ball;
+            ball.Id = ballid;
+            _ballidBalls[ballid] = ball;
             _balls.Add(ball);
 
             o.transform.SetParent(_world.transform);
@@ -98,11 +93,11 @@ namespace Bacon
             return ball;
         }
 
-        public void UpdateBall(uint session, Vector3 pos, Vector3 dir)
+        public void UpdateBall(long ballid, Vector3 pos, Vector3 dir)
         {
             try
             {
-                var ball = _sessionBalls[session];
+                var ball = _ballidBalls[ballid];
                 ball.MoveTo(pos);
                 ball.Dir = dir;
 
@@ -115,13 +110,12 @@ namespace Bacon
             }
         }
 
-        public void Leave(uint session)
+        public void Leave(long ballid)
         {
-            var ball = _sessionBalls[session];
-            _uballs[ball.Uid] = null;
+            var ball = _ballidBalls[ballid];
             _balls.Remove(ball);
             ball.Leave();
-            _sessionBalls[session] = null;
+            _ballidBalls[ballid] = null;
         }
     }
 }

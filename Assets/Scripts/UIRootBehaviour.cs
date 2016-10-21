@@ -5,9 +5,14 @@ using Bacon;
 public class UIRootBehaviour : MonoBehaviour {
 
     public GameObject _root = null;
+    public GameObject _join = null;
 
 	// Use this for initialization
 	void Start () {
+        var root = _root.GetComponent<RootBehaviour>();
+        AppContext ctx = root.App.AppContext;
+        GameController ctr = ctx.Top() as GameController;
+        ctr.SetupUI(gameObject);
 	}
 	
 	// Update is called once per frame
@@ -26,5 +31,9 @@ public class UIRootBehaviour : MonoBehaviour {
         var root = _root.GetComponent<RootBehaviour>();
         AppContext ctx = root.App.AppContext;
         ctx.AuthUdp(null);
+    }
+
+    public void disableJoin() {
+        var com = _join.GetComponent<UnityEngine.UI.Button>();
     }
 }

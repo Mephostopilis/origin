@@ -16,8 +16,12 @@ public class C2sProtocol : ProtocolBase {
 		Protocol.SetRequest<C2sSprotoType.join.request> (join.Tag);
 		Protocol.SetResponse<C2sSprotoType.join.response> (join.Tag);
 
-		Protocol.SetProtocol<test> (test.Tag);
-		Protocol.SetResponse<C2sSprotoType.test.response> (test.Tag);
+		Protocol.SetProtocol<leave> (leave.Tag);
+		Protocol.SetResponse<C2sSprotoType.leave.response> (leave.Tag);
+
+		Protocol.SetProtocol<opcode> (opcode.Tag);
+		Protocol.SetRequest<C2sSprotoType.opcode.request> (opcode.Tag);
+		Protocol.SetResponse<C2sSprotoType.opcode.response> (opcode.Tag);
 
 	}
 
@@ -33,8 +37,12 @@ public class C2sProtocol : ProtocolBase {
 		public const int Tag = 2;
 	}
 
-	public class test {
+	public class leave {
 		public const int Tag = 4;
+	}
+
+	public class opcode {
+		public const int Tag = 5;
 	}
 
 }

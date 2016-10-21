@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace S2cSprotoType { 
 	public class ball : SprotoTypeBase {
-		private static int max_field_count = 13;
+		private static int max_field_count = 14;
 		
 		
 		private Int64 _uid; // tag 0
@@ -127,6 +127,15 @@ namespace S2cSprotoType {
 			get { return base.has_field.has_field (12); }
 		}
 
+		private Int64 _ballid; // tag 13
+		public Int64 ballid {
+			get { return _ballid; }
+			set { base.has_field.set_field (13, true); _ballid = value; }
+		}
+		public bool HasBallid {
+			get { return base.has_field.has_field (13); }
+		}
+
 		public ball () : base(max_field_count) {}
 
 		public ball (byte[] buffer) : base(max_field_count, buffer) {
@@ -175,6 +184,9 @@ namespace S2cSprotoType {
 					break;
 				case 12:
 					this.vel = base.deserialize.read_integer ();
+					break;
+				case 13:
+					this.ballid = base.deserialize.read_integer ();
 					break;
 				default:
 					base.deserialize.read_unknow_data ();
@@ -236,6 +248,10 @@ namespace S2cSprotoType {
 
 			if (base.has_field.has_field (12)) {
 				base.serialize.write_integer (this.vel, 12);
+			}
+
+			if (base.has_field.has_field (13)) {
+				base.serialize.write_integer (this.ballid, 13);
 			}
 
 			return base.serialize.close ();
@@ -391,7 +407,7 @@ namespace S2cSprotoType {
 	public class leave {
 	
 		public class request : SprotoTypeBase {
-			private static int max_field_count = 1;
+			private static int max_field_count = 2;
 			
 			
 			private Int64 _session; // tag 0
@@ -401,6 +417,15 @@ namespace S2cSprotoType {
 			}
 			public bool HasSession {
 				get { return base.has_field.has_field (0); }
+			}
+
+			private List<Int64> _ballid; // tag 1
+			public List<Int64> ballid {
+				get { return _ballid; }
+				set { base.has_field.set_field (1, true); _ballid = value; }
+			}
+			public bool HasBallid {
+				get { return base.has_field.has_field (1); }
 			}
 
 			public request () : base(max_field_count) {}
@@ -416,6 +441,9 @@ namespace S2cSprotoType {
 					case 0:
 						this.session = base.deserialize.read_integer ();
 						break;
+					case 1:
+						this.ballid = base.deserialize.read_integer_list ();
+						break;
 					default:
 						base.deserialize.read_unknow_data ();
 						break;
@@ -428,6 +456,10 @@ namespace S2cSprotoType {
 
 				if (base.has_field.has_field (0)) {
 					base.serialize.write_integer (this.session, 0);
+				}
+
+				if (base.has_field.has_field (1)) {
+					base.serialize.write_integer (this.ballid, 1);
 				}
 
 				return base.serialize.close ();

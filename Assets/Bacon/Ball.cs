@@ -7,6 +7,7 @@ namespace Bacon {
 
         protected Scene _scene = null;
 
+        protected long _id = 0;
         protected uint _uid = 0;
         protected uint _session = 0;
 
@@ -33,6 +34,7 @@ namespace Bacon {
 
             _uid = 0;
             _session = 0;
+            _id = 0;
 
             _ball = o;
             try {
@@ -66,6 +68,8 @@ namespace Bacon {
         public uint Uid { get { return _uid; } set { _uid = value; } }
 
         public uint Session { get { return _session; } set { _session = value; } }
+
+        public long Id { get { return _id; } set { _id = value; } }
 
         public Vector3 Dir { get { return _dir; } set { _dir = value; } }
 
