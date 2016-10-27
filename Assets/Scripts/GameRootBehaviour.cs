@@ -15,12 +15,14 @@ public class GameRootBehaviour : MonoBehaviour {
         Debug.Assert(_map != null);
 
         var com = _root.GetComponent<RootBehaviour>();
-        GameController controller = com.Controller as GameController;
+        Maria.Command cmd1 = new Maria.Command(MyEventCmd.EVENT_SETUP_SCENE, gameObject);
+        com.Application.Enqueue(cmd1);
 
-        controller.SetupScene(gameObject);
-        controller.SetupCamera(_view);
-        controller.SetupMap(_map);
+        Maria.Command cmd2 = new Maria.Command(MyEventCmd.EVENT_SETUP_VIEW, _view);
+        com.Application.Enqueue(cmd2);
 
+        Maria.Command cmd3 = new Maria.Command(MyEventCmd.EVENT_SETUP_MAP, _map);
+        com.Application.Enqueue(cmd3);
 	}
 	
 	// Update is called once per frame

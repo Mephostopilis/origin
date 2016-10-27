@@ -1,9 +1,10 @@
 ﻿using Maria.Network;
 using System.Collections.Generic;
 using UnityEngine;
+using Maria;
 
 namespace Bacon {
-    public class Ball {
+    public class Ball : Maria.Actor {
 
         protected Scene _scene = null;
 
@@ -11,7 +12,6 @@ namespace Bacon {
         protected uint _uid = 0;
         protected uint _session = 0;
 
-        protected GameObject _ball = null;
         protected GameObject _toy = null;
         protected GameObject _arrow = null;
 
@@ -25,27 +25,21 @@ namespace Bacon {
         protected float _vel = 0.0f;
 
         protected AABB _aabb = null;
-        
 
-        public Ball(Scene scene, GameObject o, float radis, float length, float width, float height) {
-            Debug.Assert(_ball != o);
+        public Ball(Context ctx, Controller controller, Scene scene, float radis, float length, float width, float height)
+            : this(ctx, controller, null, scene, radis, length, width, height) {
+        }
 
+        public Ball(Context ctx, Controller controller, GameObject go, Scene scene, float radis, float length, float width, float height)
+            : base(ctx, controller, go) {
             _scene = scene;
 
             _uid = 0;
             _session = 0;
             _id = 0;
 
-            _ball = o;
-            try {
-                _toy = _ball.transform.FindChild("Toy").gameObject;
-                _arrow = _ball.transform.FindChild("Arrow").gameObject;
-                CalArrowPosition();
-                CalArrowDirection();
-            } catch (KeyNotFoundException ex) {
-                throw;
-            }
             
+
             _radis = radis;
             _length = length;
             _width = width;
@@ -55,13 +49,33 @@ namespace Bacon {
             _dir = Vector3.right;
             _vel = 0.0f;
 
-            Vector3 position = _ball.transform.localPosition;
-            Vector3 min = position + new Vector3(-_length / 2, -_width / 2, -_height / 2);
-            Vector3 max = position + new Vector3(_length / 2, _width / 2, _height / 2);
-            _aabb = new AABB(min, max);
+            _ctx.EnqueueRenderQueue(RenderInitBall);
+        }
 
-            var com = o.GetComponent<AABBBehaviour>();
-            com.AABB = _aabb;
+        public void RenderInitBall() {
+            string path = "Prefabs/Ball";
+            UnityEngine.Object o = Resources.Load(path, typeof(GameObject));
+            GameObject go = UnityEngine.Object.Instantiate(o) as GameObject;
+            _go = go;
+            _go.transform.localPosition = _pos;
+            var world = _scene.Go;
+            _go.transform.SetParent(world.transform);
+
+            try {
+                if (_go != null) {
+                    _toy = _go.transform.FindChild("Toy").gameObject;
+                    _arrow = _go.transform.FindChild("Arrow").gameObject;
+                    CalArrowPosition();
+                    CalArrowDirection();
+                }
+            } catch (KeyNotFoundException ex) {
+                Debug.LogError(ex.Message);
+                //throw ex;
+            }
+
+            Vector3 min = _pos + new Vector3(-_length / 2, -_width / 2, -_height / 2);
+            Vector3 max = _pos + new Vector3(_length / 2, _width / 2, _height / 2);
+            _aabb = new AABB(min, max);
         }
 
         #region sync server
@@ -70,6 +84,8 @@ namespace Bacon {
         public uint Session { get { return _session; } set { _session = value; } }
 
         public long Id { get { return _id; } set { _id = value; } }
+
+        public Vector3 Pos { get { return _pos; } }
 
         public Vector3 Dir { get { return _dir; } set { _dir = value; } }
 
@@ -84,28 +100,22 @@ namespace Bacon {
 
         public void MoveBy(Vector3 v) {
             _pos += v;
-            if (_ball != null) {
-                _ball.transform.Translate(v);
-            }
+            _ctx.EnqueueRenderQueue(RenderTransform);
         }
 
         public void MoveTo(Vector2 v) {
             // 保留原来的y值，
-            var position = _ball.transform.localPosition;
-            Vector3 shift = new Vector3(v.x, position.y, v.y);
+            Vector3 shift = new Vector3(v.x, _pos.y, v.y);
             MoveTo(shift);
         }
 
         public void MoveTo(Vector3 v) {
             _pos = v;
-            if (_ball != null) {
-                _ball.transform.localPosition = v;
-            }
+            _ctx.EnqueueRenderQueue(RenderTransform);
         }
 
         protected void CalArrowPosition() {
-            Vector3 position = _ball.transform.localPosition;
-            Vector3 arr = _dir * _radis + position;
+            Vector3 arr = _dir * _radis + _pos;
             _arrow.transform.position = arr;
         }
 
@@ -114,9 +124,6 @@ namespace Bacon {
         }
 
         public byte[] PackPos() {
-            if (_ball != null) {
-                _pos = _ball.transform.localPosition;
-            }
             byte[] res = new byte[12];
             NetPack.Packlf(res, 0, _pos.x);
             NetPack.Packlf(res, 4, _pos.y);
@@ -135,7 +142,17 @@ namespace Bacon {
         #endregion
 
         public void Leave() {
-            GameObject.DestroyImmediate(_ball);
+            _ctx.EnqueueRenderQueue(RenderLeave);
+        }
+
+        public void RenderLeave() {
+            GameObject.DestroyImmediate(_go);
+        }
+
+        public void RenderTransform() {
+            if (_go != null) {
+                _go.transform.localPosition = _pos;
+            }
         }
     }
 }

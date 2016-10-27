@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Maria;
 using UnityEngine;
 
-namespace Bacon
-{
+namespace Bacon {
     class MyBall : Ball {
-        public MyBall(Scene scene, GameObject o, float radis, float length, float width, float height) : base(scene, o, radis, length, width, height) {
-            View v = scene.View;
-            GameObject go = v.Go;
-            var com = o.GetComponent<BallBehaviour>();
-            com.Camera = go;
+
+        public MyBall(Context ctx, Controller controller, Scene scene, float radis, float length, float width, float height)
+            : base(ctx, controller, null, scene, radis, length, width, height) {
+        }
+
+        public MyBall(Context ctx, Controller controller, GameObject go, Scene scene, float radis, float length, float width, float height)
+            : base(ctx, controller, go, scene, radis, length, width, height) {
+
         }
     }
 }

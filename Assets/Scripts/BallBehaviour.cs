@@ -6,8 +6,6 @@ public class BallBehaviour : MonoBehaviour {
 
     public GameObject _camera = null;
 
-    private Bacon.Ball _ball = null; 
-
     // Use this for initialization
     void Start() {
 
@@ -15,12 +13,6 @@ public class BallBehaviour : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        Vector3 speed = _ball.Dir * _ball.Vel;
-        Vector3 shift = speed * Time.deltaTime;
-        transform.localPosition += shift;
-        Matrix4x4 mat = Matrix4x4.TRS(shift, Quaternion.identity, Vector3.zero);
-        var com = GetComponent<AABBBehaviour>();
-        //com.Transform(mat);
 
         if (_camera) {
             // 更新camera
@@ -28,9 +20,5 @@ public class BallBehaviour : MonoBehaviour {
     }
 
     public GameObject Camera { get { return _camera; } set { _camera = value; } }
-
-    public void SetupBall(Bacon.Ball ball) {
-        _ball = ball;
-    }
 
 }

@@ -7,9 +7,10 @@ using UnityEngine;
 
 namespace Bacon {
     class GameController : Controller {
-        private GameObject _ui;
+        
+        private UIRootActor _ui = null;
 
-        private float _synccd1 = 1;
+        private float _synccd1 = 0.03f;
         private byte[] _syncmsg1 = null;
 
         private Player _player = null;
@@ -20,9 +21,34 @@ namespace Bacon {
         private bool _moveflag = false;
 
         public GameController(Context ctx) : base(ctx) {
+
+            _ui = new UIRootActor(_ctx, this);
+
             // 4 + 12:pos + 12:dir
             _syncmsg1 = new byte[28];
             NetPack.Packli(_syncmsg1, 0, 1);
+
+            EventListenerCmd listener1 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_SCENE, SetupScene);
+            _ctx.EventDispatcher.AddCmdEventListener(listener1);
+
+            EventListenerCmd listener2 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_MAP, SetupMap);
+            _ctx.EventDispatcher.AddCmdEventListener(listener2);
+
+            EventListenerCmd listener3 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_VIEW, SetupCamera);
+            _ctx.EventDispatcher.AddCmdEventListener(listener3);
+
+            EventListenerCmd listener4 = new EventListenerCmd(MyEventCmd.EVENT_PRESSDOWN, OnPressDown);
+            _ctx.EventDispatcher.AddCmdEventListener(listener4);
+
+            EventListenerCmd listener5 = new EventListenerCmd(MyEventCmd.EVENT_PRESSUP, OnPressUp);
+            _ctx.EventDispatcher.AddCmdEventListener(listener5);
+
+            EventListenerCmd listener6 = new EventListenerCmd(MyEventCmd.EVENT_PRESSLEFT, OnPressLeft);
+            _ctx.EventDispatcher.AddCmdEventListener(listener6);
+
+            EventListenerCmd listener7 = new EventListenerCmd(MyEventCmd.EVENT_PRESSRIGHT, OnPressRight);
+            _ctx.EventDispatcher.AddCmdEventListener(listener7);
+
         }
 
         internal override void Update(float delta) {
@@ -38,7 +64,7 @@ namespace Bacon {
                 if (_synccd1 > 0) {
                     _synccd1 -= delta;
                     if (_synccd1 <= 0) {
-                        _synccd1 = 1.0f;
+                        _synccd1 = 0.03f;
                         int[] e = _ctx.TiSync.GlobalTime();
                         Debug.Log(string.Format("globaltime: {0}", e[0]));
 
@@ -53,16 +79,12 @@ namespace Bacon {
 
         public override void Enter() {
             base.Enter();
-            LoadScene("game");
+            SMActor actor = ((AppContext)_ctx).SMActor;
+            actor.LoadScene("game");
         }
 
         public override void Exit() {
             base.Exit();
-        }
-
-        public override void Run() {
-            base.Run();
-            _ctx.Push("game");
         }
 
         public override void AuthGateCB(int code) {
@@ -79,31 +101,26 @@ namespace Bacon {
 
         // 初始游戏场景
         private Ball SetupBall(long ballid, uint uid, uint session, float radis, float length, float width, float height, Vector3 position, Vector3 dir, float vel) {
-            string path = "Prefabs/Ball";
-            UnityEngine.Object o = Resources.Load(path, typeof(GameObject));
-            GameObject go = UnityEngine.Object.Instantiate(o) as GameObject;
-
-            Ball ball = _scene.SetupBall(ballid, uid, session, radis, length, width, height, position, dir, vel, go);
+            Ball ball = _scene.SetupBall(ballid, uid, session, radis, length, width, height, position, dir, vel);
             return ball;
         }
 
-        public void SetupCamera(GameObject go) {
+        public void SetupCamera(EventCmd e) {
             // 无论_camera == null,新场景启动都要重置
+            GameObject go = e.Orgin;
             Debug.Assert(_scene != null);
             _view = _scene.SetupView(go);
         }
 
-        public void SetupMap(GameObject map) {
+        public void SetupMap(EventCmd e) {
+            GameObject map = e.Orgin;
             Debug.Assert(_scene != null);
             _map = _scene.SetupMap(map);
         }
 
-        public void SetupScene(GameObject word) {
-            _scene = new Scene(_ctx, word);
-        }
-
-        public void SetupUI(GameObject ui) {
-            _ui = ui;
+        public void SetupScene(EventCmd e) {
+            GameObject word = e.Orgin;
+            _scene = new Scene(_ctx, this, word);
         }
 
         public void OnMoveStart() {
@@ -129,7 +146,7 @@ namespace Bacon {
             }
         }
 
-        public void OnPressUp() {
+        public void OnPressUp(EventCmd e) {
             //Vector3 dir = new Vector3(0, 0, 1);
             //_player.ChangeDir(dir);
             try {
@@ -138,11 +155,10 @@ namespace Bacon {
                 _ctx.SendReq<C2sProtocol.opcode>("opcode", obj);
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
-                throw;
             }
         }
 
-        public void OnPressRight() {
+        public void OnPressRight(EventCmd e) {
             //Vector3 dir = new Vector3(1, 0, 0);
             //_player.ChangeDir(dir);
             try {
@@ -151,11 +167,10 @@ namespace Bacon {
                 _ctx.SendReq<C2sProtocol.opcode>("opcode", obj);
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
-                throw;
             }
         }
 
-        public void OnPressDown() {
+        public void OnPressDown(EventCmd e) {
             //Vector3 dir = new Vector3(0, -1, 0);
             //_player.ChangeDir(dir);
             try {
@@ -164,11 +179,10 @@ namespace Bacon {
                 _ctx.SendReq<C2sProtocol.opcode>("opcode", obj);
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
-                throw;
             }
         }
 
-        public void OnPressLeft() {
+        public void OnPressLeft(EventCmd e) {
             //Vector3 dir = new Vector3(-1, 0, 0);
             //_player.ChangeDir(dir);
             try {
@@ -177,7 +191,6 @@ namespace Bacon {
                 _ctx.SendReq<C2sProtocol.opcode>("opcode", obj);
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
-                throw;
             }
         }
 
@@ -246,6 +259,11 @@ namespace Bacon {
                 if (session == (uint)_player.Session) {
                     var myball = SetupBall(ballid, uid, session, radis, length, width, height, pos, dir, vel);
                     _player.Add(myball as MyBall);
+                    _view.MoveTo(new Vector2(pos_x, pos_z));
+                    //Vector3 pivot = _player.GetPivot();
+                    //if (_view != null) {
+                    //    _view.InitView(pivot);
+                    //}
                 } else {
                     Debug.Assert(false);
                     SetupBall(ballid, uid, session, radis, length, width, height, pos, dir, vel);
@@ -309,32 +327,39 @@ namespace Bacon {
 
         public override void OnRecviveUdp(PackageSocketUdp.R r) {
             base.OnRecviveUdp(r);
-            uint protocol = NetUnpack.UnpacklI(r.Data, 0);
-            if (protocol == 1) {
-                Debug.Log(string.Format("{0}, {1}", r.Session, protocol));
-                //if (_player != null) {
-                //    if (_player.Session != r.Session) {
-                //        long ballid = NetUnpack.Unpackll(r.Data, 0);
-                //        float px = NetUnpack.Unpacklf(r.Data, 8);
-                //        float py = NetUnpack.Unpacklf(r.Data, 12);
-                //        float pz = NetUnpack.Unpacklf(r.Data, 16);
-                //        float dx = NetUnpack.Unpacklf(r.Data, 20);
-                //        float dy = NetUnpack.Unpacklf(r.Data, 24);
-                //        float dz = NetUnpack.Unpacklf(r.Data, 28);
-                //        uint ok = NetUnpack.UnpacklI(r.Data, 32);
-                //        _scene.UpdateBall((uint)r.Session, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
-                //    }
-                //} else {
-                //    long ballid = NetUnpack.Unpackll(r.Data, 0);
-                //    float px = NetUnpack.Unpacklf(r.Data, 8);
-                //    float py = NetUnpack.Unpacklf(r.Data, 12);
-                //    float pz = NetUnpack.Unpacklf(r.Data, 16);
-                //    float dx = NetUnpack.Unpacklf(r.Data, 20);
-                //    float dy = NetUnpack.Unpacklf(r.Data, 24);
-                //    float dz = NetUnpack.Unpacklf(r.Data, 28);
-                //    uint ok = NetUnpack.UnpacklI(r.Data, 32);
-                //    _scene.UpdateBall((uint)r.Session, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
-                //}
+            if (r.Protocol == 1) {
+                Debug.Log(string.Format("{0}, {1}", r.Session, r.Protocol));
+                Debug.Assert(_player != null);
+
+                if (_player.Session != r.Session) {
+                    int sz = NetUnpack.Unpackli(r.Data, 0);
+                    for (int i = 0; i < sz; i++) {
+                        long ballid = NetUnpack.Unpackll(r.Data, 4 + (i * 32) + 0);
+                        float px = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 8);
+                        float py = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 12);
+                        float pz = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 16);
+                        float dx = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 20);
+                        float dy = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 24);
+                        float dz = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 28);
+                        _scene.UpdateBall(ballid, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
+                    }
+                    //uint ok = NetUnpack.UnpacklI(r.Data, 32);
+
+                } else {
+                    int sz = NetUnpack.Unpackli(r.Data, 0);
+                    for (int i = 0; i < sz; i++) {
+                        long ballid = NetUnpack.Unpackll(r.Data, 4 + (i * 32) + 0);
+                        float px = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 8);
+                        float py = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 12);
+                        float pz = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 16);
+                        float dx = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 20);
+                        float dy = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 24);
+                        float dz = NetUnpack.Unpacklf(r.Data, 4 + (i * 32) + 28);
+                        _scene.UpdateBall(ballid, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
+                    }
+                    Vector3 pivot = _player.GetPivot();
+                    _view.MoveTo(new Vector2(pivot.x, pivot.z));
+                }
             }
         }
     }

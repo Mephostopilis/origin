@@ -8,6 +8,7 @@ namespace Bacon {
 
         protected uint _session = 0;
         private Dictionary<long, MyBall> _myballs = new Dictionary<long, MyBall>();
+        private int _myballsCount = 0;
 
         public Player() {
         }
@@ -16,16 +17,17 @@ namespace Bacon {
 
         public void Add(MyBall ball) {
             _myballs[ball.Id] = ball;
+            _myballsCount++;
         }
 
         public void Remove(MyBall ball) {
             _myballs.Remove(ball.Id);
+            _myballsCount--;
         }
 
         public void Clear() {
             _myballs = new Dictionary<long, MyBall>();
         }
-
 
         public byte[] PackBall() {
             int idx = 0;
@@ -46,6 +48,14 @@ namespace Bacon {
                 var ball = _myballs[i];
                 ball.Dir = dir;
             }
+        }
+
+        public Vector3 GetPivot() {
+            Vector3 pivot = Vector3.zero;
+            foreach (var item in _myballs) {
+                pivot += item.Value.Pos;
+            }
+            return pivot * (1 / _myballsCount);
         }
     }
 }

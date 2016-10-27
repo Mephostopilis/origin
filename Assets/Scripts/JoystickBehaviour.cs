@@ -7,18 +7,14 @@ public class JoystickBehaviour : MonoBehaviour {
     public RootBehaviour _root = null;
     public ETCJoystick _joystick = null;
 
-    private Context _ctx = null;
-    private GameController _controller = null;
+    //private Context _ctx = null;
+    //private GameController _controller = null;
 
 	// Use this for initialization
 	void Start () {
         _joystick.anchor = ETCBase.RectAnchor.BottomLeft;
         //_joystick.enableKeySimulation = false;
         //_joystick.axisX.range
-
-
-        _ctx = _root.App.AppContext;
-        _controller = _ctx.Top() as GameController;
 	}
 	
 	// Update is called once per frame
@@ -27,17 +23,18 @@ public class JoystickBehaviour : MonoBehaviour {
 
     public void OnMoveStart()
     {
-        _controller.OnMoveStart();
+        //_controller.OnMoveStart();
+
     }
 
     public void OnMove(Vector2 d)
     {
-        _controller.OnMove(d);
+        //_controller.OnMove(d);
     }
 
     public void OnMoveSpeed(Vector2 s)
     {
-        _controller.OnMoveSpeed(s);
+        //_controller.OnMoveSpeed(s);
     }
 
     public void OnMoveEnd()
@@ -46,18 +43,23 @@ public class JoystickBehaviour : MonoBehaviour {
     }
 
     public void OnPressUp() {
-        _controller.OnPressUp();
+
+        Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSUP);
+        _root.Application.Enqueue(cmd);
     }
 
     public void OnPressRight() {
-        _controller.OnPressRight();
+        Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSRIGHT);
+        _root.Application.Enqueue(cmd);
     }
 
     public void OnPressDown() {
-        _controller.OnPressDown();
+        Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSDOWN);
+        _root.Application.Enqueue(cmd);
     }
 
     public void OnPressLeft() {
-        _controller.OnPressLeft();
+        Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSLEFT);
+        _root.Application.Enqueue(cmd);
     }
 }

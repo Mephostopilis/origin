@@ -2,29 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Maria;
 using UnityEngine;
 
-namespace Bacon
-{
-    public class Map
-    {
+namespace Bacon {
+    public class Map : Maria.Actor {
         private Scene _scene = null;
-
-        private GameObject _map = null;
         private AABB _aabb = null;
 
-        public Map(Scene scene, GameObject o)
-        {
+        public Map(Context ctx, Controller controller, GameObject o, Scene scene) : base(ctx, controller, o) {
             _scene = scene;
-
-            _map = o;
-            _aabb = new AABB(new Vector3(0, 0, 0), new Vector3(100, 100, 100));
+            _aabb = new AABB(new Vector3(0, 0, 0), new Vector3(100, 0, 100));
         }
 
-        public AABB AABB
-        {
-            get
-            {
+        public AABB AABB {
+            get {
                 return _aabb;
             }
         }
