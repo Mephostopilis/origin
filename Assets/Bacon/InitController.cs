@@ -7,7 +7,7 @@ using System;
 namespace Bacon {
     class InitController : Controller {
         private float _handshakecd = 5f;
-        private ulong _last = 0;
+        private long _last = 0;
         private int _lag;
         private SMActor _smactor = null;
         private TimeSync _ts = new TimeSync();

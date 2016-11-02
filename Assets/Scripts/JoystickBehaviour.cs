@@ -45,21 +45,21 @@ public class JoystickBehaviour : MonoBehaviour {
     public void OnPressUp() {
 
         Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSUP);
-        _root.Application.Enqueue(cmd);
+        _root.App.Enqueue(cmd);
     }
 
     public void OnPressRight() {
         Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSRIGHT);
-        _root.Application.Enqueue(cmd);
+        _root.App.Enqueue(cmd);
     }
 
     public void OnPressDown() {
         Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSDOWN);
-        _root.Application.Enqueue(cmd);
+        _root.App.Enqueue(cmd);
     }
 
     public void OnPressLeft() {
         Maria.Command cmd = new Command(MyEventCmd.EVENT_PRESSLEFT);
-        _root.Application.Enqueue(cmd);
+        _root.App.Enqueue(cmd);
     }
 }

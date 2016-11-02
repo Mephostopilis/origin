@@ -21,6 +21,7 @@ namespace Bacon {
         private Scene _scene = null;
 
         private bool _moveflag = false;
+        private int _lastK = 0;
 
         public GameController(Context ctx) : base(ctx) {
 
@@ -195,9 +196,8 @@ namespace Bacon {
             if (responseObj != null) {
                 C2sSprotoType.join.response o = responseObj as C2sSprotoType.join.response;
                 _mysession = o.session;
-                string host = o.host;
-                int port = (int)o.port;
-                _ctx.AuthUdpCb(o.session, host, port);
+                //string host = o.host;
+                //int port = (int)o.port;
 
                 if (_playes.ContainsKey(_mysession)) {
                 } else {
@@ -364,22 +364,31 @@ namespace Bacon {
             base.OnRecviveUdp(r);
             int protocol = NetUnpack.Unpackli(r.Data, 0);
             if (protocol == 1) {
+                _ctx.TiSync.Sync((int)r.Localtime, (int)r.Globaltime);
+            } else if (protocol == 2) {
                 Debug.Log(string.Format("{0}, {1}", r.Session, protocol));
-                if (r.Data.Length > 4) {
-                    int ball_sz = NetUnpack.Unpackli(r.Data, 4);
-                    for (int i = 0; i < ball_sz; i++) {
-                        long ballid = NetUnpack.Unpackll(r.Data, 8 + (i * 32) + 0);
-                        float px = NetUnpack.Unpacklf(r.Data, 8 + (i * 32) + 8);
-                        float py = NetUnpack.Unpacklf(r.Data, 8 + (i * 32) + 12);
-                        float pz = NetUnpack.Unpacklf(r.Data, 8 + (i * 32) + 16);
-                        float dx = NetUnpack.Unpacklf(r.Data, 8 + (i * 32) + 20);
-                        float dy = NetUnpack.Unpacklf(r.Data, 8 + (i * 32) + 24);
-                        float dz = NetUnpack.Unpacklf(r.Data, 8 + (i * 32) + 28);
-                        _scene.UpdateBall(ballid, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
+                int k = NetUnpack.Unpackli(r.Data, 4);
+                if (_lastK == 0) {
+                    _lastK = k;
+                } else if (k > _lastK) {
+                    _lastK = k;
+                    if (r.Data.Length > 4) {
+                        int ball_sz = NetUnpack.Unpackli(r.Data, 8);
+                        for (int i = 0; i < ball_sz; i++) {
+                            long ballid = NetUnpack.Unpackll(r.Data, 12 + (i * 32) + 0);
+                            float px = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 8);
+                            float py = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 12);
+                            float pz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 16);
+                            float dx = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 20);
+                            float dy = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 24);
+                            float dz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 28);
+                            _scene.UpdateBall(ballid, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
+                        }
+                        var player = _playes[_mysession];
+                        var pivot = player.GetPivot();
+                        _view.MoveTo(new Vector2(pivot.x, pivot.z));
                     }
-                    var player = _playes[_mysession];
-                    var pivot = player.GetPivot();
-                    _view.MoveTo(new Vector2(pivot.x, pivot.z));
+                } else {
                 }
             }
         }

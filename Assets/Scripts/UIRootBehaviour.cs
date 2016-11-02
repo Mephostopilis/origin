@@ -16,7 +16,7 @@ public class UIRootBehaviour : MonoBehaviour {
 
         Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_SETUP_UIROOT, gameObject);
         var root = _root.GetComponent<RootBehaviour>();
-        root.Application.Enqueue(cmd);
+        root.App.Enqueue(cmd);
     }
 
     // Update is called once per frame
@@ -27,7 +27,7 @@ public class UIRootBehaviour : MonoBehaviour {
         _born.SetActive(false);
         Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONBORN);
         var root = _root.GetComponent<RootBehaviour>();
-        root.Application.Enqueue(cmd);
+        root.App.Enqueue(cmd);
     }
 
     public void OnJoin() {
@@ -35,7 +35,7 @@ public class UIRootBehaviour : MonoBehaviour {
         _born.SetActive(true);
         Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONJOIN);
         var root = _root.GetComponent<RootBehaviour>();
-        root.Application.Enqueue(cmd);
+        root.App.Enqueue(cmd);
     }
 
     public void disableJoin() {

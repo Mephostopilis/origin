@@ -16,7 +16,7 @@ namespace Bacon {
         public static uint EVENT_SETUP_VIEW = 106;
         public static uint EVENT_SETUP_MAP = 107;
 
-        public static uint EVENT_STARTSCENE_ENTER = 108;
+        public static uint EVENT_SETUP_STARTROOT = 108;
 
         public static uint EVENT_ONBORN = 109;
         public static uint EVENT_ONJOIN = 110;
