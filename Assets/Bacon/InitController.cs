@@ -33,7 +33,9 @@ namespace Bacon {
                     _handshakecd -= delta;
                     if (_handshakecd <= 0) {
                         _handshakecd = 5f;
-                        _ctx.SendReq<C2sProtocol.handshake>("handshake", null);
+                        if (_authtcp) {
+                            _ctx.SendReq<C2sProtocol.handshake>(C2sProtocol.handshake.Tag, null);
+                        }
                         _last = _ts.GetTimeMs();
                     }
                 }

@@ -34,11 +34,8 @@ namespace Bacon {
             : base(ctx, controller, go) {
             _scene = scene;
 
-            _uid = 0;
             _session = 0;
             _id = 0;
-
-            
 
             _radis = radis;
             _length = length;
@@ -79,8 +76,7 @@ namespace Bacon {
         }
 
         #region sync server
-        public uint Uid { get { return _uid; } set { _uid = value; } }
-
+        
         public uint Session { get { return _session; } set { _session = value; } }
 
         public long Id { get { return _id; } set { _id = value; } }

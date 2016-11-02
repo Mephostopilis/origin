@@ -5,12 +5,10 @@ using UnityEngine;
 namespace Bacon {
     public class Scene : Actor {
         private Matrix4x4 _mat = Matrix4x4.identity;
-        private Dictionary<long, Ball> _ballidBalls = new Dictionary<long, Ball>();
-        private List<Ball> _balls = new List<Ball>();
 
         private View _view = null;
         private Map _map = null;
-        private MyBall _myball = null;
+        private Dictionary<long, Ball> _ballidBalls = new Dictionary<long, Ball>();
 
         public Scene(Context ctx, Controller controller, GameObject go) : base(ctx, controller, go) {
 
@@ -56,45 +54,41 @@ namespace Bacon {
             return _map;
         }
 
-        public Ball SetupBall(long ballid, uint uid, uint session, float radis, float length, float width, float height, Vector3 position, Vector3 dir, float vel) {
-            Ball ball = null;
-            if (session == (uint)_ctx.Session) {
-                _myball = new MyBall(_ctx, _controller, this, radis, length, width, height);
-                ball = _myball;
-            } else {
-                ball = new Ball(_ctx, _controller, this, radis, length, width, height);
-            }
+        public Ball SetupBall(long ballid, uint session, float radis, float length, float width, float height, Vector3 position, Vector3 dir, float vel) {
+            Ball ball = new Ball(_ctx, _controller, this, radis, length, width, height);
             ball.MoveTo(position);
             ball.Dir = dir;
             ball.Vel = vel;
-            ball.Uid = uid;
             ball.Session = session;
             ball.Id = ballid;
             _ballidBalls[ballid] = ball;
-            _balls.Add(ball);
-
             return ball;
         }
 
         public void UpdateBall(long ballid, Vector3 pos, Vector3 dir) {
             try {
                 if (_ballidBalls.ContainsKey(ballid)) {
+                    Debug.Log(string.Format("update ball {0}", ballid));
                     var ball = _ballidBalls[ballid];
                     ball.MoveTo(pos);
                     ball.Dir = dir;
                 }
                 // 检测碰撞
-
             } catch (KeyNotFoundException ex) {
                 Debug.Log(ex.Message);
             }
         }
 
-        public void Leave(long ballid) {
-            var ball = _ballidBalls[ballid];
-            _balls.Remove(ball);
-            ball.Leave();
-            _ballidBalls[ballid] = null;
+        public Ball Leave(long ballid) {
+            if (_ballidBalls.ContainsKey(ballid)) {
+                var ball = _ballidBalls[ballid];
+                ball.Leave();
+                _ballidBalls.Remove(ballid);
+                return ball;
+            } else {
+                Debug.LogError(string.Format("contains key no %l", ballid));
+                return null;
+            }
         }
     }
 }

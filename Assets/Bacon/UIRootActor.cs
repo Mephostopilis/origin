@@ -34,7 +34,7 @@ namespace Bacon {
         }
 
         public void OnBorn(EventCmd e) {
-            _ctx.SendReq<C2sProtocol.born>("born", null);
+            _ctx.SendReq<C2sProtocol.born>(C2sProtocol.born.Tag, null);
         }
 
         public void OnJoin(EventCmd e) {

@@ -7,24 +7,24 @@ using System.Collections.Generic;
 
 namespace S2cSprotoType { 
 	public class ball : SprotoTypeBase {
-		private static int max_field_count = 14;
+		private static int max_field_count = 13;
 		
 		
-		private Int64 _uid; // tag 0
-		public Int64 uid {
-			get { return _uid; }
-			set { base.has_field.set_field (0, true); _uid = value; }
+		private Int64 _session; // tag 0
+		public Int64 session {
+			get { return _session; }
+			set { base.has_field.set_field (0, true); _session = value; }
 		}
-		public bool HasUid {
+		public bool HasSession {
 			get { return base.has_field.has_field (0); }
 		}
 
-		private Int64 _session; // tag 1
-		public Int64 session {
-			get { return _session; }
-			set { base.has_field.set_field (1, true); _session = value; }
+		private Int64 _ballid; // tag 1
+		public Int64 ballid {
+			get { return _ballid; }
+			set { base.has_field.set_field (1, true); _ballid = value; }
 		}
-		public bool HasSession {
+		public bool HasBallid {
 			get { return base.has_field.has_field (1); }
 		}
 
@@ -127,15 +127,6 @@ namespace S2cSprotoType {
 			get { return base.has_field.has_field (12); }
 		}
 
-		private Int64 _ballid; // tag 13
-		public Int64 ballid {
-			get { return _ballid; }
-			set { base.has_field.set_field (13, true); _ballid = value; }
-		}
-		public bool HasBallid {
-			get { return base.has_field.has_field (13); }
-		}
-
 		public ball () : base(max_field_count) {}
 
 		public ball (byte[] buffer) : base(max_field_count, buffer) {
@@ -147,10 +138,10 @@ namespace S2cSprotoType {
 			while (-1 != (tag = base.deserialize.read_tag ())) {
 				switch (tag) {
 				case 0:
-					this.uid = base.deserialize.read_integer ();
+					this.session = base.deserialize.read_integer ();
 					break;
 				case 1:
-					this.session = base.deserialize.read_integer ();
+					this.ballid = base.deserialize.read_integer ();
 					break;
 				case 2:
 					this.radis = base.deserialize.read_integer ();
@@ -185,9 +176,6 @@ namespace S2cSprotoType {
 				case 12:
 					this.vel = base.deserialize.read_integer ();
 					break;
-				case 13:
-					this.ballid = base.deserialize.read_integer ();
-					break;
 				default:
 					base.deserialize.read_unknow_data ();
 					break;
@@ -199,11 +187,11 @@ namespace S2cSprotoType {
 			base.serialize.open (stream);
 
 			if (base.has_field.has_field (0)) {
-				base.serialize.write_integer (this.uid, 0);
+				base.serialize.write_integer (this.session, 0);
 			}
 
 			if (base.has_field.has_field (1)) {
-				base.serialize.write_integer (this.session, 1);
+				base.serialize.write_integer (this.ballid, 1);
 			}
 
 			if (base.has_field.has_field (2)) {
@@ -250,10 +238,6 @@ namespace S2cSprotoType {
 				base.serialize.write_integer (this.vel, 12);
 			}
 
-			if (base.has_field.has_field (13)) {
-				base.serialize.write_integer (this.ballid, 13);
-			}
-
 			return base.serialize.close ();
 		}
 	}
@@ -265,12 +249,12 @@ namespace S2cSprotoType {
 			private static int max_field_count = 1;
 			
 			
-			private ball _b; // tag 0
-			public ball b {
-				get { return _b; }
-				set { base.has_field.set_field (0, true); _b = value; }
+			private List<ball> _bs; // tag 0
+			public List<ball> bs {
+				get { return _bs; }
+				set { base.has_field.set_field (0, true); _bs = value; }
 			}
-			public bool HasB {
+			public bool HasBs {
 				get { return base.has_field.has_field (0); }
 			}
 
@@ -285,7 +269,7 @@ namespace S2cSprotoType {
 				while (-1 != (tag = base.deserialize.read_tag ())) {
 					switch (tag) {
 					case 0:
-						this.b = base.deserialize.read_obj<ball> ();
+						this.bs = base.deserialize.read_obj_list<ball> ();
 						break;
 					default:
 						base.deserialize.read_unknow_data ();
@@ -298,7 +282,118 @@ namespace S2cSprotoType {
 				base.serialize.open (stream);
 
 				if (base.has_field.has_field (0)) {
-					base.serialize.write_obj (this.b, 0);
+					base.serialize.write_obj (this.bs, 0);
+				}
+
+				return base.serialize.close ();
+			}
+		}
+
+
+		public class response : SprotoTypeBase {
+			private static int max_field_count = 1;
+			
+			
+			private Int64 _errorcode; // tag 0
+			public Int64 errorcode {
+				get { return _errorcode; }
+				set { base.has_field.set_field (0, true); _errorcode = value; }
+			}
+			public bool HasErrorcode {
+				get { return base.has_field.has_field (0); }
+			}
+
+			public response () : base(max_field_count) {}
+
+			public response (byte[] buffer) : base(max_field_count, buffer) {
+				this.decode ();
+			}
+
+			protected override void decode () {
+				int tag = -1;
+				while (-1 != (tag = base.deserialize.read_tag ())) {
+					switch (tag) {
+					case 0:
+						this.errorcode = base.deserialize.read_integer ();
+						break;
+					default:
+						base.deserialize.read_unknow_data ();
+						break;
+					}
+				}
+			}
+
+			public override int encode (SprotoStream stream) {
+				base.serialize.open (stream);
+
+				if (base.has_field.has_field (0)) {
+					base.serialize.write_integer (this.errorcode, 0);
+				}
+
+				return base.serialize.close ();
+			}
+		}
+
+
+	}
+
+
+	public class die {
+	
+		public class request : SprotoTypeBase {
+			private static int max_field_count = 2;
+			
+			
+			private Int64 _session; // tag 0
+			public Int64 session {
+				get { return _session; }
+				set { base.has_field.set_field (0, true); _session = value; }
+			}
+			public bool HasSession {
+				get { return base.has_field.has_field (0); }
+			}
+
+			private Int64 _ballid; // tag 1
+			public Int64 ballid {
+				get { return _ballid; }
+				set { base.has_field.set_field (1, true); _ballid = value; }
+			}
+			public bool HasBallid {
+				get { return base.has_field.has_field (1); }
+			}
+
+			public request () : base(max_field_count) {}
+
+			public request (byte[] buffer) : base(max_field_count, buffer) {
+				this.decode ();
+			}
+
+			protected override void decode () {
+				int tag = -1;
+				while (-1 != (tag = base.deserialize.read_tag ())) {
+					switch (tag) {
+					case 0:
+						this.session = base.deserialize.read_integer ();
+						break;
+					case 1:
+						this.ballid = base.deserialize.read_integer ();
+						break;
+					default:
+						base.deserialize.read_unknow_data ();
+						break;
+					}
+				}
+			}
+
+			public override int encode (SprotoStream stream) {
+				base.serialize.open (stream);
+
+				if (base.has_field.has_field (0)) {
+					base.serialize.write_integer (this.session, 0);
+				}
+
+				if (base.has_field.has_field (1)) {
+					base.serialize.write_integer (this.ballid, 1);
 				}
 
 				return base.serialize.close ();
@@ -356,6 +451,101 @@ namespace S2cSprotoType {
 
 	public class handshake {
 	
+		public class response : SprotoTypeBase {
+			private static int max_field_count = 1;
+			
+			
+			private Int64 _errorcode; // tag 0
+			public Int64 errorcode {
+				get { return _errorcode; }
+				set { base.has_field.set_field (0, true); _errorcode = value; }
+			}
+			public bool HasErrorcode {
+				get { return base.has_field.has_field (0); }
+			}
+
+			public response () : base(max_field_count) {}
+
+			public response (byte[] buffer) : base(max_field_count, buffer) {
+				this.decode ();
+			}
+
+			protected override void decode () {
+				int tag = -1;
+				while (-1 != (tag = base.deserialize.read_tag ())) {
+					switch (tag) {
+					case 0:
+						this.errorcode = base.deserialize.read_integer ();
+						break;
+					default:
+						base.deserialize.read_unknow_data ();
+						break;
+					}
+				}
+			}
+
+			public override int encode (SprotoStream stream) {
+				base.serialize.open (stream);
+
+				if (base.has_field.has_field (0)) {
+					base.serialize.write_integer (this.errorcode, 0);
+				}
+
+				return base.serialize.close ();
+			}
+		}
+
+
+	}
+
+
+	public class join {
+	
+		public class request : SprotoTypeBase {
+			private static int max_field_count = 1;
+			
+			
+			private Int64 _session; // tag 0
+			public Int64 session {
+				get { return _session; }
+				set { base.has_field.set_field (0, true); _session = value; }
+			}
+			public bool HasSession {
+				get { return base.has_field.has_field (0); }
+			}
+
+			public request () : base(max_field_count) {}
+
+			public request (byte[] buffer) : base(max_field_count, buffer) {
+				this.decode ();
+			}
+
+			protected override void decode () {
+				int tag = -1;
+				while (-1 != (tag = base.deserialize.read_tag ())) {
+					switch (tag) {
+					case 0:
+						this.session = base.deserialize.read_integer ();
+						break;
+					default:
+						base.deserialize.read_unknow_data ();
+						break;
+					}
+				}
+			}
+
+			public override int encode (SprotoStream stream) {
+				base.serialize.open (stream);
+
+				if (base.has_field.has_field (0)) {
+					base.serialize.write_integer (this.session, 0);
+				}
+
+				return base.serialize.close ();
+			}
+		}
+
+
 		public class response : SprotoTypeBase {
 			private static int max_field_count = 1;
 			
@@ -601,6 +791,67 @@ namespace S2cSprotoType {
 
 			if (base.has_field.has_field (3)) {
 				base.serialize.write_integer (this.version, 3);
+			}
+
+			return base.serialize.close ();
+		}
+	}
+
+
+	public class player : SprotoTypeBase {
+		private static int max_field_count = 2;
+		
+		
+		private Int64 _session; // tag 0
+		public Int64 session {
+			get { return _session; }
+			set { base.has_field.set_field (0, true); _session = value; }
+		}
+		public bool HasSession {
+			get { return base.has_field.has_field (0); }
+		}
+
+		private List<ball> _balls; // tag 1
+		public List<ball> balls {
+			get { return _balls; }
+			set { base.has_field.set_field (1, true); _balls = value; }
+		}
+		public bool HasBalls {
+			get { return base.has_field.has_field (1); }
+		}
+
+		public player () : base(max_field_count) {}
+
+		public player (byte[] buffer) : base(max_field_count, buffer) {
+			this.decode ();
+		}
+
+		protected override void decode () {
+			int tag = -1;
+			while (-1 != (tag = base.deserialize.read_tag ())) {
+				switch (tag) {
+				case 0:
+					this.session = base.deserialize.read_integer ();
+					break;
+				case 1:
+					this.balls = base.deserialize.read_obj_list<ball> ();
+					break;
+				default:
+					base.deserialize.read_unknow_data ();
+					break;
+				}
+			}
+		}
+
+		public override int encode (SprotoStream stream) {
+			base.serialize.open (stream);
+
+			if (base.has_field.has_field (0)) {
+				base.serialize.write_integer (this.session, 0);
+			}
+
+			if (base.has_field.has_field (1)) {
+				base.serialize.write_obj (this.balls, 1);
 			}
 
 			return base.serialize.close ();

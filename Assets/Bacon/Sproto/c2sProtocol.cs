@@ -9,6 +9,8 @@ public class C2sProtocol : ProtocolBase {
 		Protocol.SetProtocol<born> (born.Tag);
 		Protocol.SetResponse<C2sSprotoType.born.response> (born.Tag);
 
+		Protocol.SetProtocol<die> (die.Tag);
+
 		Protocol.SetProtocol<handshake> (handshake.Tag);
 		Protocol.SetResponse<C2sSprotoType.handshake.response> (handshake.Tag);
 
@@ -27,6 +29,10 @@ public class C2sProtocol : ProtocolBase {
 
 	public class born {
 		public const int Tag = 3;
+	}
+
+	public class die {
+		public const int Tag = 6;
 	}
 
 	public class handshake {

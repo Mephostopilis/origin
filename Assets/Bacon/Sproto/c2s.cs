@@ -7,24 +7,24 @@ using System.Collections.Generic;
 
 namespace C2sSprotoType { 
 	public class ball : SprotoTypeBase {
-		private static int max_field_count = 14;
+		private static int max_field_count = 13;
 		
 		
-		private Int64 _uid; // tag 0
-		public Int64 uid {
-			get { return _uid; }
-			set { base.has_field.set_field (0, true); _uid = value; }
+		private Int64 _session; // tag 0
+		public Int64 session {
+			get { return _session; }
+			set { base.has_field.set_field (0, true); _session = value; }
 		}
-		public bool HasUid {
+		public bool HasSession {
 			get { return base.has_field.has_field (0); }
 		}
 
-		private Int64 _session; // tag 1
-		public Int64 session {
-			get { return _session; }
-			set { base.has_field.set_field (1, true); _session = value; }
+		private Int64 _ballid; // tag 1
+		public Int64 ballid {
+			get { return _ballid; }
+			set { base.has_field.set_field (1, true); _ballid = value; }
 		}
-		public bool HasSession {
+		public bool HasBallid {
 			get { return base.has_field.has_field (1); }
 		}
 
@@ -127,15 +127,6 @@ namespace C2sSprotoType {
 			get { return base.has_field.has_field (12); }
 		}
 
-		private Int64 _ballid; // tag 13
-		public Int64 ballid {
-			get { return _ballid; }
-			set { base.has_field.set_field (13, true); _ballid = value; }
-		}
-		public bool HasBallid {
-			get { return base.has_field.has_field (13); }
-		}
-
 		public ball () : base(max_field_count) {}
 
 		public ball (byte[] buffer) : base(max_field_count, buffer) {
@@ -147,10 +138,10 @@ namespace C2sSprotoType {
 			while (-1 != (tag = base.deserialize.read_tag ())) {
 				switch (tag) {
 				case 0:
-					this.uid = base.deserialize.read_integer ();
+					this.session = base.deserialize.read_integer ();
 					break;
 				case 1:
-					this.session = base.deserialize.read_integer ();
+					this.ballid = base.deserialize.read_integer ();
 					break;
 				case 2:
 					this.radis = base.deserialize.read_integer ();
@@ -185,9 +176,6 @@ namespace C2sSprotoType {
 				case 12:
 					this.vel = base.deserialize.read_integer ();
 					break;
-				case 13:
-					this.ballid = base.deserialize.read_integer ();
-					break;
 				default:
 					base.deserialize.read_unknow_data ();
 					break;
@@ -199,11 +187,11 @@ namespace C2sSprotoType {
 			base.serialize.open (stream);
 
 			if (base.has_field.has_field (0)) {
-				base.serialize.write_integer (this.uid, 0);
+				base.serialize.write_integer (this.session, 0);
 			}
 
 			if (base.has_field.has_field (1)) {
-				base.serialize.write_integer (this.session, 1);
+				base.serialize.write_integer (this.ballid, 1);
 			}
 
 			if (base.has_field.has_field (2)) {
@@ -248,10 +236,6 @@ namespace C2sSprotoType {
 
 			if (base.has_field.has_field (12)) {
 				base.serialize.write_integer (this.vel, 12);
-			}
-
-			if (base.has_field.has_field (13)) {
-				base.serialize.write_integer (this.ballid, 13);
 			}
 
 			return base.serialize.close ();
@@ -453,12 +437,12 @@ namespace C2sSprotoType {
 				get { return base.has_field.has_field (2); }
 			}
 
-			private List<ball> _all; // tag 3
-			public List<ball> all {
-				get { return _all; }
-				set { base.has_field.set_field (3, true); _all = value; }
+			private List<player> _players; // tag 3
+			public List<player> players {
+				get { return _players; }
+				set { base.has_field.set_field (3, true); _players = value; }
 			}
-			public bool HasAll {
+			public bool HasPlayers {
 				get { return base.has_field.has_field (3); }
 			}
 
@@ -482,7 +466,7 @@ namespace C2sSprotoType {
 						this.port = base.deserialize.read_integer ();
 						break;
 					case 3:
-						this.all = base.deserialize.read_obj_list<ball> ();
+						this.players = base.deserialize.read_obj_list<player> ();
 						break;
 					default:
 						base.deserialize.read_unknow_data ();
@@ -507,7 +491,7 @@ namespace C2sSprotoType {
 				}
 
 				if (base.has_field.has_field (3)) {
-					base.serialize.write_obj (this.all, 3);
+					base.serialize.write_obj (this.players, 3);
 				}
 
 				return base.serialize.close ();
@@ -749,6 +733,67 @@ namespace C2sSprotoType {
 
 			if (base.has_field.has_field (3)) {
 				base.serialize.write_integer (this.version, 3);
+			}
+
+			return base.serialize.close ();
+		}
+	}
+
+
+	public class player : SprotoTypeBase {
+		private static int max_field_count = 2;
+		
+		
+		private Int64 _session; // tag 0
+		public Int64 session {
+			get { return _session; }
+			set { base.has_field.set_field (0, true); _session = value; }
+		}
+		public bool HasSession {
+			get { return base.has_field.has_field (0); }
+		}
+
+		private List<ball> _balls; // tag 1
+		public List<ball> balls {
+			get { return _balls; }
+			set { base.has_field.set_field (1, true); _balls = value; }
+		}
+		public bool HasBalls {
+			get { return base.has_field.has_field (1); }
+		}
+
+		public player () : base(max_field_count) {}
+
+		public player (byte[] buffer) : base(max_field_count, buffer) {
+			this.decode ();
+		}
+
+		protected override void decode () {
+			int tag = -1;
+			while (-1 != (tag = base.deserialize.read_tag ())) {
+				switch (tag) {
+				case 0:
+					this.session = base.deserialize.read_integer ();
+					break;
+				case 1:
+					this.balls = base.deserialize.read_obj_list<ball> ();
+					break;
+				default:
+					base.deserialize.read_unknow_data ();
+					break;
+				}
+			}
+		}
+
+		public override int encode (SprotoStream stream) {
+			base.serialize.open (stream);
+
+			if (base.has_field.has_field (0)) {
+				base.serialize.write_integer (this.session, 0);
+			}
+
+			if (base.has_field.has_field (1)) {
+				base.serialize.write_obj (this.balls, 1);
 			}
 
 			return base.serialize.close ();

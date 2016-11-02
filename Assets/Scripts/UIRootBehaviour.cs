@@ -6,11 +6,14 @@ using UnityEngine.UI;
 public class UIRootBehaviour : MonoBehaviour {
 
     public GameObject _root = null;
+    public GameObject _born = null;
     public GameObject _join = null;
     public GameObject _ping = null;
 
     // Use this for initialization
     void Start() {
+        _born.SetActive(false);
+
         Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_SETUP_UIROOT, gameObject);
         var root = _root.GetComponent<RootBehaviour>();
         root.Application.Enqueue(cmd);
@@ -21,12 +24,15 @@ public class UIRootBehaviour : MonoBehaviour {
     }
 
     public void OnBorn() {
+        _born.SetActive(false);
         Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONBORN);
         var root = _root.GetComponent<RootBehaviour>();
         root.Application.Enqueue(cmd);
     }
 
     public void OnJoin() {
+        _join.SetActive(false);
+        _born.SetActive(true);
         Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONJOIN);
         var root = _root.GetComponent<RootBehaviour>();
         root.Application.Enqueue(cmd);
