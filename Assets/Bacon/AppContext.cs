@@ -20,9 +20,8 @@ namespace Bacon
             _init.Update(delta);
         }
 
-        public override void AuthGateOnDisconnect() {
-            base.AuthGateOnDisconnect();
-            _init.AuthGateOnDisconnect();
+        public override void GateDisconnect() {
+            base.GateDisconnect();
         }
 
         public SMActor SMActor {

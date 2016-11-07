@@ -72,14 +72,6 @@ namespace Bacon {
             base.Exit();
         }
 
-        public override void AuthGateCB(int code) {
-            base.AuthGateCB(code);
-        }
-
-        public override void AuthUdpCb(bool ok) {
-            base.AuthUdpCb(ok);
-        }
-
         public void Sync1(float delta) {
             if (_authudp) {
                 if (_synccd1 > 0) {
@@ -146,9 +138,11 @@ namespace Bacon {
             //Vector3 dir = new Vector3(0, 0, 1);
             //_player.ChangeDir(dir);
             try {
-                C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                obj.code = (long)(OpCodes.OPCODE_PRESSUP);
-                _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                if (_mysession != 0) {
+                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+                    obj.code = (long)(OpCodes.OPCODE_PRESSUP);
+                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                }
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
             }
@@ -158,9 +152,11 @@ namespace Bacon {
             //Vector3 dir = new Vector3(1, 0, 0);
             //_player.ChangeDir(dir);
             try {
-                C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                obj.code = OpCodes.OPCODE_PRESSRIGHT;
-                _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                if (_mysession != 0) {
+                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+                    obj.code = OpCodes.OPCODE_PRESSRIGHT;
+                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                }
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
             }
@@ -170,9 +166,11 @@ namespace Bacon {
             //Vector3 dir = new Vector3(0, -1, 0);
             //_player.ChangeDir(dir);
             try {
-                C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                obj.code = OpCodes.OPCODE_PRESSDOWN;
-                _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                if (_mysession != 0) {
+                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+                    obj.code = OpCodes.OPCODE_PRESSDOWN;
+                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                }
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
             }
@@ -182,9 +180,11 @@ namespace Bacon {
             //Vector3 dir = new Vector3(-1, 0, 0);
             //_player.ChangeDir(dir);
             try {
-                C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                obj.code = OpCodes.OPCODE_PRESSLEFT;
-                _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                if (_mysession != 0) {
+                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+                    obj.code = OpCodes.OPCODE_PRESSLEFT;
+                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+                }
             } catch (KeyNotFoundException ex) {
                 Debug.LogError(ex.Message);
             }
