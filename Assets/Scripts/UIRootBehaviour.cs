@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Bacon;
+//using Bacon;
 using UnityEngine.UI;
 
 public class UIRootBehaviour : MonoBehaviour {
@@ -14,9 +14,9 @@ public class UIRootBehaviour : MonoBehaviour {
     void Start() {
         _born.SetActive(false);
 
-        Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_SETUP_UIROOT, gameObject);
-        var root = _root.GetComponent<RootBehaviour>();
-        root.App.Enqueue(cmd);
+        //Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_SETUP_UIROOT, gameObject);
+        //var root = _root.GetComponent<RootBehaviour>();
+        //root.App.Enqueue(cmd);
     }
 
     // Update is called once per frame
@@ -25,17 +25,17 @@ public class UIRootBehaviour : MonoBehaviour {
 
     public void OnBorn() {
         _born.SetActive(false);
-        Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONBORN);
-        var root = _root.GetComponent<RootBehaviour>();
-        root.App.Enqueue(cmd);
+        //Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONBORN);
+        //var root = _root.GetComponent<RootBehaviour>();
+        //root.App.Enqueue(cmd);
     }
 
     public void OnJoin() {
         _join.SetActive(false);
         _born.SetActive(true);
-        Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONJOIN);
-        var root = _root.GetComponent<RootBehaviour>();
-        root.App.Enqueue(cmd);
+        //Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_ONJOIN);
+        //var root = _root.GetComponent<RootBehaviour>();
+        //root.App.Enqueue(cmd);
     }
 
     public void disableJoin() {

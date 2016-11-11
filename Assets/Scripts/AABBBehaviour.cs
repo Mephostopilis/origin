@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Bacon;
 
 public class AABBBehaviour : MonoBehaviour {
 
-    private AABB _aabb = null;
+    //private AABB _aabb = null;
 
 	// Use this for initialization
 	void Start () {
@@ -17,8 +16,8 @@ public class AABBBehaviour : MonoBehaviour {
 	}
 
     public void Transform(Matrix4x4 m) {
-        _aabb.transform(m);
+        //_aabb.transform(m);
     }
 
-    public AABB AABB { get { return _aabb; } set { _aabb = value; } }
+    //public AABB AABB { get { return _aabb; } set { _aabb = value; } }
 }

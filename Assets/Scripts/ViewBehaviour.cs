@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Bacon;
+//using Bacon;
 
 public class ViewBehaviour : MonoBehaviour {
 
-    private View _view = null;
-    private AABB _aabb = null;
+    //private View _view = null;
+    //private AABB _aabb = null;
     private GameObject _mainCamera = null;
 
 	// Use this for initialization
@@ -40,7 +40,7 @@ public class ViewBehaviour : MonoBehaviour {
 
     }
 
-    public void SetupView(View view) {
-        _view = view;
-    }
+    //public void SetupView(View view) {
+    //    _view = view;
+    //}
 }

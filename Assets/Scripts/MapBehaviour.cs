@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Bacon;
+//using Bacon;
 
 public class MapBehaviour : MonoBehaviour {
 
-    private Map _map = null;
+    //private Map _map = null;
     //public GameObject _cube;
     //public GameObject _sprite;
 
@@ -20,7 +20,7 @@ public class MapBehaviour : MonoBehaviour {
 
     }
 
-    public void SetupMap(Map map) {
-        _map = map;
-    }
+    //public void SetupMap(Map map) {
+    //    _map = map;
+    //}
 }
