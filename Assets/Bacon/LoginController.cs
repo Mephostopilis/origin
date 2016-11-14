@@ -1,7 +1,8 @@
 ﻿using Bacon;
+using Maria;
 using UnityEngine;
 
-namespace Maria {
+namespace Bacon {
     class LoginController : Controller {
         private string _server;
         private string _username;

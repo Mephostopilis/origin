@@ -6,19 +6,18 @@ using System.Collections.Generic;
 public class App : MonoBehaviour {
 
     public RootBehaviour _root = null;
-    private Maria.Application _app = null;
+    private Bacon.App _app = null;
     
     // Use this for initialization
     void Start() {
         DontDestroyOnLoad(this);
-        _app = new Maria.Application(this);
+        _app = new Bacon.App();
         var com = _root.GetComponent<StartBehaviour>();
         com.SetupStartRoot();
     }
 
     // Update is called once per frame
     void Update() {
-
         _app.Update();
     }
 

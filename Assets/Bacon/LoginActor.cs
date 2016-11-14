@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Maria;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace Maria {
+namespace Bacon {
     public class LoginActor : Actor {
         public LoginActor(Context ctx, Controller controller) : base(ctx, controller) {
             EventListenerCmd listener1 = new EventListenerCmd(EventCmd.EVENT_LOGIN, Login);
