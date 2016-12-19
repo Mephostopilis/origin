@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bacon
-{
-    class OBB
-    {
+namespace Assets.Bacon {
+    class StartController {
     }
 }

@@ -24,10 +24,6 @@ namespace Bacon
             _init.Update(delta);
         }
 
-        public override void GateDisconnect() {
-            base.GateDisconnect();
-        }
-
         public SMActor SMActor {
             get {
                 InitController controller = _hash["init"] as InitController;
