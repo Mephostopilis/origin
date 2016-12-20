@@ -37,7 +37,6 @@ public class ViewBehaviour : MonoBehaviour {
 
         gameObject.transform.localPosition = orgin;
         //_go.transform.
-
     }
 
     //public void SetupView(View view) {

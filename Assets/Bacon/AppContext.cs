@@ -11,11 +11,14 @@ namespace Bacon
         public AppContext(Application application, Config config) : base(application, config) {
             _init = new InitController(this);
             _hash["init"] = _init;
+            _hash["start"] = new StartController(this);
             _hash["login"] = new LoginController(this);
             _hash["game"] = new GameController(this);
 
             _request = new Request(this, _client);
             _response = new Response(this, _client);
+
+            Push("start");
         }
 
         public override void Update(float delta) {

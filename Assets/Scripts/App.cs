@@ -5,15 +5,15 @@ using System.Collections.Generic;
 
 public class App : MonoBehaviour {
 
-    public RootBehaviour _root = null;
+    public StartBehaviour _start = null;
     private Bacon.App _app = null;
     
     // Use this for initialization
     void Start() {
         DontDestroyOnLoad(this);
         _app = new Bacon.App();
-        var com = _root.GetComponent<StartBehaviour>();
-        com.SetupStartRoot();
+
+        _start.SetupStartRoot();
     }
 
     // Update is called once per frame

@@ -20,7 +20,7 @@ namespace Bacon {
         private float _near = 0.0f;
         private float _depth = 0.0f;
 
-        private AABB _aabb = null;
+        private Maria.AABB _aabb = null;
         private Vector3 _min = Vector3.zero;
         private Vector3 _max = Vector3.zero;
 
