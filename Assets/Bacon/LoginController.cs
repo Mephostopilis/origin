@@ -11,6 +11,7 @@ namespace Bacon {
         private LoginActor _loginActor;
 
         public LoginController(Context ctx) : base(ctx) {
+            _name = "login";
             _loginActor = new LoginActor(_ctx, this);
         }
 
@@ -38,7 +39,7 @@ namespace Bacon {
         public override void OnGateAuthed(int code) {
             base.OnGateAuthed(code);
             if (code == 200) {
-                _ctx.Push("game");
+                _ctx.Push("main");
             } else {
                 _loginActor.EnableCommitOk();
             }

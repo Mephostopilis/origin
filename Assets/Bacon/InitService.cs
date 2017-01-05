@@ -6,6 +6,9 @@ using System;
 
 namespace Bacon {
     class InitService : Service {
+
+        public static readonly string Name = "init";
+
         private bool _authed = false;
         private float _handshakecd = 5f;
         private long _last = 0;

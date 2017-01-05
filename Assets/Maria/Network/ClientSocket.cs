@@ -53,8 +53,6 @@ namespace Maria.Network {
         private Dictionary<string, ReqPg> _reqPg = new Dictionary<string, ReqPg>();
         private Dictionary<string, RspPg> _rspPg = new Dictionary<string, RspPg>();
 
-        private Queue<byte[]> _sendBuffer = new Queue<byte[]>();
-
         // udp
         private PackageSocketUdp _udp = null;
         private long             _udpsession = 0;
@@ -93,6 +91,7 @@ namespace Maria.Network {
         }
 
         public void SendReq<T>(int tag, SprotoTypeBase obj) {
+            Debug.Assert(_tcpflag == true);
             uint id = genSession();
             byte[] d = _sendRequest.Invoke<T>(obj, id);
             Debug.Assert(d != null);
@@ -106,15 +105,16 @@ namespace Maria.Network {
             string key = idToHex(id);
             _rspPg[key] = pg;
 
-            if (_tcpflag) {
-                while (_sendBuffer.Count > 0) {
-                    byte[] b = _sendBuffer.Dequeue();
-                    _tcp.Send(b, 0, b.Length);
-                }
-                _tcp.Send(d, 0, d.Length);
-            } else {
-                _sendBuffer.Enqueue(d);
-            }
+            _tcp.Send(d, 0, d.Length);
+        }
+
+        private byte[] WriteToken() {
+            string u = Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(string.Format("{0}", _user.Uid))));
+            string s = Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(_user.Server)));
+            string sid = Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(string.Format("{0}", _user.Subid))));
+            string token = string.Format("{0}@{1}#{2}:{3}", u, s, sid, _index);
+            Debug.Log(token);
+            return Encoding.ASCII.GetBytes(token);
         }
 
         private void DoAuth() {
@@ -151,8 +151,8 @@ namespace Maria.Network {
                         _tcpflag = true;
                         _step = 0;
                         _handshake = false;
-                        _tcp.SetEnabledPing(true);
-                        _tcp.SendPing();
+                        //_tcp.SetEnabledPing(true);
+                        //_tcp.SendPing();
                         Debug.Log(string.Format("{0},{1}", code, msg));
                         if (OnAuthed != null) {
                             OnAuthed(code);
@@ -209,37 +209,6 @@ namespace Maria.Network {
             if (OnDisconnected != null) {
                 OnDisconnected();
             }
-        }
-
-        private byte[] WriteToken() {
-            string u = Encoding.ASCII.GetString(Crypt.base64encode(_user.Uid));
-            string s = Encoding.ASCII.GetString(Crypt.base64encode(Encoding.ASCII.GetBytes(_user.Server)));
-            string sid = Encoding.ASCII.GetString(Crypt.base64encode(_user.Subid));
-            string token = string.Format("{0}@{1}#{2}:{3}", u, s, sid, _index);
-            Debug.Log(token);
-            return Encoding.ASCII.GetBytes(token);
-        }
-
-        private uint B2L(byte[] buffer, int start, int length) {
-            uint r = 0;
-            for (int i = 0; i < length; i++) {
-                int idx = start + i;
-                int b = buffer[idx];
-            }
-            return r;
-        }
-
-        private void Write(byte[] buffer, uint session, byte tag) {
-            int l = buffer.Length + 5;
-            byte[] tmp = new byte[l];
-            Array.Copy(buffer, tmp, buffer.Length);
-            byte[] s = new byte[4];
-            for (int i = 0; i < 4; i++) {
-                s[i] = (byte)(session >> (8 * (3 - i)) & 0xff);
-            }
-            Array.Copy(s, 0, tmp, buffer.Length, 4);
-            tmp[l - 1] = tag;
-            _tcp.Send(tmp, 0, l);
         }
 
         private uint genSession() {

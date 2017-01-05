@@ -126,8 +126,8 @@ namespace Maria {
                 int _2 = dummy.IndexOf('@', _1);
                 int _3 = dummy.IndexOf(':', _2);
 
-                byte[] uid = Encoding.ASCII.GetBytes(dummy.Substring(0, _1));
-                byte[] sid = Encoding.ASCII.GetBytes(dummy.Substring(_1 + 1, _2 - _1 - 1));
+                int uid = Int32.Parse(dummy.Substring(0, _1));
+                int sid = Int32.Parse(dummy.Substring(_1 + 1, _2 - _1 - 1));
                 string gip = dummy.Substring(_2 + 1, _3 - _2 - 1);
                 int gpt = Int32.Parse(dummy.Substring(_3 + 1));
 
@@ -138,6 +138,8 @@ namespace Maria {
                 _user.Uid = uid;
                 _user.Subid = sid;
 
+                //_config.GateIp = gip;
+                //_config.GatePort = gpt;
                 GateAuth();
             } else {
             }

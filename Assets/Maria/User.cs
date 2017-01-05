@@ -9,8 +9,8 @@ namespace Maria
         public string Server { get; set; }
         public string Username { set; get; }
         public string Password { set; get; }
-        public byte[] Uid { get; set; }
+        public int Uid { get; set; }
+        public int Subid { set; get; }
         public byte[] Secret { set; get; }
-        public byte[] Subid { set; get; }
     }
 }

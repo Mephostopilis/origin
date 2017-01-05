@@ -11,6 +11,7 @@ namespace Maria  {
         protected bool _authtcp = false;
         protected bool _authudp = false;
         protected List<Actor> _actors = new List<Actor>();
+        protected string _name = string.Empty;
 
         public Controller(Context ctx) {
             Debug.Assert(ctx != null);
@@ -33,6 +34,9 @@ namespace Maria  {
         }
 
         public virtual void Enter() {
+            if (_name != String.Empty) {
+                _ctx.QueryService("init")
+            }
         }
 
         public virtual void Exit() {

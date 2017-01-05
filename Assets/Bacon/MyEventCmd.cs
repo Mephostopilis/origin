@@ -22,6 +22,8 @@ namespace Bacon {
         public static uint EVENT_ONJOIN = 110;
         public static uint EVENT_SETUP_UIROOT = 111;
 
+        public static uint EVENT_MUI_MATCH = 112;
+
         public MyEventCmd(uint cmd) : base(cmd) {
         }
     }
