@@ -11,14 +11,18 @@ public class App : MonoBehaviour {
     // Use this for initialization
     void Start() {
         DontDestroyOnLoad(this);
-        _app = new Bacon.App();
-
+        _app = new Bacon.App(this);
         _start.SetupStartRoot();
     }
 
     // Update is called once per frame
     void Update() {
-        _app.Update();
+        try {
+            _app.Update();
+        } catch (System.Exception ex) {
+            Debug.LogError(string.Format("ex message: {0}", ex.Message));
+            Debug.LogError(ex.StackTrace);
+        }
     }
 
     void OnApplicationFocus(bool isFocus) {

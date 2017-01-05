@@ -7,12 +7,9 @@ using Maria;
 namespace Bacon {
     class UIRootActor : Maria.Actor {
 
-        private InitController _init = null;
         private int _ping = 0;
 
         public UIRootActor(Context ctx, Controller controller) : base(ctx, controller) {
-
-            _init = _ctx.GetController<InitController>("init");
 
             EventListenerCmd listener1 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_UIROOT, SetupUIRoot);
             _ctx.EventDispatcher.AddCmdEventListener(listener1);
@@ -34,15 +31,15 @@ namespace Bacon {
         }
 
         public void OnBorn(EventCmd e) {
-            _ctx.SendReq<C2sProtocol.born>(C2sProtocol.born.Tag, null);
+            //_ctx.SendReq<C2sProtocol.born>(C2sProtocol.born.Tag, null);
         }
 
         public void OnJoin(EventCmd e) {
-            _ctx.UdpAuth(null);
+            //_ctx.UdpAuth(null);
         }
 
         public void Ping() {
-            _ping = _init.Ping;
+            //_ping = _init.Ping;
             _ctx.EnqueueRenderQueue(RenderPing);
         }
 

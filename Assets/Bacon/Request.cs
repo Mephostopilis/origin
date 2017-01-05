@@ -11,10 +11,10 @@ namespace Bacon {
             _cs = cs;
 
             _cs.RegisterRequest(S2cProtocol.handshake.Tag, handshake);
-            _cs.RegisterRequest(S2cProtocol.join.Tag, join);
-            _cs.RegisterRequest(S2cProtocol.born.Tag, born);
-            _cs.RegisterRequest(S2cProtocol.leave.Tag, leave);
-            _cs.RegisterRequest(S2cProtocol.die.Tag, die);
+            //_cs.RegisterRequest(S2cProtocol.join.Tag, join);
+            //_cs.RegisterRequest(S2cProtocol.born.Tag, born);
+            //_cs.RegisterRequest(S2cProtocol.leave.Tag, leave);
+            //_cs.RegisterRequest(S2cProtocol.die.Tag, die);
         }
 
         public SprotoTypeBase handshake(uint session, SprotoTypeBase requestObj) {

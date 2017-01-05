@@ -64,8 +64,11 @@ namespace Bacon {
 
         public override void Enter() {
             base.Enter();
-            SMActor actor = ((AppContext)_ctx).SMActor;
-            actor.LoadScene("game");
+            InitService service = (InitService)_ctx.QueryService("init");
+            if (service != null) {
+                SMActor actor = service.SMActor;
+                actor.LoadScene("game");
+            }
         }
 
         public override void Exit() {
@@ -137,207 +140,210 @@ namespace Bacon {
         public void OnPressUp(EventCmd e) {
             //Vector3 dir = new Vector3(0, 0, 1);
             //_player.ChangeDir(dir);
-            try {
-                if (_mysession != 0) {
-                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                    obj.code = (long)(OpCodes.OPCODE_PRESSUP);
-                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-                }
-            } catch (KeyNotFoundException ex) {
-                Debug.LogError(ex.Message);
-            }
+            //try {
+            //    if (_mysession != 0) {
+            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+            //        obj.code = (long)(OpCodes.OPCODE_PRESSUP);
+            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+            //    }
+            //} catch (KeyNotFoundException ex) {
+            //    Debug.LogError(ex.Message);
+            //}
         }
 
         public void OnPressRight(EventCmd e) {
             //Vector3 dir = new Vector3(1, 0, 0);
             //_player.ChangeDir(dir);
-            try {
-                if (_mysession != 0) {
-                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                    obj.code = OpCodes.OPCODE_PRESSRIGHT;
-                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-                }
-            } catch (KeyNotFoundException ex) {
-                Debug.LogError(ex.Message);
-            }
+            //try {
+            //    if (_mysession != 0) {
+            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+            //        obj.code = OpCodes.OPCODE_PRESSRIGHT;
+            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+            //    }
+            //} catch (KeyNotFoundException ex) {
+            //    Debug.LogError(ex.Message);
+            //}
         }
 
         public void OnPressDown(EventCmd e) {
             //Vector3 dir = new Vector3(0, -1, 0);
             //_player.ChangeDir(dir);
-            try {
-                if (_mysession != 0) {
-                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                    obj.code = OpCodes.OPCODE_PRESSDOWN;
-                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-                }
-            } catch (KeyNotFoundException ex) {
-                Debug.LogError(ex.Message);
-            }
+            //try {
+            //    if (_mysession != 0) {
+            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+            //        obj.code = OpCodes.OPCODE_PRESSDOWN;
+            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+            //    }
+            //} catch (KeyNotFoundException ex) {
+            //    Debug.LogError(ex.Message);
+            //}
         }
 
         public void OnPressLeft(EventCmd e) {
             //Vector3 dir = new Vector3(-1, 0, 0);
             //_player.ChangeDir(dir);
-            try {
-                if (_mysession != 0) {
-                    C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-                    obj.code = OpCodes.OPCODE_PRESSLEFT;
-                    _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-                }
-            } catch (KeyNotFoundException ex) {
-                Debug.LogError(ex.Message);
-            }
+            //try {
+            //    if (_mysession != 0) {
+            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
+            //        obj.code = OpCodes.OPCODE_PRESSLEFT;
+            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
+            //    }
+            //} catch (KeyNotFoundException ex) {
+            //    Debug.LogError(ex.Message);
+            //}
         }
 
         // 游戏协议
         // 主要是同步场景中已经加入的其他玩家
         public void Join(SprotoTypeBase responseObj) {
-            if (responseObj != null) {
-                C2sSprotoType.join.response o = responseObj as C2sSprotoType.join.response;
-                _mysession = o.session;
-                //string host = o.host;
-                //int port = (int)o.port;
+            //if (responseObj != null) {
+            //    C2sSprotoType.join.response o = responseObj as C2sSprotoType.join.response;
+            //    _mysession = o.session;
+            //    //string host = o.host;
+            //    //int port = (int)o.port;
 
-                if (_playes.ContainsKey(_mysession)) {
-                } else {
-                    Player player = new Player((uint)_mysession);
-                    _playes[_mysession] = player;
-                }
+            //    if (_playes.ContainsKey(_mysession)) {
+            //    } else {
+            //        Player player = new Player((uint)_mysession);
+            //        _playes[_mysession] = player;
+            //    }
 
-                foreach (var item in o.players) {
-                    Player player = null;
-                    if (_playes.ContainsKey(item.session)) {
-                        player = _playes[item.session];
-                    } else {
-                        player = new Player((uint)item.session);
-                        _playes[item.session] = player;
-                    }
-                    if (player != null) {
-                        foreach (var b in item.balls) {
-                            uint session = (uint)b.session;
-                            long ballid = b.ballid;
-                            float radis = b.radis;
-                            float length = b.length;
-                            float width = b.width;
-                            float height = b.height;
-                            float pos_x = (float)BitConverter.Int64BitsToDouble(b.px);
-                            float pos_y = (float)BitConverter.Int64BitsToDouble(b.py);
-                            float pos_z = (float)BitConverter.Int64BitsToDouble(b.pz);
-                            Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-                            float dir_x = (float)BitConverter.Int64BitsToDouble(b.dx);
-                            float dir_y = (float)BitConverter.Int64BitsToDouble(b.dy);
-                            float dir_z = (float)BitConverter.Int64BitsToDouble(b.dz);
-                            Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
-                            float vel = (float)BitConverter.Int64BitsToDouble(b.vel);
-                            var ball = SetupBall(ballid, session, radis, length, width, height, pos, dir, vel);
-                            player.Add(ball);
-                        }
-                    }
-                }
-            }
+            //    foreach (var item in o.players) {
+            //        Player player = null;
+            //        if (_playes.ContainsKey(item.session)) {
+            //            player = _playes[item.session];
+            //        } else {
+            //            player = new Player((uint)item.session);
+            //            _playes[item.session] = player;
+            //        }
+            //        if (player != null) {
+            //            foreach (var b in item.balls) {
+            //                uint session = (uint)b.session;
+            //                long ballid = b.ballid;
+            //                float radis = b.radis;
+            //                float length = b.length;
+            //                float width = b.width;
+            //                float height = b.height;
+            //                float pos_x = (float)BitConverter.Int64BitsToDouble(b.px);
+            //                float pos_y = (float)BitConverter.Int64BitsToDouble(b.py);
+            //                float pos_z = (float)BitConverter.Int64BitsToDouble(b.pz);
+            //                Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+            //                float dir_x = (float)BitConverter.Int64BitsToDouble(b.dx);
+            //                float dir_y = (float)BitConverter.Int64BitsToDouble(b.dy);
+            //                float dir_z = (float)BitConverter.Int64BitsToDouble(b.dz);
+            //                Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
+            //                float vel = (float)BitConverter.Int64BitsToDouble(b.vel);
+            //                var ball = SetupBall(ballid, session, radis, length, width, height, pos, dir, vel);
+            //                player.Add(ball);
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         public SprotoTypeBase OnJoin(SprotoTypeBase requestObj) {
-            S2cSprotoType.join.request obj = requestObj as S2cSprotoType.join.request;
-            if (obj != null) {
-                if (_playes.ContainsKey(obj.session)) {
-                } else {
-                    Player player = new Player((uint)obj.session);
-                    _playes[obj.session] = player;
-                }
-            }
-            S2cSprotoType.join.response responseObj = new S2cSprotoType.join.response();
-            responseObj.errorcode = Errorcode.SUCCESS;
-            return responseObj;
+            //S2cSprotoType.join.request obj = requestObj as S2cSprotoType.join.request;
+            //if (obj != null) {
+            //    if (_playes.ContainsKey(obj.session)) {
+            //    } else {
+            //        Player player = new Player((uint)obj.session);
+            //        _playes[obj.session] = player;
+            //    }
+            //}
+            //S2cSprotoType.join.response responseObj = new S2cSprotoType.join.response();
+            //responseObj.errorcode = Errorcode.SUCCESS;
+            //return responseObj;
+            return null;
         }
 
         public void Born(SprotoTypeBase responseObj) {
-            C2sSprotoType.born.response obj = responseObj as C2sSprotoType.born.response;
-            if (obj != null && obj.errorcode == Errorcode.SUCCESS) {
-                var item = obj.b;
-                uint session = (uint)item.session;
-                long ballid = item.ballid;
-                float radis = item.radis;
-                float length = item.length;
-                float width = item.width;
-                float height = item.height;
-                float pos_x = (float)BitConverter.Int64BitsToDouble(item.px);
-                float pos_y = (float)BitConverter.Int64BitsToDouble(item.py);
-                float pos_z = (float)BitConverter.Int64BitsToDouble(item.pz);
-                Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-                float dir_x = (float)BitConverter.Int64BitsToDouble(item.dx);
-                float dir_y = (float)BitConverter.Int64BitsToDouble(item.dy);
-                float dir_z = (float)BitConverter.Int64BitsToDouble(item.dz);
-                Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
-                float vel = (float)BitConverter.Int64BitsToDouble(item.vel);
-                var ball = SetupBall(ballid, session, radis, length, width, height, pos, dir, vel);
-                var player = _playes[session];
-                player.Add(ball);
-                if (session == _mysession) {
-                    _view.MoveTo(new Vector2(pos_x, pos_z));
-                }
-            }
+            //C2sSprotoType.born.response obj = responseObj as C2sSprotoType.born.response;
+            //if (obj != null && obj.errorcode == Errorcode.SUCCESS) {
+            //    var item = obj.b;
+            //    uint session = (uint)item.session;
+            //    long ballid = item.ballid;
+            //    float radis = item.radis;
+            //    float length = item.length;
+            //    float width = item.width;
+            //    float height = item.height;
+            //    float pos_x = (float)BitConverter.Int64BitsToDouble(item.px);
+            //    float pos_y = (float)BitConverter.Int64BitsToDouble(item.py);
+            //    float pos_z = (float)BitConverter.Int64BitsToDouble(item.pz);
+            //    Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+            //    float dir_x = (float)BitConverter.Int64BitsToDouble(item.dx);
+            //    float dir_y = (float)BitConverter.Int64BitsToDouble(item.dy);
+            //    float dir_z = (float)BitConverter.Int64BitsToDouble(item.dz);
+            //    Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
+            //    float vel = (float)BitConverter.Int64BitsToDouble(item.vel);
+            //    var ball = SetupBall(ballid, session, radis, length, width, height, pos, dir, vel);
+            //    var player = _playes[session];
+            //    player.Add(ball);
+            //    if (session == _mysession) {
+            //        _view.MoveTo(new Vector2(pos_x, pos_z));
+            //    }
+            //}
         }
 
         public SprotoTypeBase OnBorn(SprotoTypeBase requestObj) {
-            S2cSprotoType.born.request obj = requestObj as S2cSprotoType.born.request;
-            if (obj != null) {
-                foreach (var b in obj.bs) {
-                    uint session = (uint)b.session;
-                    long ballid = b.ballid;
-                    float radis = b.radis;
-                    float length = b.length;
-                    float width = b.width;
-                    float height = b.height;
-                    float pos_x = (float)BitConverter.Int64BitsToDouble(b.px);
-                    float pos_y = (float)BitConverter.Int64BitsToDouble(b.py);
-                    float pos_z = (float)BitConverter.Int64BitsToDouble(b.pz);
-                    Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-                    float dir_x = (float)BitConverter.Int64BitsToDouble(b.dx);
-                    float dir_y = (float)BitConverter.Int64BitsToDouble(b.dy);
-                    float dir_z = (float)BitConverter.Int64BitsToDouble(b.dz);
-                    Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
-                    float vel = (float)BitConverter.Int64BitsToDouble(b.vel);
-                    var ball = SetupBall(ballid, session, radis, length, width, height, pos, dir, vel);
-                    var player = _playes[session];
-                    player.Add(ball);
-                }
-                
-                S2cSprotoType.born.response responseObj = new S2cSprotoType.born.response();
-                responseObj.errorcode = Errorcode.SUCCESS;
-                return responseObj;
-            } else {
-                throw new System.Exception("request obj is null");
-            }
+            //S2cSprotoType.born.request obj = requestObj as S2cSprotoType.born.request;
+            //if (obj != null) {
+            //    foreach (var b in obj.bs) {
+            //        uint session = (uint)b.session;
+            //        long ballid = b.ballid;
+            //        float radis = b.radis;
+            //        float length = b.length;
+            //        float width = b.width;
+            //        float height = b.height;
+            //        float pos_x = (float)BitConverter.Int64BitsToDouble(b.px);
+            //        float pos_y = (float)BitConverter.Int64BitsToDouble(b.py);
+            //        float pos_z = (float)BitConverter.Int64BitsToDouble(b.pz);
+            //        Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+            //        float dir_x = (float)BitConverter.Int64BitsToDouble(b.dx);
+            //        float dir_y = (float)BitConverter.Int64BitsToDouble(b.dy);
+            //        float dir_z = (float)BitConverter.Int64BitsToDouble(b.dz);
+            //        Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
+            //        float vel = (float)BitConverter.Int64BitsToDouble(b.vel);
+            //        var ball = SetupBall(ballid, session, radis, length, width, height, pos, dir, vel);
+            //        var player = _playes[session];
+            //        player.Add(ball);
+            //    }
+
+            //    S2cSprotoType.born.response responseObj = new S2cSprotoType.born.response();
+            //    responseObj.errorcode = Errorcode.SUCCESS;
+            //    return responseObj;
+            //} else {
+            //    throw new System.Exception("request obj is null");
+            //}
+            return null;
         }
 
         public void Leave(SprotoTypeBase responseObj) {
-            C2sSprotoType.leave.response obj = responseObj as C2sSprotoType.leave.response;
-            if (obj != null) {
-                if (obj.errorcode == Errorcode.SUCCESS) {
-                    var player = _playes[_mysession];
-                    var balls = player.GetBallids();
-                    foreach (var item in balls) {
-                        _scene.Leave(item);
-                    }
-                    player.Clear();
-                }
-            }
+            //C2sSprotoType.leave.response obj = responseObj as C2sSprotoType.leave.response;
+            //if (obj != null) {
+            //    if (obj.errorcode == Errorcode.SUCCESS) {
+            //        var player = _playes[_mysession];
+            //        var balls = player.GetBallids();
+            //        foreach (var item in balls) {
+            //            _scene.Leave(item);
+            //        }
+            //        player.Clear();
+            //    }
+            //}
         }
 
         public SprotoTypeBase OnLeave(SprotoTypeBase requestObj) {
-            S2cSprotoType.leave.request obj = requestObj as S2cSprotoType.leave.request;
-            if (obj != null) {
-                for (int i = 0; i < obj.ballid.Count; i++) {
-                    _scene.Leave(obj.ballid[i]);
-                }
-                S2cSprotoType.leave.response responseObj = new S2cSprotoType.leave.response();
-                responseObj.errorcode = Errorcode.SUCCESS;
-                return responseObj;
-            } else {
-                throw new System.Exception("obj is null");
-            }
+            //S2cSprotoType.leave.request obj = requestObj as S2cSprotoType.leave.request;
+            //if (obj != null) {
+            //    for (int i = 0; i < obj.ballid.Count; i++) {
+            //        _scene.Leave(obj.ballid[i]);
+            //    }
+            //    S2cSprotoType.leave.response responseObj = new S2cSprotoType.leave.response();
+            //    responseObj.errorcode = Errorcode.SUCCESS;
+            //    return responseObj;
+            //} else {
+            //    throw new System.Exception("obj is null");
+            //}
+            return null;
         }
 
         public void OpCode(SprotoTypeBase responseObj) {
@@ -345,23 +351,24 @@ namespace Bacon {
         }
 
         public SprotoTypeBase OnDie(SprotoTypeBase requestObj) {
-            S2cSprotoType.die.request obj = requestObj as S2cSprotoType.die.request;
-            try {
-                var ball =_scene.Leave(obj.ballid);
-                Player player = _playes[obj.session];
-                player.Remove(ball);
+            //S2cSprotoType.die.request obj = requestObj as S2cSprotoType.die.request;
+            //try {
+            //    var ball =_scene.Leave(obj.ballid);
+            //    Player player = _playes[obj.session];
+            //    player.Remove(ball);
 
-                S2cSprotoType.leave.response responseObj = new S2cSprotoType.leave.response();
-                responseObj.errorcode = Errorcode.SUCCESS;
-                return responseObj;
-            } catch (KeyNotFoundException ex) {
-                Debug.LogError(ex.Message);
-                throw;
-            }
+            //    S2cSprotoType.leave.response responseObj = new S2cSprotoType.leave.response();
+            //    responseObj.errorcode = Errorcode.SUCCESS;
+            //    return responseObj;
+            //} catch (KeyNotFoundException ex) {
+            //    Debug.LogError(ex.Message);
+            //    throw;
+            //}
+            return null;
         }
 
-        public override void OnRecviveUdp(PackageSocketUdp.R r) {
-            base.OnRecviveUdp(r);
+        public override void OnUdpRecv(PackageSocketUdp.R r) {
+            base.OnUdpRecv(r);
             int protocol = NetUnpack.Unpackli(r.Data, 0);
             if (protocol == 1) {
                 _ctx.TiSync.Sync((int)r.Localtime, (int)r.Globaltime);

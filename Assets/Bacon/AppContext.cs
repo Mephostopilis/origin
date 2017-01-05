@@ -4,16 +4,18 @@ using Maria.Network;
 namespace Bacon
 {
     public class AppContext : Context {
-        private InitController _init = null;
+        
+        private InitService _initService = null;
         private Request _request = null;
         private Response _response = null;
 
-        public AppContext(Application application, Config config) : base(application, config) {
-            _init = new InitController(this);
-            _hash["init"] = _init;
+        public AppContext(Application application, Config config, TimeSync ts) : base(application, config, ts) {
             _hash["start"] = new StartController(this);
             _hash["login"] = new LoginController(this);
             _hash["game"] = new GameController(this);
+
+            _initService = new InitService(this);
+            RegService("init", _initService);
 
             _request = new Request(this, _client);
             _response = new Response(this, _client);
@@ -21,21 +23,7 @@ namespace Bacon
             Push("start");
         }
 
-        public override void Update(float delta) {
-            // delta in seconds
-            base.Update(delta);
-            _init.Update(delta);
-        }
+        public global::App GApp { get { return ((App)_application).GApp; } }
 
-        public SMActor SMActor {
-            get {
-                InitController controller = _hash["init"] as InitController;
-                if (controller != null) {
-                    return controller.SMActor;
-                } else {
-                    return null;
-                }
-            }
-        }
     }
 }

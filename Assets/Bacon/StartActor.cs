@@ -6,8 +6,8 @@ namespace Bacon {
     class StartActor : Actor {
 
         public StartActor(Context ctx, Controller controller) : base(ctx, controller) {
-            //EventListenerCmd listener1 = new EventListenerCmd(Bacon.MyEventCmd.EVENT_SETUP_STARTROOT, SetupStartRoot);
-            //_ctx.EventDispatcher.AddCmdEventListener(listener1);
+            EventListenerCmd listener1 = new EventListenerCmd(Bacon.MyEventCmd.EVENT_SETUP_STARTROOT, SetupStartRoot);
+            _ctx.EventDispatcher.AddCmdEventListener(listener1);
         }
 
         private void SetupStartRoot(EventCmd e) {

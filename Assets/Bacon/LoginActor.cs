@@ -19,13 +19,13 @@ namespace Bacon {
         }
 
         public void Login(EventCmd e) {
-            string str = "login controller login.";
-            Debug.Log(str);
+            //string str = "login controller login.";
+            //Debug.Log(str);
 
             Message msg = e.Msg;
-            string server = msg["server"].ToString();
-            string username = msg["username"].ToString();
-            string password = msg["password"].ToString();
+            string server = (string)msg["server"];
+            string username = (string)msg["username"].ToString();
+            string password = (string)msg["password"].ToString();
             LoginController controller = _controller as LoginController;
             controller.LoginAuth(server, username, password);
         }

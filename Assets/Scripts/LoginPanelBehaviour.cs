@@ -7,10 +7,10 @@ public class LoginPanelBehaviour : MonoBehaviour {
 
 
     public RootBehaviour _root = null;
-    public GameObject _uiroot = null;
-    public GameObject _usernmIF = null;
-    public GameObject _passwdIF = null;
-    public GameObject _ok = null;
+    public LSUIRootBehaviour _uiroot = null;
+    public InputField _usernmIF = null;
+    public InputField _passwdIF = null;
+    public Button _ok = null;
 
     private string _server = null;
     private string _username = null;
@@ -43,7 +43,7 @@ public class LoginPanelBehaviour : MonoBehaviour {
         if (!_commit)
         {
             _commit = true;
-            _ok.SetActive(false);
+            _ok.gameObject.SetActive(false);
             _username = GetUsername();
             _password = GetPassword();
             if (_username.Length < 4)
@@ -69,7 +69,7 @@ public class LoginPanelBehaviour : MonoBehaviour {
 
     public void EnableCommitOk() {
         _commit = false;
-        _ok.SetActive(true);
+        _ok.gameObject.SetActive(true);
     }
 
     public void OnUserValueChanged(string v) {

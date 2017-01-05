@@ -8,7 +8,7 @@ namespace Bacon {
 
         private Queue<string> _queue = new Queue<string>();
 
-        public SMActor(Context ctx, Controller controller) : base(ctx, controller) {
+        public SMActor(Context ctx, Service service) : base(ctx, service) {
         }
 
         public void LoadScene(string name) {

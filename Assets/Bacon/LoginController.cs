@@ -16,8 +16,12 @@ namespace Bacon {
 
         public override void Enter() {
             base.Enter();
-            SMActor actor = ((AppContext)_ctx).SMActor;
-            actor.LoadScene("login");
+
+            InitService service = (InitService)_ctx.QueryService("init");
+            if (service != null) {
+                SMActor actor = service.SMActor;
+                actor.LoadScene("login");
+            }
         }
 
         public override void Exit() {
@@ -31,13 +35,17 @@ namespace Bacon {
             _ctx.LoginAuth(server, username, password);
         }
 
-        public override void GateAuthCb(int code) {
-            base.GateAuthCb(code);
+        public override void OnGateAuthed(int code) {
+            base.OnGateAuthed(code);
             if (code == 200) {
                 _ctx.Push("game");
             } else {
                 _loginActor.EnableCommitOk();
             }
+        }
+
+        public override void OnGateDisconnected() {
+            base.OnGateDisconnected();
         }
     }
 }

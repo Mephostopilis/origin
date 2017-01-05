@@ -6,10 +6,8 @@ using System.Collections.Generic;
 public class C2sProtocol : ProtocolBase {
 	public static  C2sProtocol Instance = new C2sProtocol();
 	private C2sProtocol() {
-		Protocol.SetProtocol<born> (born.Tag);
-		Protocol.SetResponse<C2sSprotoType.born.response> (born.Tag);
-
-		Protocol.SetProtocol<die> (die.Tag);
+		Protocol.SetProtocol<enter_room> (enter_room.Tag);
+		Protocol.SetResponse<C2sSprotoType.enter_room.response> (enter_room.Tag);
 
 		Protocol.SetProtocol<handshake> (handshake.Tag);
 		Protocol.SetResponse<C2sSprotoType.handshake.response> (handshake.Tag);
@@ -18,21 +16,10 @@ public class C2sProtocol : ProtocolBase {
 		Protocol.SetRequest<C2sSprotoType.join.request> (join.Tag);
 		Protocol.SetResponse<C2sSprotoType.join.response> (join.Tag);
 
-		Protocol.SetProtocol<leave> (leave.Tag);
-		Protocol.SetResponse<C2sSprotoType.leave.response> (leave.Tag);
-
-		Protocol.SetProtocol<opcode> (opcode.Tag);
-		Protocol.SetRequest<C2sSprotoType.opcode.request> (opcode.Tag);
-		Protocol.SetResponse<C2sSprotoType.opcode.response> (opcode.Tag);
-
 	}
 
-	public class born {
-		public const int Tag = 3;
-	}
-
-	public class die {
-		public const int Tag = 6;
+	public class enter_room {
+		public const int Tag = 2;
 	}
 
 	public class handshake {
@@ -40,15 +27,7 @@ public class C2sProtocol : ProtocolBase {
 	}
 
 	public class join {
-		public const int Tag = 2;
-	}
-
-	public class leave {
-		public const int Tag = 4;
-	}
-
-	public class opcode {
-		public const int Tag = 5;
+		public const int Tag = 3;
 	}
 
 }
