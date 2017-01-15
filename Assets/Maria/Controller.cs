@@ -34,9 +34,6 @@ namespace Maria  {
         }
 
         public virtual void Enter() {
-            if (_name != String.Empty) {
-                _ctx.QueryService("init")
-            }
         }
 
         public virtual void Exit() {

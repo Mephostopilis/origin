@@ -16,6 +16,7 @@ namespace Maria.Network {
             _cs.RegisterResponse(C2sProtocol.join.Tag, join);
             //_cs.RegisterResponse(C2sProtocol.born.Tag, born);
             //_cs.RegisterResponse(C2sProtocol.opcode.Tag, opcode);
+            _cs.RegisterResponse(C2sProtocol.match.Tag, match);
         }
 
         public void handshake(uint session, SprotoTypeBase responseObj) {
@@ -41,6 +42,11 @@ namespace Maria.Network {
         public void opcode(uint session, SprotoTypeBase responseObj) {
             GameController ctr = _ctx.Top() as GameController;
             ctr.OpCode(responseObj);
+        }
+
+        public void match(uint session, SprotoTypeBase responseObj) {
+            MainController ctr = _ctx.Top() as MainController;
+            ctr.Match(responseObj);
         }
     }
 }

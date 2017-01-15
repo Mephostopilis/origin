@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Maria.Encrypt;
 using Maria.Rudp;
@@ -31,12 +32,12 @@ namespace Maria.Network {
         private uint _session;
         private TimeSync _timeSync;
 
-        private List<byte[]> _sendBuffer = new List<byte[]>();
         private bool _connected = false;
         private RecvCB _recvCb = null;
         private SyncCB _syncCb = null;
         private Rudp.Rudp _u = null;
-        private int _tick = 0;
+        private int _last = 0;
+
 
         public PackageSocketUdp(byte[] secret, uint session, TimeSync ts) {
             Debug.Assert(ts != null);
@@ -45,7 +46,8 @@ namespace Maria.Network {
             _session = session;
             _timeSync = ts;
             _u = new Rudp.Rudp(1, 5);
-            _u.OnRecv = Recv;
+            _u.OnRecv = RRecv;
+            _u.OnSend = RSend;
         }
 
         protected override void Dispose(bool disposing) {
@@ -73,6 +75,8 @@ namespace Maria.Network {
 
         public void Sync() {
             int now = _timeSync.LocalTime();
+            _last = now;
+
             byte[] buffer = new byte[12];
             NetPack.PacklI(buffer, 0, (uint)now);
             NetPack.PacklI(buffer, 4, 0xffffffff);
@@ -111,30 +115,38 @@ namespace Maria.Network {
         }
 
         public void Update() {
-            _tick++;
-            if (_tick == Int32.MaxValue) {
-                _tick = 0;
-            }
             if (_so.Poll(0, SelectMode.SelectRead)) {
                 EndPoint ep = _remoteEP as EndPoint;
                 int sz = _so.ReceiveFrom(_buffer, 3072, SocketFlags.None, ref ep);
-                List<byte[]> res = _u.Update(_buffer, 0, sz, 1);
-                foreach (var item in res) {
-                    _so.SendTo(item, _remoteEP);
+                int now = _timeSync.LocalTime();
+                if (now - _last >= 5) {
+                    _last += 5;
+                    _u.Update(_buffer, 0, sz, 1);
+                    while (now - _last >= 5) {
+                        _u.Update(null, 0, 0, 1);
+                    }
+                } else {
+                    _u.Update(_buffer, 0, sz, 0);
                 }
-                while (_u.Recv() > 0) {
-                }
+
+
             } else {
-                List<byte[]> res = _u.Update(null, 0, 0, 1);
-                foreach (var item in res) {
-                    _so.SendTo(item, _remoteEP);
-                }
+                _u.Update(null, 0, 0, 1);
             }
         }
 
-        private void Recv(byte[] buffer, int start, int len) {
+        private void RSend(byte[] buffer, int start, int len) {
+            if (len > 0) {
+                _so.SendTo(buffer, start, len, SocketFlags.None, _remoteEP);
+            }
+        }
+
+        private void RRecv(byte[] buffer, int start, int len) {
+            if (len < 0) {
+                return;
+            }
             int remaining = len;
-            int head = start;
+            int head = 0;
             do {
                 Debug.Assert(len >= 12);
                 uint globaltime = NetUnpack.UnpacklI(_buffer, head);

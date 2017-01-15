@@ -6,9 +6,6 @@ using System.Collections.Generic;
 public class C2sProtocol : ProtocolBase {
 	public static  C2sProtocol Instance = new C2sProtocol();
 	private C2sProtocol() {
-		Protocol.SetProtocol<enter_room> (enter_room.Tag);
-		Protocol.SetResponse<C2sSprotoType.enter_room.response> (enter_room.Tag);
-
 		Protocol.SetProtocol<handshake> (handshake.Tag);
 		Protocol.SetResponse<C2sSprotoType.handshake.response> (handshake.Tag);
 
@@ -16,10 +13,9 @@ public class C2sProtocol : ProtocolBase {
 		Protocol.SetRequest<C2sSprotoType.join.request> (join.Tag);
 		Protocol.SetResponse<C2sSprotoType.join.response> (join.Tag);
 
-	}
+		Protocol.SetProtocol<match> (match.Tag);
+		Protocol.SetResponse<C2sSprotoType.match.response> (match.Tag);
 
-	public class enter_room {
-		public const int Tag = 2;
 	}
 
 	public class handshake {
@@ -28,6 +24,10 @@ public class C2sProtocol : ProtocolBase {
 
 	public class join {
 		public const int Tag = 3;
+	}
+
+	public class match {
+		public const int Tag = 2;
 	}
 
 }

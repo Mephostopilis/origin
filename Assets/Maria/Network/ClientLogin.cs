@@ -51,6 +51,8 @@ namespace Maria.Network {
         private void OnConnect(bool connected) {
             if (connected) {
                 _step++;
+            } else {
+                _sock.Connect(_ip, _port);
             }
         }
 

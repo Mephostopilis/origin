@@ -5,6 +5,10 @@ using Maria;
 
 namespace Bacon {
     public class Ball : Maria.Actor {
+        public enum BallId {
+
+        }
+
 
         protected Scene _scene = null;
 

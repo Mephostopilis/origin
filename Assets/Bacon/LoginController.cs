@@ -30,10 +30,14 @@ namespace Bacon {
         }
 
         public void LoginAuth(string server, string username, string password) {
-            _server = server;
-            _username = username;
-            _password = password;
-            _ctx.LoginAuth(server, username, password);
+            if (((AppConfig)_ctx.Config).VERSION == AppConfig.VERSION_TYPE.TEST) {
+                _ctx.Push("main");
+            } else {
+                _server = server;
+                _username = username;
+                _password = password;
+                _ctx.LoginAuth(server, username, password);
+            }
         }
 
         public override void OnGateAuthed(int code) {

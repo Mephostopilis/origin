@@ -31,27 +31,14 @@ namespace Bacon {
             _syncmsg1 = new byte[4];
             NetPack.Packli(_syncmsg1, 0, 1);
 
-            EventListenerCmd listener1 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_SCENE, SetupScene);
-            _ctx.EventDispatcher.AddCmdEventListener(listener1);
+            //EventListenerCmd listener1 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_SCENE, SetupScene);
+            //_ctx.EventDispatcher.AddCmdEventListener(listener1);
 
-            EventListenerCmd listener2 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_MAP, SetupMap);
-            _ctx.EventDispatcher.AddCmdEventListener(listener2);
+            //EventListenerCmd listener2 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_MAP, SetupMap);
+            //_ctx.EventDispatcher.AddCmdEventListener(listener2);
 
-            EventListenerCmd listener3 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_VIEW, SetupCamera);
-            _ctx.EventDispatcher.AddCmdEventListener(listener3);
-
-            EventListenerCmd listener4 = new EventListenerCmd(MyEventCmd.EVENT_PRESSDOWN, OnPressDown);
-            _ctx.EventDispatcher.AddCmdEventListener(listener4);
-
-            EventListenerCmd listener5 = new EventListenerCmd(MyEventCmd.EVENT_PRESSUP, OnPressUp);
-            _ctx.EventDispatcher.AddCmdEventListener(listener5);
-
-            EventListenerCmd listener6 = new EventListenerCmd(MyEventCmd.EVENT_PRESSLEFT, OnPressLeft);
-            _ctx.EventDispatcher.AddCmdEventListener(listener6);
-
-            EventListenerCmd listener7 = new EventListenerCmd(MyEventCmd.EVENT_PRESSRIGHT, OnPressRight);
-            _ctx.EventDispatcher.AddCmdEventListener(listener7);
-
+            //EventListenerCmd listener3 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_VIEW, SetupCamera);
+            //_ctx.EventDispatcher.AddCmdEventListener(listener3);
         }
 
         public override void Update(float delta) {
@@ -137,61 +124,7 @@ namespace Bacon {
             }
         }
 
-        public void OnPressUp(EventCmd e) {
-            //Vector3 dir = new Vector3(0, 0, 1);
-            //_player.ChangeDir(dir);
-            //try {
-            //    if (_mysession != 0) {
-            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-            //        obj.code = (long)(OpCodes.OPCODE_PRESSUP);
-            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-            //    }
-            //} catch (KeyNotFoundException ex) {
-            //    Debug.LogError(ex.Message);
-            //}
-        }
-
-        public void OnPressRight(EventCmd e) {
-            //Vector3 dir = new Vector3(1, 0, 0);
-            //_player.ChangeDir(dir);
-            //try {
-            //    if (_mysession != 0) {
-            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-            //        obj.code = OpCodes.OPCODE_PRESSRIGHT;
-            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-            //    }
-            //} catch (KeyNotFoundException ex) {
-            //    Debug.LogError(ex.Message);
-            //}
-        }
-
-        public void OnPressDown(EventCmd e) {
-            //Vector3 dir = new Vector3(0, -1, 0);
-            //_player.ChangeDir(dir);
-            //try {
-            //    if (_mysession != 0) {
-            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-            //        obj.code = OpCodes.OPCODE_PRESSDOWN;
-            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-            //    }
-            //} catch (KeyNotFoundException ex) {
-            //    Debug.LogError(ex.Message);
-            //}
-        }
-
-        public void OnPressLeft(EventCmd e) {
-            //Vector3 dir = new Vector3(-1, 0, 0);
-            //_player.ChangeDir(dir);
-            //try {
-            //    if (_mysession != 0) {
-            //        C2sSprotoType.opcode.request obj = new C2sSprotoType.opcode.request();
-            //        obj.code = OpCodes.OPCODE_PRESSLEFT;
-            //        _ctx.SendReq<C2sProtocol.opcode>(C2sProtocol.opcode.Tag, obj);
-            //    }
-            //} catch (KeyNotFoundException ex) {
-            //    Debug.LogError(ex.Message);
-            //}
-        }
+       
 
         // 游戏协议
         // 主要是同步场景中已经加入的其他玩家
@@ -369,35 +302,35 @@ namespace Bacon {
 
         public override void OnUdpRecv(PackageSocketUdp.R r) {
             base.OnUdpRecv(r);
-            int protocol = NetUnpack.Unpackli(r.Data, 0);
-            if (protocol == 1) {
-                _ctx.TiSync.Sync((int)r.Localtime, (int)r.Globaltime);
-            } else if (protocol == 2) {
-                Debug.Log(string.Format("{0}, {1}", r.Session, protocol));
-                int k = NetUnpack.Unpackli(r.Data, 4);
-                if (_lastK == 0) {
-                    _lastK = k;
-                } else if (k > _lastK) {
-                    _lastK = k;
-                    if (r.Data.Length > 4) {
-                        int ball_sz = NetUnpack.Unpackli(r.Data, 8);
-                        for (int i = 0; i < ball_sz; i++) {
-                            long ballid = NetUnpack.Unpackll(r.Data, 12 + (i * 32) + 0);
-                            float px = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 8);
-                            float py = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 12);
-                            float pz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 16);
-                            float dx = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 20);
-                            float dy = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 24);
-                            float dz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 28);
-                            _scene.UpdateBall(ballid, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
-                        }
-                        var player = _playes[_mysession];
-                        var pivot = player.GetPivot();
-                        _view.MoveTo(new Vector2(pivot.x, pivot.z));
-                    }
-                } else {
-                }
-            }
+            //int protocol = NetUnpack.Unpackli(r.Data, 0);
+            //if (protocol == 1) {
+            //    _ctx.TiSync.Sync((int)r.Localtime, (int)r.Globaltime);
+            //} else if (protocol == 2) {
+            //    Debug.Log(string.Format("{0}, {1}", r.Session, protocol));
+            //    int k = NetUnpack.Unpackli(r.Data, 4);
+            //    if (_lastK == 0) {
+            //        _lastK = k;
+            //    } else if (k > _lastK) {
+            //        _lastK = k;
+            //        if (r.Data.Length > 4) {
+            //            int ball_sz = NetUnpack.Unpackli(r.Data, 8);
+            //            for (int i = 0; i < ball_sz; i++) {
+            //                long ballid = NetUnpack.Unpackll(r.Data, 12 + (i * 32) + 0);
+            //                float px = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 8);
+            //                float py = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 12);
+            //                float pz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 16);
+            //                float dx = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 20);
+            //                float dy = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 24);
+            //                float dz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 28);
+            //                _scene.UpdateBall(ballid, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
+            //            }
+            //            var player = _playes[_mysession];
+            //            var pivot = player.GetPivot();
+            //            _view.MoveTo(new Vector2(pivot.x, pivot.z));
+            //        }
+            //    } else {
+            //    }
+            //}
         }
     }
 }

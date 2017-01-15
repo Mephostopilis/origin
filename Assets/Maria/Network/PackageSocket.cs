@@ -81,7 +81,8 @@ namespace Maria.Network
 
             try
             {
-                var ip = GetIPAddress(server);
+                //var ip = GetIPAddress(server);
+                var ip = server;
                 CurSocket.Connect(ip, port);
             }
             catch (SocketException e)

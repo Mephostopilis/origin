@@ -4,6 +4,13 @@ namespace Bacon
 {
     class AppConfig : Config
     {
+        public enum VERSION_TYPE {
+            TEST,
+            DEV,
+        }
+
+        public VERSION_TYPE VERSION = VERSION_TYPE.DEV;
+
         public AppConfig()
             : base()
         {
@@ -15,5 +22,7 @@ namespace Bacon
             c2s = C2sProtocol.Instance;
             s2c = S2cProtocol.Instance;
         }
+
+        
     }
 }

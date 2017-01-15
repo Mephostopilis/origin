@@ -24,7 +24,6 @@ namespace Maria {
 
         public Actor(Context ctx, Service service)
             : this(ctx, service, null) {
-
         }
 
         public Actor(Context ctx, Service service, GameObject go) {

@@ -47,12 +47,13 @@ namespace Maria {
             while (true) {
                 _semaphore.WaitOne();
                 try {
-                    lock (_queue) {
-                        if (_dispatcher != null) {
-                            while (_queue.Count > 0) {
-                                Command command = _queue.Dequeue();
-                                _dispatcher.DispatchCmdEvent(command);
+                    if (_dispatcher != null) {
+                        while (_queue.Count > 0) {
+                            Command command = null;
+                            lock (_queue) {
+                                command = _queue.Dequeue();
                             }
+                            _dispatcher.DispatchCmdEvent(command);
                         }
                     }
 
@@ -87,11 +88,12 @@ namespace Maria {
 
         // Update is called once per frame
         public void Update() {
-            lock (_renderQueue) {
-                while (_renderQueue.Count > 0) {
-                    Actor.RenderHandler handler = _renderQueue.Dequeue();
-                    handler();
+            while (_renderQueue.Count > 0) {
+                Actor.RenderHandler handler = null;
+                lock (_renderQueue) {
+                    handler = _renderQueue.Dequeue();
                 }
+                handler();
             }
         }
 

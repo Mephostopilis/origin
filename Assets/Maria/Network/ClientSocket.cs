@@ -184,7 +184,7 @@ namespace Maria.Network {
                         SprotoTypeBase rsp = cb(0, sinfo.requestObj);
                         byte[] d = sinfo.Response(rsp);
                         _tcp.Send(d, 0, d.Length);
-                    } catch (KeyNotFoundException ex) {
+                    } catch (Exception ex) {
                         Debug.LogError(ex.Message);
                     }
                 } else if (sinfo.type == SprotoRpc.RpcType.RESPONSE) {
@@ -195,7 +195,7 @@ namespace Maria.Network {
                     try {
                         var cb = _rsp[pg.Tag];
                         cb(session, sinfo.responseObj);
-                    } catch (KeyNotFoundException ex) {
+                    } catch (Exception ex) {
                         Debug.LogError(ex.Message);
                         //throw;
                     }
