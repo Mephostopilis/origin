@@ -1,27 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Maria.Play
-{
+namespace Maria.Play {
     class Play_CSharp
     {
-        [DllImport("play", EntryPoint = "play_alloc", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern IntPtr play_alloc();
+        private const string DLL = "sharpc";
 
-        [DllImport("play", EntryPoint = "play_free", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr play_alloc([In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject ex, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject cb);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void play_free(IntPtr self);
 
-        [DllImport("play", EntryPoint = "play_update", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern void play_update(IntPtr self);
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void play_start(IntPtr self);
 
-        [DllImport("play", EntryPoint = "play_join", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern int  play_join(IntPtr self, IntPtr ud);
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void play_close(IntPtr self);
 
-        [DllImport("play", EntryPoint = "play_leave", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern void play_leave(IntPtr self, int id);
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void play_kill(IntPtr self);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void play_update(IntPtr self, SharpC.CSObject delta);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int  play_join(IntPtr self, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject uid, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject sid, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject session);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void play_leave(IntPtr self, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject uid, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject sid, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject session);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int play_fetch(IntPtr self, [In, Out, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject ptr, [In, Out, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject len);
+
     }
 }

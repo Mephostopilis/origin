@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using Maria.Encrypt;
 
 namespace Maria.Network {
-    public class ClientSocket {
+    public class ClientSocket : DisposeObject {
 
         public delegate void AuthedCb(int ok);
         public delegate void DisconnectedCb();
@@ -59,12 +59,25 @@ namespace Maria.Network {
         private string           _udpip = null;
         private int              _udpport = 0;
         private bool             _udpflag = false;
-        private AuthedCb         _udpAuthed = null;
+
 
         public ClientSocket(Context ctx, ProtocolBase s2c, ProtocolBase c2s) {
             _ctx = ctx;
             _host = new SprotoRpc(s2c);
             _sendRequest = _host.Attach(c2s);
+        }
+
+        protected override void Dispose(bool disposing) {
+            if (_disposed) {
+                return;
+            }
+            if (disposing) {
+                // 清理托管资源，调用自己管理的对象的Dispose方法
+                _udp.Dispose();
+            }
+            // 清理非托管资源
+
+            _disposed = true;
         }
 
         public AuthedCb OnAuthed { get; set; }
@@ -254,16 +267,15 @@ namespace Maria.Network {
         }
 
         // UDP
-        public void UdpAuth(long session, string ip, int port, AuthedCb authed) {
+        public void UdpAuth(long session, string ip, int port) {
             Debug.Assert(_udpflag == false);
             Debug.Assert(_udp == null);
             _udpsession = session;
             _udpip = ip;
             _udpport = port;
-            _udpAuthed = authed;
-
+            
             TimeSync ts = _ctx.TiSync;
-            _udp = new PackageSocketUdp(_user.Secret, (uint)session, ts);
+            _udp = new PackageSocketUdp(_ctx, _user.Secret, (uint)session);
             _udp.OnRecv = UdpRecv;
             _udp.OnSync = UdpSync;
             Debug.Assert(_udp != null);

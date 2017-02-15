@@ -14,6 +14,7 @@ public class C2sProtocol : ProtocolBase {
 		Protocol.SetResponse<C2sSprotoType.join.response> (join.Tag);
 
 		Protocol.SetProtocol<match> (match.Tag);
+		Protocol.SetRequest<C2sSprotoType.match.request> (match.Tag);
 		Protocol.SetResponse<C2sSprotoType.match.response> (match.Tag);
 
 	}

@@ -20,9 +20,19 @@ namespace Maria {
             _cmd[cmd] = listener;
         }
 
-        public EventListenerCustom AddCustomEventListener(string eventName, EventListenerCustom.OnEventCustomHandler callback) {
-            EventListenerCustom listener = new EventListenerCustom(eventName, callback);
-            _custom[eventName] = listener;
+        public EventListenerCustom AddCustomEventListener(string eventName, EventListenerCustom.OnEventCustomHandler callback, object ud) {
+            EventListenerCustom listener = null;
+            if (_custom.ContainsKey(eventName)) {
+                listener = _custom[eventName];
+                if (listener == null) {
+                    listener = new EventListenerCustom(eventName, callback);
+                    _custom[eventName] = listener;
+                }
+            } else {
+                listener = new EventListenerCustom(eventName, callback);
+                _custom[eventName] = listener;
+            }
+
             return listener;
         }
 

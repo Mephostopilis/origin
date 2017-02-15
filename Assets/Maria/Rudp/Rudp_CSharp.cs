@@ -7,18 +7,18 @@ using System.Text;
 namespace Maria.Rudp {
     class Rudp_CSharp {
 
-        public delegate void Callback(IntPtr buffer, int len);
+        public const string DLL = "sharpc";
 
-        [DllImport("rudp", EntryPoint = "aux_new", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern IntPtr aux_new(int send_delay, int expired_time, Callback send, Callback recv);
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr rudpaux_alloc(int send_delay, int expired_time, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject ex, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject send, [In, MarshalAs(UnmanagedType.Struct)] SharpC.CSObject recv);
 
-        [DllImport("rudp", EntryPoint = "aux_delete", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern void aux_delete(IntPtr U);
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void rudpaux_free(IntPtr U);
 
-        [DllImport("rudp", EntryPoint = "aux_send", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern void aux_send(IntPtr U, IntPtr buffer, int sz);
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void rudpaux_send(IntPtr U, IntPtr buffer, int sz);
 
-        [DllImport("rudp", EntryPoint = "aux_update", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Winapi)]
-        public static extern void aux_update(IntPtr U, IntPtr buffer, int sz, int tick);
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void rudpaux_update(IntPtr U, IntPtr buffer, int sz, int tick);
     }
 }

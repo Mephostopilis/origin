@@ -20,8 +20,8 @@ namespace Bacon {
             _ts = ctx.TiSync;
             _smactor = new SMActor(ctx, this);
 
-            _ctx.EventDispatcher.AddCustomEventListener(EventCustom.OnDisconnected, OnDiconnected);
-            _ctx.EventDispatcher.AddCustomEventListener(EventCustom.OnAuthed, OnAuthed);
+            _ctx.EventDispatcher.AddCustomEventListener(EventCustom.OnDisconnected, OnDiconnected, null);
+            _ctx.EventDispatcher.AddCustomEventListener(EventCustom.OnAuthed, OnAuthed, null);
         }
 
         public override void Update(float delta) {
@@ -62,6 +62,7 @@ namespace Bacon {
 
         private void OnDiconnected(EventCustom e) {
             _authed = false;
+            _ctx.GateAuth();
         }
     }
 }

@@ -30,13 +30,14 @@ namespace Maria {
 
         }
 
-        protected virtual void Dispose(bool disposing) {
+        protected override void Dispose(bool disposing) {
             if (_disposed) {
                 return;
             }
             if (disposing) {
                 // 清理托管资源，调用自己管理的对象的Dispose方法
-                _worker.Abort();
+                _ctx.Dispose();
+                //_worker.Abort();
             }
             // 清理非托管资源
 
@@ -65,8 +66,7 @@ namespace Maria {
                         _ctx.Update(((float)delta) / 100.0f);
                     }
                 } catch (Exception ex) {
-                    Debug.LogError(string.Format("ex message: {0}", ex.Message));
-                    Debug.LogError(ex.StackTrace);
+                    Debug.LogException(ex);
                 }
 
                 //_tiSync.Sleep(10);
@@ -121,6 +121,7 @@ namespace Maria {
 
         public void OnApplicationQuit() {
             _worker.Abort();
+            Dispose(true);
         }
     }
 }

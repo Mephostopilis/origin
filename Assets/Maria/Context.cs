@@ -7,7 +7,7 @@ using Sproto;
 using System.Text;
 
 namespace Maria {
-    public class Context : INetwork {
+    public class Context : DisposeObject, INetwork {
         private class Timer {
             public string Name { get; set; }
             public float CD { get; set; }
@@ -19,6 +19,7 @@ namespace Maria {
         protected Application _application;
         protected Config _config = null;
         protected TimeSync _ts = null;
+        protected SharpC _sharpc = null;
 
         protected EventDispatcher _dispatcher = null;
         protected Dictionary<string, Controller> _hash = new Dictionary<string, Controller>();
@@ -38,6 +39,7 @@ namespace Maria {
             _application = application;
             _config = config;
             _ts = ts;
+            _sharpc = new SharpC();
 
             _dispatcher = new EventDispatcher(this);
 
@@ -50,6 +52,19 @@ namespace Maria {
             _client.OnDisconnected = OnGateDisconnected;
             _client.OnSyncUdp = OnUdpSync;
             _client.OnRecvUdp = OnUdpRecv;
+        }
+
+        protected override void Dispose(bool disposing) {
+            if (_disposed) {
+                return;
+            }
+            if (disposing) {
+                // 清理托管资源，调用自己管理的对象的Dispose方法
+                _client.Dispose();
+            }
+            // 清理非托管资源
+
+            _disposed = true;
         }
 
         // Update is called once per frame
@@ -90,6 +105,8 @@ namespace Maria {
         public Config Config { get { return _config; } set { _config = value; } }
 
         public TimeSync TiSync { get { return _ts; } set { _ts = value; } }
+
+        public SharpC SharpC { get { return _sharpc; } }
 
         public User U { get { return _user; } }
 
@@ -158,6 +175,11 @@ namespace Maria {
         }
 
         // UDP
+        public void UdpAuth(long session, string ip, int port) {
+            _client.UdpAuth(session, ip, port);
+        }
+
+
         public void SendUdp(byte[] data) {
             if (_authudp) {
                 _client.SendUdp(data);

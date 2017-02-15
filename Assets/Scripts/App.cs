@@ -18,7 +18,9 @@ public class App : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         try {
-            _app.Update();
+            if (_app != null) {
+                _app.Update();
+            }
         } catch (System.Exception ex) {
             Debug.LogError(string.Format("ex message: {0}", ex.Message));
             Debug.LogError(ex.StackTrace);

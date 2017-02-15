@@ -217,6 +217,51 @@ namespace C2sSprotoType {
 
 	public class match {
 	
+		public class request : SprotoTypeBase {
+			private static int max_field_count = 1;
+			
+			
+			private Int64 _mode; // tag 0
+			public Int64 mode {
+				get { return _mode; }
+				set { base.has_field.set_field (0, true); _mode = value; }
+			}
+			public bool HasMode {
+				get { return base.has_field.has_field (0); }
+			}
+
+			public request () : base(max_field_count) {}
+
+			public request (byte[] buffer) : base(max_field_count, buffer) {
+				this.decode ();
+			}
+
+			protected override void decode () {
+				int tag = -1;
+				while (-1 != (tag = base.deserialize.read_tag ())) {
+					switch (tag) {
+					case 0:
+						this.mode = base.deserialize.read_integer ();
+						break;
+					default:
+						base.deserialize.read_unknow_data ();
+						break;
+					}
+				}
+			}
+
+			public override int encode (SprotoStream stream) {
+				base.serialize.open (stream);
+
+				if (base.has_field.has_field (0)) {
+					base.serialize.write_integer (this.mode, 0);
+				}
+
+				return base.serialize.close ();
+			}
+		}
+
+
 		public class response : SprotoTypeBase {
 			private static int max_field_count = 1;
 			

@@ -29,9 +29,8 @@ namespace Maria.Network {
         // 进入房间这个协议, authudp
         public void join(uint session, SprotoTypeBase responseObj) {
             C2sSprotoType.join.response o = responseObj as C2sSprotoType.join.response;
-            //_cs.UdpAuth(o.session, o.host, (int)o.port);
-            GameController controller = _ctx.Top() as GameController;
-            controller.Join(responseObj);
+            GameService service = (GameService)_ctx.QueryService(GameService.Name);
+            service.Join(responseObj);
         }
 
         public void born(uint session, SprotoTypeBase responseObj) {
