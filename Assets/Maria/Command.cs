@@ -4,6 +4,8 @@ using System.Text;
 using UnityEngine;
 
 namespace Maria {
+
+    [XLua.LuaCallCSharp]
     public class Command {
         
         private uint _cmd;

@@ -32,7 +32,7 @@ namespace Maria {
             if (buffer.Length > (self.cap - self.size)) {
                 return 0;
             }
-            Debug.Assert(self.size == 0);
+            UnityEngine.Debug.Assert(self.size == 0);
             Marshal.Copy(buffer, 0, self.buffer, buffer.Length);
             self.size = buffer.Length;
             return 1;
@@ -42,7 +42,7 @@ namespace Maria {
             if (len > (self.cap - self.size)) {
                 return 0;
             }
-            Debug.Assert(self.size == 0);
+            UnityEngine.Debug.Assert(self.size == 0);
             Marshal.Copy(buffer, start, self.buffer, len);
             self.size = buffer.Length;
             return 1;

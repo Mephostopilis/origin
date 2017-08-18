@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
+namespace UnityUI { 
 public class UIWindow : MonoBehaviour, IDragHandler, IPointerDownHandler{
 
 	public void OnDrag (PointerEventData eventData){
@@ -10,4 +11,5 @@ public class UIWindow : MonoBehaviour, IDragHandler, IPointerDownHandler{
 	public void OnPointerDown (PointerEventData eventData){
 		transform.SetAsLastSibling();
 	}
+}
 }

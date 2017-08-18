@@ -3,30 +3,37 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Maria {
-    public class EventCustom : Event {
-        public static string OnDisconnected = "OnDisconnected";
-        public static string OnAuthed = "OnAuthed";
 
+    [XLua.LuaCallCSharp]
+    public class EventCustom : Event {
+
+        public static readonly string OnGateAuthed = "OnGateAuthed";
+        public static readonly string OnGateDisconnected = "OnGateDisconnected";
+
+        private Context _ctx = null;
         private string _name = string.Empty;
-        private object _param = null;
+        private object _addition = null;
         private object _ud = null;
 
-        public EventCustom(string name)
-            : this(name, null, null) {
+        public EventCustom(Context ctx, string name)
+            : this(ctx, name, null, null) {
         }
 
-        public EventCustom(string name, object param)
-            : this(name, param, null) {
+        public EventCustom(Context ctx, string name, object addition)
+            : this(ctx, name, addition, null) {
         }
 
-        public EventCustom(string name, object param, object ud) {
+        public EventCustom(Context ctx, string name, object addition, object ud)
+            : base(ctx) {
+            _type = Type.CUSTOM;
             _name = name;
-            _param = param;
+            _addition = addition;
             _ud = ud;
         }
 
+        
         public string Name { get { return _name; } }
-        public object Param { get { return _param; } }
+        public object Addition { get { return _addition; } }
         public object Ud { get { return _ud; } }
 
     }

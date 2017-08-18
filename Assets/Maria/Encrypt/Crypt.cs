@@ -17,8 +17,8 @@ namespace Maria.Encrypt {
         }
 
         public static byte[] desencode(byte[] key, byte[] src) {
-            Debug.Assert(key.Length > 0);
-            Debug.Assert(src.Length > 0);
+            UnityEngine.Debug.Assert(key.Length > 0);
+            UnityEngine.Debug.Assert(src.Length > 0);
             try {
                 IntPtr keyptr = Marshal.AllocHGlobal(key.Length);
                 Marshal.Copy(key, 0, keyptr, key.Length);
@@ -46,7 +46,7 @@ namespace Maria.Encrypt {
         }
 
         public static byte[] desdecode(byte[] key, byte[] encrypted) {
-            Debug.Assert(key.Length == 8);
+            UnityEngine.Debug.Assert(key.Length == 8);
             try {
                 IntPtr keyptr = Marshal.AllocHGlobal(key.Length);
                 Marshal.Copy(key, 0, keyptr, key.Length);
@@ -288,7 +288,7 @@ namespace Maria.Encrypt {
 
         public static byte[] hmac_hash(byte[] key, byte[] data) {
             try {
-                Debug.Assert(key.Length == 8);
+                UnityEngine.Debug.Assert(key.Length == 8);
                 IntPtr keyptr = Marshal.AllocHGlobal(key.Length);
                 Marshal.Copy(key, 0, keyptr, key.Length);
                 Crypt_CSharp.PACKAGE keypg;

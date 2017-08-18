@@ -28,7 +28,7 @@ namespace Maria.Network {
                 res |= buffer[offset + 3] << (3 * 8);
                 return res;
             } catch (IndexOutOfRangeException ex) {
-                Debug.Log(ex.Message);
+                UnityEngine.Debug.Log(ex.Message);
                 throw;
             }
         }
@@ -42,7 +42,7 @@ namespace Maria.Network {
                 res |= (uint)(buffer[offset + 3] << (3 * 8));
                 return res;
             } catch (IndexOutOfRangeException ex) {
-                Debug.Log(ex.Message);
+                UnityEngine.Debug.LogException(ex);
                 throw;
             }
         }
@@ -66,7 +66,7 @@ namespace Maria.Network {
         }
 
         public static long Unpackll(byte[] buffer, int offset) {
-            Debug.Assert(buffer.Length >= offset + 8);
+            UnityEngine.Debug.Assert(buffer.Length >= offset + 8);
             ulong res = 0;
             for (int i = 0; i < 8; i++) {
                 res |= ((ulong)buffer[offset + i]) << (i * 8);
@@ -80,7 +80,7 @@ namespace Maria.Network {
         }
 
         public static double Unpackld(byte[] buffer, int offset) {
-            Debug.Assert(buffer.Length >= offset + 8);
+            UnityEngine.Debug.Assert(buffer.Length >= offset + 8);
             long nn = Unpackll(buffer, offset);
             return BitConverter.Int64BitsToDouble(nn);
         }

@@ -102,7 +102,7 @@ namespace Maria.Network {
         }
 
         /// <summary>
-        /// debug use
+        /// UnityEngine.Debug use
         /// </summary>
         /// <param name="ti"></param>
         public void Sleep(int ti) {

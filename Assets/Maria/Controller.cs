@@ -1,11 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.SceneManagement;
+﻿using System.Collections.Generic;
 using Maria.Network;
 using System;
 
-namespace Maria  {
+/// <summary>
+/// Controller 主要作用就是调度Actor,分发事件
+/// </summary>
+namespace Maria {
     public class Controller : INetwork {
         protected Context _ctx = null;
         protected bool _authtcp = false;
@@ -14,8 +14,24 @@ namespace Maria  {
         protected string _name = string.Empty;
 
         public Controller(Context ctx) {
-            Debug.Assert(ctx != null);
+            UnityEngine.Debug.Assert(ctx != null);
             _ctx = ctx;
+        }
+
+        public Context Ctx { get { return _ctx; } }
+
+        public string Name { get { return _name; } }
+
+        public virtual void OnEnter() {
+            foreach (var item in _actors) {
+                item.OnEnter();
+            }
+        }
+
+        public virtual void OnExit() {
+            foreach (var item in _actors) {
+                item.OnExit();
+            }
         }
 
         // Update is called once per frame
@@ -33,10 +49,15 @@ namespace Maria  {
             return _actors.Remove(item);
         }
 
-        public virtual void Enter() {
+
+
+        public virtual void OnLoginAuthed(int code, byte[] secret, string dummy) {
         }
 
-        public virtual void Exit() {
+        public virtual void OnLoginConnected(bool connected) {
+        }
+
+        public virtual void OnLoginDisconnected() {
         }
 
         public virtual void OnGateAuthed(int code) {
@@ -45,8 +66,16 @@ namespace Maria  {
             }
         }
 
+        public virtual void OnGateConnected(bool connected) {
+
+        }
+
         public virtual void OnGateDisconnected() {
             _authtcp = false;
+        }
+
+        public virtual void Logout() {
+
         }
 
         public virtual void OnUdpSync() {

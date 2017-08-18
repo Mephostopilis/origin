@@ -23,7 +23,7 @@ namespace Maria {
         }
 
         public void getCorners(Vector3[] dst) {
-            Debug.Assert(dst != null && dst.Length >= 8);
+            UnityEngine.Debug.Assert(dst != null && dst.Length >= 8);
             // left-top-front
             dst[0] = new Vector3(_min.x, _max.y, _max.z);
             // left-bottom-front
@@ -86,7 +86,7 @@ namespace Maria {
         }
 
         public void updateMinMax(Vector3[] point) {
-            Debug.Assert(point != null);
+            UnityEngine.Debug.Assert(point != null);
             for (int i = 0; i < point.Length; i++) {
                 // Leftmost point.
                 if (point[i].x < _min.x)

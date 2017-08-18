@@ -58,7 +58,7 @@ namespace Maria {
                 _sharpc = sharpc_alloc(SharpC.CallCSharp);
                 CacheLog();
             } catch (DllNotFoundException ex) {
-                Debug.LogException(ex);
+                UnityEngine.Debug.LogException(ex);
             }
         }
 
@@ -101,19 +101,19 @@ namespace Maria {
         }
 
         public static int Log(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 8)] SharpC.CSObject[] argv, int args, int res) {
-            Debug.Assert(args + res + 1 <= 8);
+            UnityEngine.Debug.Assert(args + res + 1 <= 8);
 
-            Debug.Assert(argv[1].type == CSType.INT32);
-            Debug.Assert(argv[2].type == CSType.STRING);
+            UnityEngine.Debug.Assert(argv[1].type == CSType.INT32);
+            UnityEngine.Debug.Assert(argv[2].type == CSType.STRING);
 
             string msg = Marshal.PtrToStringAnsi(argv[2].ptr);
 
             if (argv[1].v32 == 1) {
-                Debug.Log(msg);
+                UnityEngine.Debug.Log(msg);
             } else if (argv[1].v32 == 2) {
-                Debug.LogWarning(msg);
+                UnityEngine.Debug.LogWarning(msg);
             } else if (argv[1].v32 == 3) {
-                Debug.LogError(msg);
+                UnityEngine.Debug.LogError(msg);
             }
             
             return 0;

@@ -7,6 +7,7 @@ using Maria.Encrypt;
 namespace Maria.Network {
     public class ClientLogin {
         public delegate void OnLoginedCB(int code, byte[] secret, string dummy);
+        public delegate void OnConnectedCB(bool connected);
         public delegate void OnDisconnectCB();
 
         private Context _ctx;
@@ -31,6 +32,7 @@ namespace Maria.Network {
         }
 
         public OnLoginedCB OnLogined { get; set; }
+        public OnConnectedCB OnConnected { get; set; }
         public OnDisconnectCB OnDisconnected { get; set; }
 
         public void Auth(string ipstr, int pt, string s, string u, string pwd) {
@@ -52,7 +54,7 @@ namespace Maria.Network {
             if (connected) {
                 _step++;
             } else {
-                _sock.Connect(_ip, _port);
+                OnConnected(connected);
             }
         }
 
@@ -68,7 +70,7 @@ namespace Maria.Network {
             } else if (_step == 2) {
                 byte[] key = Crypt.base64decode(buffer);
                 _secret = Crypt.dhsecret(key, _clientkey);
-                Debug.Log("sceret is " + Encoding.ASCII.GetString(Crypt.hexencode(_secret)));
+                UnityEngine.Debug.Log("sceret is " + Encoding.ASCII.GetString(Crypt.hexencode(_secret)));
                 byte[] hmac = Crypt.hmac64(_challenge, _secret);
                 var buf = Crypt.base64encode(hmac);
                 _sock.SendLine(buf, 0, buf.Length);

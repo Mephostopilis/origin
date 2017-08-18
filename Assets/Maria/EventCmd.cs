@@ -4,28 +4,32 @@ using System.Text;
 using UnityEngine;
 
 namespace Maria {
+
+    [XLua.LuaCallCSharp]
     public class EventCmd : Event {
 
-        public static uint EVENT_LOGIN = 1;
-        public static uint EVENT_SETUP_LOGINPANEL = 2;
+        /// <summary>
+        /// ui 到框架的事件传递
+        /// </summary>
+        private Context _ctx = null;
+        private uint _cmd = 0;
+        private GameObject _orgin = null;
+        private Message _msg = null;
 
-        private uint _cmd;
-        private GameObject _orgin;
-        private Message _msg;
-
-        public EventCmd(uint cmd)
-            : this(cmd, null, null) {
+        public EventCmd(Context ctx, uint cmd)
+            : this(ctx, cmd, null, null) {
         }
 
-        public EventCmd(uint cmd, Message msg)
-            : this(cmd, null, msg) {
+        public EventCmd(Context ctx, uint cmd, Message msg)
+            : this(ctx, cmd, null, msg) {
         }
 
-        public EventCmd(uint cmd, GameObject orgin)
-            : this(cmd, orgin, null) {
+        public EventCmd(Context ctx, uint cmd, GameObject orgin)
+            : this(ctx, cmd, orgin, null) {
         }
 
-        public EventCmd(uint cmd, GameObject orgin, Message msg) {
+        public EventCmd(Context ctx, uint cmd, GameObject orgin, Message msg)
+            : base(ctx) {
             _type = Type.CMD;
             _cmd = cmd;
             _orgin = orgin;

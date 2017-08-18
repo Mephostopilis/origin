@@ -47,7 +47,7 @@ namespace Maria.Rudp {
         public Callback OnRecv { get; set; }
 
         public void Send(byte[] buf, int start, int len) {
-            Debug.Assert(len > 0);
+            UnityEngine.Debug.Assert(len > 0);
 
             IntPtr buffer = Marshal.AllocHGlobal(len);
             Marshal.Copy(buf, 0, buffer, len);
@@ -65,8 +65,8 @@ namespace Maria.Rudp {
         }
 
         public static int RSend(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 8)] SharpC.CSObject[] argv, int args, int res) {
-            Debug.Assert(args >= 3);
-            Debug.Assert(argv[1].type == SharpC.CSType.SHARPOBJECT);
+            UnityEngine.Debug.Assert(args >= 3);
+            UnityEngine.Debug.Assert(argv[1].type == SharpC.CSType.SHARPOBJECT);
             Rudp u = (Rudp)SharpC.cache.Get(argv[1].v32);
             IntPtr buffer = argv[2].ptr;
             int len = argv[3].v32;
@@ -78,33 +78,17 @@ namespace Maria.Rudp {
         }
 
         public static int RRecv(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 8)] SharpC.CSObject[] argv, int args, int res) {
-            Debug.Assert(args >= 3);
-            Debug.Assert(argv[1].type == SharpC.CSType.SHARPOBJECT);
+            UnityEngine.Debug.Assert(args >= 3);
+            UnityEngine.Debug.Assert(argv[1].type == SharpC.CSType.SHARPOBJECT);
             Rudp u = (Rudp)SharpC.cache.Get(argv[1].v32);
             IntPtr buffer = argv[2].ptr;
             int len = argv[3].v32;
-            if (u.OnSend != null) {
+            if (u.OnRecv != null) {
                 Marshal.Copy(buffer, _recvBuffer, 0, len);
-                u.OnSend(_recvBuffer, 0, len);
+                u.OnRecv(_recvBuffer, 0, len);
             }
             return 0;
         }
 
-
-            //[MonoPInvokeCallback(typeof(Rudp_CSharp.Callback))]
-            //public void RSend(IntPtr buffer, int len) {
-            //    Marshal.Copy(buffer, _sendBuffer, 0, len);
-            //    if (OnSend != null) {
-            //        OnSend(_sendBuffer, 0, len);
-            //    }
-            //}
-
-            //[MonoPInvokeCallback(typeof(Rudp_CSharp.Callback))]
-            //public void RRecv(IntPtr buffer, int len) {
-            //    Marshal.Copy(buffer, _recvBuffer, 0, len);
-            //    if (OnRecv != null) {
-            //        OnRecv(_recvBuffer, 0, len);
-            //    }
-            //}
-        }
+    }
 }
