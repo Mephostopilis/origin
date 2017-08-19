@@ -15,6 +15,7 @@
 // http://forum.unity3d.com/threads/bug-syncliststruct-only-works-with-some-file-names.384582/
 using UnityEngine;
 using UnityEngine.Networking;
+using Utils = uMoba.Utils;
 
 [System.Serializable]
 public struct Skill {

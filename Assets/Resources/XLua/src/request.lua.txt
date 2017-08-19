@@ -1,0 +1,13 @@
+local assert = assert
+local errorcode = require "errorcode"
+
+local _M = {}
+
+-- function cls:handshake(args, ... )
+-- 	-- body
+-- 	local res = {}
+-- 	res.errorcode = errorcode.SUCCESS
+-- 	return res
+-- end
+
+return _M

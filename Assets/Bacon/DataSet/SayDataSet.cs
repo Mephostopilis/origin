@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Configs;
 using Maria.Util;
+using Maria.Res;
 
 namespace Bacon.DataSet {
     public class SayDataSet : Maria.Singleton<SayDataSet> {

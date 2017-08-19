@@ -1,0 +1,38 @@
+if not cc then
+	cc = {}
+end
+require "base.class"
+require "base.ctype"
+require "base.io"
+require "base.math"
+require "base.os"
+require "base.string"
+require "base.table"
+
+class = cc.class
+
+local sproto = require "lualib.sproto"
+local parser = require "lualib.sprotoparser"
+local core = require "sproto.core"
+
+local env = require "env"
+local main_controller = require "maincontroller"
+
+-- xlua.hotfix(CS.Maria.Application, 'XluaTest', function (self) 
+-- 	CS.UnityEngine.Debug.Log('xlua hello world')
+-- end)
+
+function main(ctx, ... )
+	-- body
+	print("test main")
+
+	ctx.EventDispatcher:AddCustomEventListener("abc", function (e, ... )
+		-- body
+		print("test event")
+	end, nil)
+
+	ctx.EventDispatcher:FireCustomEvent("abc", "hello")
+
+	env:ctor(ctx)
+	return env
+end

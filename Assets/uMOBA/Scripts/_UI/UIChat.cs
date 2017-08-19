@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-
+using Utils = uMoba.Utils;
 public class UIChat : MonoBehaviour {
     public InputField messageInput;
     [SerializeField] Button sendButton;

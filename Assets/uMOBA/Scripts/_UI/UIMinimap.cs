@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Utils = uMoba.Utils;
 
 public class UIMinimap : MonoBehaviour, IPointerDownHandler, IDragHandler {
     [SerializeField] Camera minimapCamera;

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using Utils = uMoba.Utils;
 
 public class UIShortcuts : MonoBehaviour {    
     [SerializeField] Button quitButton;

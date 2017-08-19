@@ -4,6 +4,8 @@ using UnityEngine.Rendering;
 using UnityEngine.Networking;
 using UnityEngine.EventSystems;
 
+namespace uMoba { 
+
 public class Utils {
     // Mathf.Max only works for float and int, not long
     public static long MaxLong(long a, long b) {
@@ -122,4 +124,5 @@ public class Utils {
         return EventSystem.current.IsPointerOverGameObject() ||
                GUIUtility.hotControl != 0;
     }
+}
 }

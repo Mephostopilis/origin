@@ -53,7 +53,7 @@ namespace Maria {
                         listener.Handler(e);
                     }
                 } else {
-                    throw new KeyNotFoundException(string.Format("custom not contains {0}", cmd.Cmd));
+                    //throw new KeyNotFoundException(string.Format("custom not contains {0}", cmd.Cmd));
                 }
             } catch (Exception ex) {
                 UnityEngine.Debug.LogException(ex);

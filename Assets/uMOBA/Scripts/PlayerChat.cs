@@ -21,6 +21,7 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
+using Utils = uMoba.Utils;
 
 [System.Serializable]
 public class ChannelInfo {

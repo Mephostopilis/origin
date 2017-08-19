@@ -1,0 +1,110 @@
+local sproto = require "lualib.sproto"
+local parser = require "lualib.sprotoparser"
+local core = require "sproto.core"
+local request = require "request"
+local response = require "response"
+local assert = assert
+
+local cls = {}
+
+function cls:ctor(env, ... )
+	-- body
+	self._env = env
+	self._g = env._ctx.Client
+	
+	-- sproto
+	local proto = {}
+	proto.c2s = CS.Maria.Res.ABLoader.current:LoadTextAsset("proto", "proto.c2s.sproto").text
+	proto.s2c = CS.Maria.Res.ABLoader.current:LoadTextAsset("proto", "proto.s2c.sproto").text
+	assert(type(proto.s2c) == "string")
+	assert(type(proto.c2s) == "string")
+	local s2c_sp = core.newproto(parser.parse(proto.s2c))
+	local host = sproto.sharenew(s2c_sp):host "package"
+	local c2s_sp = core.newproto(parser.parse(proto.c2s))
+	local send_request = host:attach(sproto.sharenew(c2s_sp))
+
+	self._host = host
+	self._send_request = send_request
+
+	return self
+end
+
+function cls:send_request(name, args, ... )
+	-- body
+	local session = self._g:genSession()
+	self._RESPONSE_SESSION_NAME[self._response_session] = name
+	local v = self._send_request(name, args, self._response_session)
+	self._g:Send(v)
+end
+
+function cls:response(session, args, ... )
+	-- body
+	local name = self._RESPONSE_SESSION_NAME[session]
+	local f = response[name]
+	if f then
+		local ok, err = pcall(f, self._env, args, ...)
+		if not ok then
+			print(err)
+		end
+		return false
+	else
+		return true
+	end
+end
+
+-- @return continue to exe
+function cls:request(name, args, response, ... )
+	-- body
+	print("request :", name)
+	local f = request[name]
+	if f then
+		local ok, err = pcall(f, env, args)
+		if ok then
+			local resp = response(err)
+			self._g:send(resp)
+		else
+			print(err)
+		end
+		return false
+	else
+		return true
+	end
+end
+
+-- @return continue to exe
+function cls:dispatch(type, ... )
+	-- body
+	if type == "REQUEST" then
+		return self:request(...)
+	elseif type == "RESPONSE" then
+		return self:response(...)
+	end
+end
+
+function cls:enable( ... )
+	-- body
+	return false
+end
+
+function cls:recv(package, ... )
+	-- body
+	-- pcall report session error, but for response
+	assert(package)
+	local ok, err = pcall(function (arg, ... )
+		-- body
+		assert(arg)
+		self:dispatch(self._host:dispatch(arg))
+	end, package)
+	if ok then
+		if err then
+			return true
+		else
+			return false
+		end
+	else
+		print("pcall error:", err)
+		return false
+	end
+end
+
+return cls

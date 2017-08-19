@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Utils = uMoba.Utils;
 
 public class UISkillTargetIndicator : MonoBehaviour {
     public GameObject indicator;

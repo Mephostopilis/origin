@@ -6,7 +6,7 @@ public class UIBuffs : MonoBehaviour {
     [SerializeField] GameObject slotPrefab;
 
     void Update() {
-        var player = Utils.ClientLocalPlayer();
+        var player = uMoba.Utils.ClientLocalPlayer();
         if (!player) return;
 
         // instantiate/destroy enough slots

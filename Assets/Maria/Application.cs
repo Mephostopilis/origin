@@ -1,13 +1,12 @@
-﻿using Maria.Network;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using UnityEngine;
 using XLua;
-using System.Reflection;
 using Maria.Util;
+using Maria.Network;
+using Maria.Res;
 
 namespace Maria {
 
@@ -54,36 +53,6 @@ namespace Maria {
             } else {
                 UnityEngine.Debug.LogWarning("create co success.");
             }
-            _luaenv = new XLua.LuaEnv();
-            _luaenv.AddBuildin("cjson", XLua.LuaDLL.Lua.LoadCJson);
-            _luaenv.AddBuildin("lpeg", XLua.LuaDLL.Lua.LoadLpeg);
-            _luaenv.AddBuildin("sproto.core", XLua.LuaDLL.Lua.LoadSprotoCore);
-            _luaenv.AddLoader((ref string filepath) => {
-                UnityEngine.Debug.LogFormat("LUA custom loader {0}", filepath);
-
-                string[] xpaths = filepath.Split(new char[] { '.' });
-                string path = "xlua/src";
-                int idx = 0;
-                while (idx + 1 < xpaths.Length) {
-                    path += "/";
-                    path += xpaths[idx];
-                    idx++;
-                }
-
-                TextAsset file = ABLoader.current.LoadAsset<TextAsset>(path, xpaths[idx] + ".lua");
-                if (file != null) {
-                    return file.bytes;
-                } else {
-                    file = ABLoader.current.LoadAsset<TextAsset>(path+"/lualib", xpaths[idx] + ".lua");
-                    if (file != null) {
-                        return file.bytes;
-                    }
-                    return null;
-                }
-            });
-            _luaenv.DoString(@"
-require 'main'
-");
         }
 
         protected override void Dispose(bool disposing) {
@@ -100,7 +69,7 @@ require 'main'
             _disposed = true;
         }
 
-        public XLua.LuaEnv Env { get { return _luaenv; } }
+        public XLua.LuaEnv LuaEnv { get { return _luaenv; } }
 
         private void Worker() {
             while (true) {
@@ -195,8 +164,10 @@ require 'main'
 
         // Update is called once per frame
         public virtual void Update() {
-            _luaenv.Tick();
-
+            if (_luaenv != null) {
+                _luaenv.Tick();
+            }
+            
             if (_cotype == CoType.CO) {
                 CoWorker();
                 while (_renderQueue.Count > 0) {
@@ -214,6 +185,55 @@ require 'main'
                     handler();
                 }
             }
+        }
+
+        // first step
+        public virtual void StartUpdateRes() {
+            if (UnityEngine.Application.internetReachability == NetworkReachability.NotReachable) {
+                Command cmd1 = new Command(EventCmd.EVENT_NOTREACHABLE);
+                Enqueue(cmd1);
+            } else {
+                Command cmd1 = new Command(EventCmd.EVENT_UPDATERES_BEGIN);
+                Enqueue(cmd1);
+                ABLoader.current.FetchVersion(() => {
+                    //StartScript();
+
+                    Command cmd2 = new Command(EventCmd.EVENT_UPDATERES_END);
+                    Enqueue(cmd2);
+                });
+            }
+        }
+
+        // second step
+        public virtual void StartScript() {
+            _luaenv = new XLua.LuaEnv();
+            _luaenv.AddBuildin("cjson", XLua.LuaDLL.Lua.LoadCJson);
+            _luaenv.AddBuildin("lpeg", XLua.LuaDLL.Lua.LoadLpeg);
+            _luaenv.AddBuildin("sproto.core", XLua.LuaDLL.Lua.LoadSprotoCore);
+            _luaenv.AddLoader((ref string filepath) => {
+                UnityEngine.Debug.LogFormat("LUA custom loader {0}", filepath);
+
+                string[] xpaths = filepath.Split(new char[] { '.' });
+                string path = "xlua/src";
+                int idx = 0;
+                while (idx + 1 < xpaths.Length) {
+                    path += "/";
+                    path += xpaths[idx];
+                    idx++;
+                }
+
+                TextAsset file = ABLoader.current.LoadAsset<TextAsset>(path, xpaths[idx] + ".lua");
+                if (file != null) {
+                    return file.bytes;
+                } else {
+                    file = ABLoader.current.LoadAsset<TextAsset>(path + "/lualib", xpaths[idx] + ".lua");
+                    if (file != null) {
+                        return file.bytes;
+                    }
+                    return null;
+                }
+            });
+            _luaenv.DoString(@" require 'main' ");
         }
 
         public void OnApplicationFocus(bool hasFocus) {

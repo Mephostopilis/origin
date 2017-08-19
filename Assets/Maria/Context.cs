@@ -12,6 +12,9 @@ namespace Maria {
     [CSharpCallLua]
     [LuaCallCSharp]
     public class Context : DisposeObject, INetwork {
+        [CSharpCallLua]
+        public delegate Maria.Lua.Env Main(Context ctx);
+
 
         protected Application _application = null;
         protected Config _config = null;
@@ -75,6 +78,9 @@ namespace Maria {
         public virtual void Update(float delta) {
             _login.Update();
             _client.Update();
+            if (_envScript != null) {
+                _envScript.update();
+            }
             //_env.update();
 
             //int now = _ts.LocalTime();
@@ -363,6 +369,16 @@ namespace Maria {
             if (controller != null) {
                 controller.OnUdpRecv(r);
             }
+        }
+
+        public void StartScript() {
+            // enter for lua
+            XLua.LuaEnv env = _application.LuaEnv;
+            Main main = env.Global.Get<Main>("main");
+            _envScript = main(this);
+            _envScript.update();
+
+            _client.StartScript();
         }
     }
 }

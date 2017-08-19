@@ -8,6 +8,14 @@ namespace Maria {
     [XLua.LuaCallCSharp]
     public class EventCmd : Event {
 
+        // 1 ~ 1000  框架保留事件
+        public static uint EVENT_UPDATERES_BEGIN = 1;
+        public static uint EVENT_UPDATERES_END = 2;
+        public static uint EVENT_START_SETUP_ROOT = 3;
+        public static uint EVENT_NOTREACHABLE = 4;
+        public static uint EVENT_REACHABLEVIACARRIERDATANETWORK = 5;
+        public static uint EVENT_REACHABLEVIALOCALAREANETWORK = 6;
+
         /// <summary>
         /// ui 到框架的事件传递
         /// </summary>

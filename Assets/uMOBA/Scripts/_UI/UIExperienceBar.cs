@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Utils = uMoba.Utils;
 
 public class UIExperienceBar : MonoBehaviour {
     [SerializeField] Slider bar;

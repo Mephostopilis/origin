@@ -7,6 +7,7 @@ using Bacon.Service;
 using Bacon.Game;
 using Bacon.Helper;
 using Bacon.Event;
+using Maria.Res;
 
 namespace Bacon
 {

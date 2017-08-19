@@ -360,5 +360,10 @@ namespace Maria.Network {
                 _udp.Send(data);
             }
         }
+
+        public void StartScript() {
+            _clientSockScript = _ctx.EnvScript.clientsock();
+            _clientSockScriptEnable = _clientSockScript.enable();
+        }
     }
 }
