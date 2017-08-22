@@ -29,7 +29,7 @@ namespace Bacon {
                 _loginPort = 3002;
                 _gateIp = "127.0.0.1";
                 _gatePort = 3301;
-            }
+            } 
 
             c2s = C2sProtocol.Instance;
             s2c = S2cProtocol.Instance;

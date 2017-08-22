@@ -5,6 +5,8 @@ using Bacon.GL.Common;
 using Maria.Util;
 
 namespace Bacon.GL.Login.UI {
+
+    [RequireComponent(typeof(FindApp))]
     public class LoginPanel : MonoBehaviour {
 
         public InputField _usernmIF = null;
@@ -26,7 +28,6 @@ namespace Bacon.GL.Login.UI {
 
         // Update is called once per frame
         void Update() {
-
         }
 
         void OnEnable() {

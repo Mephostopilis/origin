@@ -149,6 +149,14 @@ namespace Maria {
             _login.Auth(ip, port, s, u, pwd);
         }
 
+        public void OnLoginConnected(bool connected) {
+            if (!connected) {
+                if (_stack.Count > 0) {
+                    _stack.Peek().OnLoginConnected(connected);
+                }
+            }
+        }
+
         public void OnLoginAuthed(int code, byte[] secret, string dummy) {
             if (code == 200) {
                 int _1 = dummy.IndexOf('#');
@@ -180,30 +188,31 @@ namespace Maria {
             }
         }
 
-        public void OnLoginConnected(bool connected) {
-            if (!connected) {
-                if (_stack.Count > 0) {
-                    _stack.Peek().OnLoginConnected(connected);
-                }
-            }
-        }
-
         public void OnLoginDisconnected() {
             if (_stack.Count > 0) {
                 _stack.Peek().OnLoginDisconnected();
             }
         }
 
-        // Gate
-        public void SendReq<T>(int tag, SprotoTypeBase obj) {
-            _client.SendReq<T>(tag, obj);
-        }
-
+        // gate
         public void GateAuth() {
             _client.Auth(Config.GateIp, Config.GatePort, _user);
         }
 
+        public void OnGateConnected(bool connected) {
+            _user.OnGateConnected(connected);
+
+            if (!connected) {
+                if (_stack.Count > 0) {
+                    Controller controller = Peek();
+                    controller.OnGateConnected(connected);
+                }
+            }
+        }
+
         public void OnGateAuthed(int code) {
+            _user.OnGateAuthed(code);
+
             if (code == 200) {
                 _authtcp = true;
                 
@@ -221,17 +230,10 @@ namespace Maria {
             }
         }
 
-        public void OnGateConnected(bool connected) {
-            if (!connected) {
-                if (_stack.Count > 0) {
-                    Controller controller = Peek();
-                    controller.OnGateConnected(connected);
-                }
-            }
-        }
-
         public void OnGateDisconnected() {
             UnityEngine.Debug.Assert(_authtcp);
+            _user.OnGateDisconnected();
+
             EventDispatcher.FireCustomEvent(EventCustom.OnGateDisconnected, null);
             if (_stack.Count > 0) {
                 var controller = Peek();
@@ -369,6 +371,11 @@ namespace Maria {
             if (controller != null) {
                 controller.OnUdpRecv(r);
             }
+        }
+
+        // send
+        public void SendReq<T>(int tag, SprotoTypeBase obj) {
+            _client.SendReq<T>(tag, obj);
         }
 
         public void StartScript() {

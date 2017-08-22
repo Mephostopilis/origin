@@ -2,8 +2,7 @@
 using Bacon.Service;
 using Bacon.Helper;
 
-namespace Bacon.Login
-{
+namespace Bacon.Login {
     class LoginController : Controller {
 
         private LoginActor _loginActor;
@@ -28,7 +27,7 @@ namespace Bacon.Login
             base.OnExit();
         }
 
-        public void LoginAuth(string server, string username, string password) {
+        public override void LoginAuth(string server, string username, string password) {
             if (((AppConfig)_ctx.Config).VTYPE == AppConfig.VERSION_TYPE.DEV) {
                 _ctx.Push(typeof(MainController));
             } else {
@@ -39,14 +38,6 @@ namespace Bacon.Login
 
         public override void OnLoginAuthed(int code, byte[] secret, string dummy) {
             if (code == 200) {
-                int uid = _ctx.U.Uid;
-                int subid = _ctx.U.Subid;
-
-                AppContext ctx = _ctx as AppContext;
-                //EntityMgr mgr = ctx.GetEntityMgr();
-                //UEntity e = new UEntity(_ctx, (uint)uid);
-                //mgr.AddEntity(e);
-                //mgr.MyEntity = e;
 
                 _loginActor.ShowTips("提示：成功登陆");
             } else if (code == 401) {
@@ -69,8 +60,13 @@ namespace Bacon.Login
             }
         }
 
-        public override void OnLoginDisconnected() {
+        public override void OnLoginDisconnected() { }
 
+
+        public override void OnGateConnected(bool connected) {
+            if (!connected) {
+                _loginActor.ShowTips("提示:服务器正在维护中");
+            }
         }
 
         public override void OnGateAuthed(int code) {
@@ -79,12 +75,6 @@ namespace Bacon.Login
                 _ctx.Push(typeof(MainController));
             } else {
                 _loginActor.EnableCommitOk();
-            }
-        }
-
-        public override void OnGateConnected(bool connected) {
-            if (!connected) {
-                _loginActor.ShowTips("提示:服务器正在维护中");
             }
         }
 

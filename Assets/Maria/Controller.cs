@@ -8,6 +8,7 @@ using System;
 namespace Maria {
     public class Controller : INetwork {
         protected Context _ctx = null;
+        protected bool _login = false;
         protected bool _authtcp = false;
         protected bool _authudp = false;
         protected List<Actor> _actors = new List<Actor>();
@@ -49,25 +50,31 @@ namespace Maria {
             return _actors.Remove(item);
         }
 
+        public virtual void LoginAuth(string server, string username, string password) {}
+
+        /// <summary>
+        /// @param connected 开始不一定就连接成功
+        /// </summary>
+        /// <param name="connected"></param>
+        public virtual void OnLoginConnected(bool connected) {}
+
+        public virtual void OnLoginAuthed(int code, byte[] secret, string dummy) {}
+
+        public virtual void OnLoginDisconnected() {}
 
 
-        public virtual void OnLoginAuthed(int code, byte[] secret, string dummy) {
-        }
+        public virtual void GateAuth() {}
 
-        public virtual void OnLoginConnected(bool connected) {
-        }
-
-        public virtual void OnLoginDisconnected() {
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connected"></param>
+        public virtual void OnGateConnected(bool connected) {}
 
         public virtual void OnGateAuthed(int code) {
             if (code == 200) {
                 _authtcp = true;
             }
-        }
-
-        public virtual void OnGateConnected(bool connected) {
-
         }
 
         public virtual void OnGateDisconnected() {

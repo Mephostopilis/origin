@@ -8,6 +8,7 @@ namespace Maria
     public class Module
     {
         protected User _user;
+
         public Module(User u)
         {
             _user = u;
@@ -27,5 +28,11 @@ namespace Maria
         {
             _user.RemoveModule<T>();
         }
+
+        public virtual void OnGateConnected(bool connected) {}
+
+        public virtual void OnGateAuthed(int code) {}
+
+        public virtual void OnGateDisconnected() {}
     }
 }
