@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Maria.Play {
     class Play_CSharp
     {
-        private const string DLL = "sharpc";
+        private const string DLL = "play";
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr play_alloc([In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject ex, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject cb);

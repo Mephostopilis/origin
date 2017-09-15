@@ -11,7 +11,9 @@ namespace Bacon
         private Response _response = null;
         
         public AppContext(Application application, Config config, TimeSync ts) : base(application, config, ts) {
-            
+
+            _user.AddModule<Bacon.Modules.BattleScene>();
+
             _request = new Request(this, _client);
             _response = new Response(this, _client);
 

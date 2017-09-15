@@ -15,12 +15,14 @@ namespace Bacon
     [Hotfix]
     [LuaCallCSharp]
     class MainController : Controller {
-        private InitService _service = null;
+        
         private GameObject _uiroot = null;
         private GameObject _role = null;
         private GameObject _waiting = null;
 
         private long _curmsgid;
+        private long _roomid;
+
         
         public MainController(Context ctx) : base(ctx) {
             _name = "main";
@@ -56,10 +58,8 @@ namespace Bacon
 
         public override void OnEnter() {
             base.OnEnter();
-            if (_service == null) {
-                _service = _ctx.QueryService<InitService>(InitService.Name);
-            }
-            SMActor actor = _service.SMActor;
+            InitService service = _ctx.QueryService<InitService>(InitService.Name);
+            SMActor actor = service.SMActor;
             actor.LoadScene(_name);
         }
 
@@ -173,15 +173,12 @@ namespace Bacon
         #endregion
 
         #region request
-        public SprotoTypeBase OnMatch(SprotoTypeBase requestObj) {
+        public SprotoTypeBase OnReqMatch(SprotoTypeBase requestObj) {
             S2cSprotoType.match.request obj = requestObj as S2cSprotoType.match.request;
 
-            //GameService service = _ctx.QueryService(GameService.Name) as GameService;
-            //service.RoomId = (int)obj.roomid;
+            _ctx.U.GetModule<Bacon.Modules.BattleScene>().RoomId = obj.roomid;
 
-            //C2sSprotoType.join.request request = new C2sSprotoType.join.request();
-            //request.roomid = obj.roomid;
-            //_ctx.SendReq<C2sProtocol.join>(C2sProtocol.join.Tag, request);
+            _ctx.Push<GameController>();
 
             S2cSprotoType.match.response responseObj = new S2cSprotoType.match.response();
             responseObj.errorcode = Errorcode.SUCCESS;
@@ -207,7 +204,7 @@ namespace Bacon
         //    entity.GetComponent<UComRecordMgr>().FetchRecords(responseObj);
         //}
 
-        public void Match(SprotoTypeBase responseObj) {
+        public void OnRspMatch(SprotoTypeBase responseObj) {
             C2sSprotoType.match.response obj = responseObj as C2sSprotoType.match.response;
             UnityEngine.Debug.Assert(obj.errorcode == Errorcode.SUCCESS);
         }

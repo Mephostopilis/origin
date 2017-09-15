@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>name</key>
+    <string>map</string>
+    <key>width</key>
+    <integer>20</integer>
+    <key>height</key>
+    <integer>20</integer>
+    <key>orientation</key>
+    <integer>1</integer>
+    <key>shape</key>
+    <integer>0</integer>
+    <key>grids</key>
+    <array />
+  </dict>
+</plist>

@@ -7,7 +7,7 @@ using System.Text;
 namespace Maria.Rudp {
     class Rudp_CSharp {
 
-        public const string DLL = "sharpc";
+        public const string DLL = "play";
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr rudpaux_alloc(int send_delay, int expired_time, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject ex, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject send, [In, MarshalAs(UnmanagedType.Struct)] SharpC.CSObject recv);

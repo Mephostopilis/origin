@@ -60,7 +60,7 @@ namespace Bacon.Game {
         //    }
         //}
 
-        
+
         //public void Sync1(float delta) {
         //    if (_authudp) {
         //        if (_synccd1 > 0) {
@@ -99,6 +99,12 @@ namespace Bacon.Game {
         //    GameObject word = e.Orgin;
         //    _scene = new Scene(_ctx, this, word);
         //}
+
+        public override void OnEnter() {
+            base.OnEnter();
+            InitService service = _ctx.QueryService<InitService>(InitService.Name);
+            service.SMActor.LoadScene("world");
+        }
 
         public void OnMoveStart() {
             _moveflag = true;

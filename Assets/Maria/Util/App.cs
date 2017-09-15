@@ -1,12 +1,10 @@
-﻿using System;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine;
 using XLua;
+using System;
+using Bacon.GL.Common;
 
 namespace Maria.Util {
-
-    [RequireComponent(typeof(Maria.Res.ABLoader))]
-    [RequireComponent(typeof(SoundMgr))]
     public class App : MonoBehaviour {
 
         [CSharpCallLua]
@@ -39,9 +37,8 @@ namespace Maria.Util {
         }
 
         public static App current = null;
-        public static string NOTIFICATION_APP_START = "NOTIFICATION_APP_START";
 
-
+        public StartBehaviour _start = null;
         private Bacon.App _app = null;
         private Dictionary<string, Action<Notification>> _dic = null;
 
@@ -49,14 +46,19 @@ namespace Maria.Util {
             if (current == null) {
                 current = this;
             }
-            DontDestroyOnLoad(this);
-            _app = new Bacon.App(this);
-            _dic = new Dictionary<string, Action<Notification>>();
         }
 
         // Use this for initialization
         void Start() {
-            PostNotification(NOTIFICATION_APP_START, this);
+            DontDestroyOnLoad(this);
+            _app = new Bacon.App(this);
+            _dic = new Dictionary<string, Action<Notification>>();
+
+            if (_start != null) {
+                _start.SetupStartRoot();
+            } else {
+                throw new System.Exception("not imple");
+            }
         }
 
         // Update is called once per frame
@@ -68,10 +70,6 @@ namespace Maria.Util {
             } catch (System.Exception ex) {
                 UnityEngine.Debug.LogException(ex);
             }
-        }
-
-        void OnEnable() {
-            
         }
 
         void OnApplicationFocus(bool isFocus) {
@@ -138,10 +136,6 @@ namespace Maria.Util {
             if (_dic.ContainsKey(notification.name)) {
                 _dic[notification.name](notification);
             }
-        }
-
-        public void StartUpdateRes() {
-            _app.StartUpdateRes();
         }
     }
 }
