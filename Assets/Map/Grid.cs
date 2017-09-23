@@ -100,7 +100,7 @@ public class Grid : MonoBehaviour {
             tile.Add("state", 1);
             grids.Add(tile);
         }
-        PlistCS.Plist.writeXml(dic, UnityEngine.Application.streamingAssetsPath + "\\" + fileName + ".map");
+        Maria.PlistCS.Plist.writeXml(dic, UnityEngine.Application.streamingAssetsPath + "\\" + fileName + ".map");
     }
 
     public void RegisterObjectSampler(ObjectSampler sampler) {

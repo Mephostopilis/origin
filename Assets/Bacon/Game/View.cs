@@ -59,12 +59,12 @@ namespace Bacon.Game
                 Vector3 max = new Vector3(maxm.m03, maxm.m13, maxm.m23);
                 _aabb = new AABB(min, max);
             } else {
-                 Maria.Debug.LogError("_go is empty.");
+                 //Maria.Debug.LogError("_go is empty.");
             }
         }
 
         public void InitView(Vector3 pos) {
-            Maria.Debug.Assert(false);
+            //Maria.Debug.Assert(false);
 
             _centerPos.x = pos.x;
             _centerPos.z = pos.z;
@@ -76,7 +76,7 @@ namespace Bacon.Game
             _viewMat = _centerMat * r;
 
             _depth = _centerPos.y - pos.y;
-            Maria.Debug.Assert(_depth == 15);
+            //Maria.Debug.Assert(_depth == 15);
 
             float yMax = Mathf.Tan(_fov / 2.0f / 180 * Mathf.PI) * _depth;
             float yMin = -yMax;
@@ -107,7 +107,7 @@ namespace Bacon.Game
         }
 
         public void Contains(Vector3 pivot) {
-            Maria.Debug.Assert(false);
+            //Maria.Debug.Assert(false);
             float padding = 2;
             float dx = 0, dy = 0, dz = 0;
             if (pivot.x + padding < _max.x) {

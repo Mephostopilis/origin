@@ -9,7 +9,7 @@ namespace Bacon
         private InitService _initService = null;
         private Request _request = null;
         private Response _response = null;
-        
+
         public AppContext(Application application, Config config, TimeSync ts) : base(application, config, ts) {
 
             _user.AddModule<Bacon.Modules.BattleScene>();
@@ -23,8 +23,5 @@ namespace Bacon
 
             Push(typeof(StartController));
         }
-
-        public Maria.Util.App GApp { get { return ((App)_application).GApp; } }
-
     }
 }

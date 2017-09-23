@@ -6,7 +6,6 @@ using Maria.Util;
 
 namespace Bacon.GL.Login.UI {
 
-    [RequireComponent(typeof(FindApp))]
     public class LoginPanel : MonoBehaviour {
 
         public InputField _usernmIF = null;
@@ -22,8 +21,8 @@ namespace Bacon.GL.Login.UI {
         // Use this for initialization
         void Start() {
             Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_SETUP_LOGINPANEL, gameObject);
-            GetComponent<FindApp>().App.Enqueue(cmd);
-            Maria.Util.App.current.AddObserver("AndroidLogin", OnAnroidLogin);
+            Bacon.Util.App.current.Enqueue(cmd);
+            Maria.Util.NotificationCenter.current.AddObserver("AndroidLogin", OnAnroidLogin);
         }
 
         // Update is called once per frame
@@ -104,14 +103,14 @@ namespace Bacon.GL.Login.UI {
         msg["server"] = "sample";
 #endif
             Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_LOGIN, gameObject, msg);
-            GetComponent<FindApp>().App.Enqueue(cmd);
+            Bacon.Util.App.current.Enqueue(cmd);
         }
 
         public void ShowTips(string tips) {
             _Tips.text = tips;
         }
 
-        public void OnAnroidLogin(Maria.Util.App.Notification n) {
+        public void OnAnroidLogin(Maria.Util.NotificationCenter.Notification n) {
             string code = n.data.ToString();
             Login(code);
         }

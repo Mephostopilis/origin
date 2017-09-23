@@ -69,41 +69,14 @@ namespace Bacon.DataSet {
         }
 
         private void LoadSay() {
-            UnityEngine.TextAsset ts = ABLoader.current.LoadTextAsset("Excels", "say");
-            sayConfig config = new sayConfig();
-            config.Load(ts.text);
-            foreach (var item in config.Items) {
-                SayItem say = new SayItem();
-                say.id = item.Value["id"].l;
-                say.code = item.Value["code"].l;
-                say.text = item.Value["text"].s;
-                say.sound = item.Value["sound"].s;
-                _says.Add(say.id, say);
-            }
         }
 
         private void LoadData() {
             UnityEngine.TextAsset ts = ABLoader.current.LoadTextAsset("Excels", "data");
-            dataConfig config = new dataConfig();
-            config.Load(ts.text);
-            foreach (var item in config.Items) {
-                DataItem say = new DataItem();
-                say.key = item.Value["key"].l;
-                say.value = item.Value["value"].s;
-                _datas.Add(say.key, say);
-            }
         }
 
         private void LoadHuType() {
             UnityEngine.TextAsset ts = ABLoader.current.LoadTextAsset("Excels", "hutype");
-            hutypeConfig config = new hutypeConfig();
-            config.Load(ts.text);
-            foreach (var item in config.Items) {
-                HuTypeItem say = new HuTypeItem();
-                say.id = item.Value["id"].l;
-                say.ch = item.Value["ch"].s;
-                _hutypes.Add(say.id, say);
-            }
         }
     }
 }

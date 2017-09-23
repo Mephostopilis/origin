@@ -6,7 +6,7 @@ using Maria.Util;
 using Maria.Res;
 
 namespace Bacon.GL.Start {
-    [RequireComponent(typeof(FindApp))]
+    
     public class StartBehaviour : MonoBehaviour {
 
         public GameObject _Slider;
@@ -17,9 +17,9 @@ namespace Bacon.GL.Start {
 
         // Use this for initialization
         void Start() {
-            Maria.Util.App.current.AddObserver(Maria.Util.App.NOTIFICATION_APP_START, (Maria.Util.App.Notification notification) => {
+            Maria.Util.NotificationCenter.current.AddObserver(NotificationCenter.Notification.NOTIFICATION_APP_START, (NotificationCenter.Notification notification) => {
                 Maria.Command cmd = new Maria.Command(EventCmd.EVENT_START_SETUP_ROOT, gameObject);
-                GetComponent<FindApp>().App.Enqueue(cmd);
+                Bacon.Util.App.current.Enqueue(cmd);
             });
             _progress = 0.0f;
         }
@@ -35,7 +35,7 @@ namespace Bacon.GL.Start {
 
                     if (_progress > 1.0f) {
                         Command cmd = new Command(MyEventCmd.EVENT_UPdATERES);
-                        GetComponent<FindApp>().App.Enqueue(cmd);
+                        Bacon.Util.App.current.Enqueue(cmd);
                     }
                 }
             }
@@ -44,7 +44,11 @@ namespace Bacon.GL.Start {
 
         public void UpdateRes() {
             _updateres = 1;
-            Maria.Util.App.current.StartUpdateRes();
+            ABLoader.current.FetchVersion(() => {
+
+            });
+
+            
 
             //SayDataSet.Instance.Load();
             //UnityEngine.Debug.Log(SayDataSet.Instance.GetSayItem(1).text);

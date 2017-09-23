@@ -7,7 +7,7 @@ namespace Bacon {
 
         private AppConfig _config = null;
         
-        public App(Maria.Util.App app) : base(app) {
+        public App() {
             _config = new AppConfig();
             _ctx = new AppContext(this, _config, _tiSync);
             _dispatcher = _ctx.EventDispatcher;
@@ -16,10 +16,6 @@ namespace Bacon {
                 StartController controller = _ctx.Push<StartController>();
                 controller.SetupRoot(e);
             }));
-        }
-
-        public Maria.Util.App GApp {
-            get { return _app; }
         }
 
         sealed public override void StartScript() {
