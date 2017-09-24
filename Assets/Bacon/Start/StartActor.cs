@@ -3,7 +3,7 @@ using Bacon.GL.Start;
 using Bacon.Login;
 using Maria;
 
-namespace Bacon
+namespace Bacon.Start
 {
     class StartActor : Actor {
 

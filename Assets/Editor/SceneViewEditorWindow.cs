@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Map;
 
 public class SceneViewEditorWindow : EditorWindow {
 
@@ -41,7 +42,7 @@ public class SceneViewEditorWindow : EditorWindow {
                         int layermask = 1 << 12;
                         RaycastHit hitInfo;
                         if (Physics.Raycast(r, out hitInfo, Mathf.Infinity, layermask)) {
-                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(TileState.Block);
+                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(Tile.TileState.Block);
                             EditorGUIUtility.PingObject(hitInfo.collider.gameObject);
                         }
                     }
@@ -51,7 +52,7 @@ public class SceneViewEditorWindow : EditorWindow {
                         int layermask = 1 << 12;
                         RaycastHit hitInfo;
                         if (Physics.Raycast(r, out hitInfo, Mathf.Infinity, layermask)) {
-                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(TileState.Block);
+                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(Tile.TileState.Block);
                             EditorGUIUtility.PingObject(hitInfo.collider.gameObject);
                         }
                     }
@@ -62,7 +63,7 @@ public class SceneViewEditorWindow : EditorWindow {
                         int layermask = 1 << 12;
                         RaycastHit hitInfo;
                         if (Physics.Raycast(r, out hitInfo, Mathf.Infinity, layermask)) {
-                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(TileState.Block);
+                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(Tile.TileState.Block);
                             EditorGUIUtility.PingObject(hitInfo.collider.gameObject);
                         }
                     }
@@ -73,7 +74,7 @@ public class SceneViewEditorWindow : EditorWindow {
                         int layermask = 1 << 12;
                         RaycastHit hitInfo;
                         if (Physics.Raycast(r, out hitInfo, Mathf.Infinity, layermask)) {
-                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(TileState.Tree);
+                            hitInfo.collider.gameObject.GetComponent<Tile>().ChooseTileState(Tile.TileState.Tree);
                             EditorGUIUtility.PingObject(hitInfo.collider.gameObject);
                         }
                     }

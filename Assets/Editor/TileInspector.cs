@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Map;
 
 [CustomEditor(typeof(Tile))]
 public class TileInspector : Editor {
@@ -18,13 +19,13 @@ public class TileInspector : Editor {
         if (GUILayout.Button("Create")) {
             switch (index) {
                 case 0:
-                    tile.ChooseTileState(TileState.Normal);
+                    tile.ChooseTileState(Tile.TileState.Normal);
                     break;
                 case 1:
-                    tile.ChooseTileState(TileState.Block);
+                    tile.ChooseTileState(Tile.TileState.Block);
                     break;
                 case 2:
-                    tile.ChooseTileState(TileState.Tree);
+                    tile.ChooseTileState(Tile.TileState.Tree);
                     break;
                 default:
                     break;

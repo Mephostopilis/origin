@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace Map { 
 public class StaticObjectSampler : ObjectSampler {
 
 	// Use this for initialization
@@ -14,4 +15,5 @@ public class StaticObjectSampler : ObjectSampler {
 	void Update () {
         base.Update();
 	}
+}
 }

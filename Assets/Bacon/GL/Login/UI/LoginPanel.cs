@@ -21,7 +21,7 @@ namespace Bacon.GL.Login.UI {
         // Use this for initialization
         void Start() {
             Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_SETUP_LOGINPANEL, gameObject);
-            Bacon.Util.App.current.Enqueue(cmd);
+            Bacon.GL.Util.App.current.Enqueue(cmd);
             Maria.Util.NotificationCenter.current.AddObserver("AndroidLogin", OnAnroidLogin);
         }
 
@@ -103,7 +103,7 @@ namespace Bacon.GL.Login.UI {
         msg["server"] = "sample";
 #endif
             Maria.Command cmd = new Maria.Command(MyEventCmd.EVENT_LOGIN, gameObject, msg);
-            Bacon.Util.App.current.Enqueue(cmd);
+            Bacon.GL.Util.App.current.Enqueue(cmd);
         }
 
         public void ShowTips(string tips) {

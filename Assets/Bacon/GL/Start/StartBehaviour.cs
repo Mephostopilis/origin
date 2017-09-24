@@ -6,7 +6,7 @@ using Maria.Util;
 using Maria.Res;
 
 namespace Bacon.GL.Start {
-    
+
     public class StartBehaviour : MonoBehaviour {
 
         public GameObject _Slider;
@@ -17,10 +17,6 @@ namespace Bacon.GL.Start {
 
         // Use this for initialization
         void Start() {
-            Maria.Util.NotificationCenter.current.AddObserver(NotificationCenter.Notification.NOTIFICATION_APP_START, (NotificationCenter.Notification notification) => {
-                Maria.Command cmd = new Maria.Command(EventCmd.EVENT_START_SETUP_ROOT, gameObject);
-                Bacon.Util.App.current.Enqueue(cmd);
-            });
             _progress = 0.0f;
         }
 
@@ -35,20 +31,28 @@ namespace Bacon.GL.Start {
 
                     if (_progress > 1.0f) {
                         Command cmd = new Command(MyEventCmd.EVENT_UPdATERES);
-                        Bacon.Util.App.current.Enqueue(cmd);
+                        Bacon.GL.Util.App.current.Enqueue(cmd);
                     }
                 }
             }
         }
 
+        public void SetupRoot() {
+            Maria.Command cmd = new Maria.Command(EventCmd.EVENT_START_SETUP_ROOT, gameObject);
+            Bacon.GL.Util.App.current.Enqueue(cmd);
+        }
 
         public void UpdateRes() {
             _updateres = 1;
-            ABLoader.current.FetchVersion(() => {
+            Command cmd = new Command(MyEventCmd.EVENT_UPDATERES_END);
+            Bacon.GL.Util.App.current.Enqueue(cmd);
 
-            });
+            //Bacon.GL.Util.App.current.Enqueue(cmd);
+            //ABLoader.current.FetchVersion(() => {
 
-            
+            //});
+
+
 
             //SayDataSet.Instance.Load();
             //UnityEngine.Debug.Log(SayDataSet.Instance.GetSayItem(1).text);
@@ -61,6 +65,9 @@ namespace Bacon.GL.Start {
 
         public void TestRes() {
             _updateres = 2;
+            Command cmd = new Command(MyEventCmd.EVENT_UPDATERES_END);
+            Bacon.GL.Util.App.current.Enqueue(cmd);
+
             // 下面是测试代码
             //ABLoader.current.LoadAssetAsync<AudioClip>("Sound/Man", "peng", (AudioClip clip) => {
             //    UnityEngine.Debug.Log("ok");

@@ -1,6 +1,6 @@
 ﻿using Maria;
 
-namespace Bacon {
+namespace Bacon.Start {
     class StartController : Controller {
         private StartActor _startActor = null;
 

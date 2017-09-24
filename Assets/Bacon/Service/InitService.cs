@@ -6,6 +6,7 @@ using System;
 using XLua;
 using Bacon.Helper;
 using Bacon.Event;
+using Bacon.Start;
 
 namespace Bacon.Service {
 

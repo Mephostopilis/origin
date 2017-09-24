@@ -5,8 +5,9 @@ using UnityEngine;
 using XLua;
 using Maria.Util;
 using Bacon.GL.Start;
+using Bacon.Event;
 
-namespace Bacon.Util {
+namespace Bacon.GL.Util {
 
     [RequireComponent(typeof(Maria.Util.NotificationCenter))]
     [RequireComponent(typeof(Maria.Util.SoundMgr))]
@@ -37,6 +38,7 @@ namespace Bacon.Util {
         void Start() {
             DontDestroyOnLoad(this);
             _app = new Bacon.App();
+            _start.SetupRoot();
         }
 
         // Update is called once per frame

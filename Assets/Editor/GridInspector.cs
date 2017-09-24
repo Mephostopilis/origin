@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System.Collections;
+using Map;
 
 [CustomEditor(typeof(Grid))]
 public class GridInspector : Editor {

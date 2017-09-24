@@ -7,7 +7,10 @@ using System.Text;
 namespace Bacon.Event {
     class MyEventCmd : EventCmd {
 
-        // 开始界面 1001 ~ 1100
+        // 1001 ~ 1050
+        public static uint EVENT_APP_START = 1001;
+
+        // 开始界面 1051 ~ 1100
         public static uint EVENT_SETUP_STARTROOT = 1051;
         public static uint EVENT_UPdATERES = 1052;
         public static uint EVENT_TSETRES = 1053;

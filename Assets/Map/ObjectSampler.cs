@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+namespace Map { 
 public class ObjectSampler : MonoBehaviour {
 
     public enum Type {
@@ -23,4 +24,4 @@ public class ObjectSampler : MonoBehaviour {
 
     }
 }
-
+}
