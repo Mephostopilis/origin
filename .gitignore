@@ -28,3 +28,5 @@ sysinfo.txt
 
 *.sdf
 *.dll
+
+.vs

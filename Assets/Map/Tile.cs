@@ -119,10 +119,12 @@ namespace Map {
         public Grid grid;
         public CubeIndex index;
         public Grid.HexOrientation orientation;
+        public TileState state;
+        public float height;
+
+        // 模型在世界的位置
         public Vector3 position;
-        private TileState state;
         private float[] cornerheight = new float[6];
-        
 
         public static Vector3 Corner(Vector3 origin, float radius, int corner, Grid.HexOrientation orientation) {
             float angle = 60 * corner;
@@ -130,6 +132,13 @@ namespace Map {
                 angle += 30;
             angle *= Mathf.PI / 180;
             return new Vector3(origin.x + radius * Mathf.Cos(angle), origin.y, origin.z + radius * Mathf.Sin(angle));
+        }
+
+        public float SamepleHeight() {
+            Vector3 worldPos = transform.position;
+            float y = grid.SampleHeight(worldPos);
+            height = y;
+            return height;
         }
 
         public void AddHexMesh(float radius, Grid.HexOrientation orientation) {
@@ -209,6 +218,15 @@ namespace Map {
                 Vector3 localPos = transform.InverseTransformPoint(new Vector3(worldPos.x, y, worldPos.z));
                 lines.SetPosition(vert, localPos);
             }
+        }
+
+        public void AddDesc() {
+            //GameObject go = new GameObject();
+            //go.name = "desc";
+            //go.transform.position = new Vector3(transform.position.x, SamepleHeight(), transform.position.z);
+            //TextMesh tm = go.AddComponent<TextMesh>();
+            //tm.text = index.ToString();
+            //go.transform.SetParent(transform);
         }
 
         public void ChooseTileState(TileState s) {

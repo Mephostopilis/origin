@@ -24,14 +24,31 @@ namespace Map {
 
         public class GridAStar {
 
+            private int _current = 1;
+            private int _pathid = 0;
+
+            public GridAStar(int pathid) {
+                _pathid = pathid;
+                Free = true;
+            }
+
+            public int Pathid { get { return _pathid; } }
             public bool Free { get; set; }
-            public int Pathid { get; set; }
             public Tile Exit { get; set; }
             public List<TileAStar> Open { get; set; }
             public List<TileAStar> Closed { get; set; }
-        }
 
-        public static Grid current = null;
+            // read
+            public int Current { get { return _current; } set { _current = value; } }
+
+            public void Clear() {
+                _current = 1;
+                Free = true;
+                Exit = null;
+                Open.Clear();
+                Closed.Clear();
+            }
+        }
 
         //Map settings
         public MapShape mapShape = MapShape.Rectangle;
@@ -68,9 +85,7 @@ namespace Map {
 
         public Grid() {
             for (int i = 0; i < 100; i++) {
-                astars[i] = new GridAStar();
-                astars[i].Free = true;
-                astars[i].Pathid = i;
+                astars[i] = new GridAStar(i);
             }
         }
 
@@ -110,9 +125,9 @@ namespace Map {
 
         public void ClearGrid() {
             Debug.Log("Clearing grid...");
-            foreach (var tile in Tiles)
+            foreach (var tile in grid)
                 DestroyImmediate(tile.Value.gameObject);
-            //grid.Clear();
+            grid.Clear();
         }
 
         public void SaveFile() {
@@ -123,16 +138,17 @@ namespace Map {
             dic.Add("orientation", (int)HexOrientation.Flat);
             dic.Add("shape", (int)MapShape.Rectangle);
             List<object> grids = new List<object>();
-            dic.Add("grids", grids);
             foreach (var item in grid) {
                 Dictionary<string, object> tile = new Dictionary<string, object>();
                 tile.Add("g", item.Value.index.x);
                 tile.Add("r", item.Value.index.y);
                 tile.Add("s", item.Value.index.z);
-                tile.Add("height", item.Value.transform.position.y);
+                float height = item.Value.SamepleHeight();
+                tile.Add("height", height.ToString());
                 tile.Add("state", 1);
                 grids.Add(tile);
             }
+            dic.Add("grids", grids);
             Maria.PlistCS.Plist.writeXml(dic, UnityEngine.Application.streamingAssetsPath + "\\" + fileName + ".map");
         }
 
@@ -226,19 +242,21 @@ namespace Map {
                         double r = 0.0f * pt.x + (2.0 / 3.0) * pt.z;
                         Tile.FractionalIndex hex = new Tile.FractionalIndex(q, r, -q - r);
                         Tile.CubeIndex cube = Tile.FractionalIndex.HexRound(hex);
-                        return TileAt(cube);
+                        UnityEngine.Debug.Log(cube.ToString());
+                        return TileAt(cube.x, cube.y, cube.z);
                     }
                 case HexOrientation.Flat: {
                         double q = 2.0 / 3.0f * pos.x + 0.0 * pt.z;
                         double r = -1.0 / 3.0f * pt.x + Mathf.Sqrt(3.0f) / 3.0f * pt.z;
                         Tile.FractionalIndex hex = new Tile.FractionalIndex(q, r, -q - r);
                         Tile.CubeIndex cube = Tile.FractionalIndex.HexRound(hex);
-                        return TileAt(cube);
+                        UnityEngine.Debug.Log(cube.ToString());
+                        return TileAt(cube.x, cube.y, cube.z);
                     }
                 default:
-                    return null;
                     break;
             }
+            return null;
         }
 
         public int FindPath(Vector3 start, Vector3 exit) {
@@ -251,6 +269,11 @@ namespace Map {
             if (i >= 0 && i < 100) {
                 Tile startTile = ToTile(start);
                 Tile exitTile = ToTile(exit);
+                if (exitTile == null) {
+                    Debug.Log("exit tile is null");
+                    return -1;
+                }
+                exitTile.LineColour(Color.red, Color.red);
                 astars[i].Exit = exitTile;
                 if (astars[i].Open == null) {
                     astars[i].Open = new List<TileAStar>();
@@ -270,16 +293,19 @@ namespace Map {
                 star.Tile = startTile;
 
                 astars[i].Open.Add(star);
-                astars[i].Open.Sort();
+                astars[i].Open.Sort(star);
 
                 while (astars[i].Open.Count > 0) {
                     TileAStar top = astars[i].Open[0];
+                    astars[i].Open.Remove(top);
                     astars[i].Closed.Add(top);
-                    List<Tile> neighbours = Neighbours(top.Tile);
-
                     if (top.Tile == astars[i].Exit) {
                         break;
                     }
+
+                    UnityEngine.Debug.Log(top.Tile.index.ToString());
+
+                    List<Tile> neighbours = Neighbours(top.Tile);
                     foreach (var item in neighbours) {
                         star = new TileAStar();
                         star.GCost = 0;
@@ -295,7 +321,7 @@ namespace Map {
                         }
 
                         astars[i].Open.Add(star);
-                        astars[i].Open.Sort();
+                        astars[i].Open.Sort(star);
                     }
                 }
                 // finish
@@ -304,22 +330,18 @@ namespace Map {
             return -1;
         }
 
+        public bool NextPoint(int pathid, ref Vector3 pos) {
+            if (astars[pathid].Current < astars[pathid].Closed.Count) {
+                pos = astars[pathid].Closed[astars[pathid].Current].Tile.position;
+                astars[pathid].Current = astars[pathid].Current + 1;
+                return true;
+            } else {
+                return false;
+            }
+        }
         #endregion
 
         #region Private Methods
-        private void Awake() {
-            if (current == null)
-                current = this;
-        }
-
-        private void OnEnable() {
-            grid.Clear();
-            for (int i = 0; i < transform.childCount; i++) {
-                Transform t = transform.GetChild(i);
-                Tile tile = t.GetComponent<Tile>();
-                grid.Add(tile.index.ToString(), tile);
-            }
-        }
 
         private void GenHexShape() {
             Debug.Log("Generating hexagonal shaped grid...");
@@ -463,13 +485,13 @@ namespace Map {
 
             go.transform.position = postion;
             go.transform.parent = this.transform;
-            int layermask = 1 << 12;
             go.layer = LayerMask.NameToLayer("Grid");
 
             Tile tile = go.GetComponent<Tile>();
             tile.grid = this;
             tile.orientation = hexOrientation;
             tile.AddHexMesh(hexRadius, hexOrientation);
+            tile.SamepleHeight();
 
             //MeshFilter fil = go.GetComponent<MeshFilter>();
             //MeshRenderer ren = go.GetComponent<MeshRenderer>();
@@ -485,6 +507,8 @@ namespace Map {
             if (drawOutlines) {
                 tile.AddOutlines(hexRadius, hexOrientation);
             }
+
+            tile.AddDesc();
 
             return tile;
         }

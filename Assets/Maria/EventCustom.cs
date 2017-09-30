@@ -10,7 +10,6 @@ namespace Maria {
         public static readonly string OnGateAuthed = "OnGateAuthed";
         public static readonly string OnGateDisconnected = "OnGateDisconnected";
 
-        private Context _ctx = null;
         private string _name = string.Empty;
         private object _addition = null;
         private object _ud = null;

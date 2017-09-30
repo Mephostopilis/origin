@@ -54,6 +54,9 @@ namespace Bacon
             //EventListenerCmd listener9 = new EventListenerCmd(MyEventCmd.EVENT_MUI_EXITLOGIN, OnLogout);
             //_ctx.EventDispatcher.AddCmdEventListener(listener9);
 
+            EventListenerCmd listener9 = new EventListenerCmd(MyEventCmd.EVENT_MUI_MATCH, OnSendMatch);
+            _ctx.EventDispatcher.AddCmdEventListener(listener9);
+
         }
 
         public override void OnEnter() {
@@ -95,13 +98,15 @@ namespace Bacon
         }
 
         public void OnSendMatch(EventCmd e) {
-            if (((AppConfig)_ctx.Config).VTYPE == AppConfig.VERSION_TYPE.TEST_WIN) {
-                _ctx.Push(typeof(GameController));
-            } else {
-                C2sSprotoType.match.request request = new C2sSprotoType.match.request();
-                request.mode = 1;
-                _ctx.SendReq<C2sProtocol.match>(C2sProtocol.match.Tag, request);
-            }
+
+            _ctx.Push<Bacon.Game.GameController>();
+            //if (((AppConfig)_ctx.Config).VTYPE == AppConfig.VERSION_TYPE.TEST_WIN) {
+            //    _ctx.Push(typeof(GameController));
+            //} else {
+            //    C2sSprotoType.match.request request = new C2sSprotoType.match.request();
+            //    request.mode = 1;
+            //    _ctx.SendReq<C2sProtocol.match>(C2sProtocol.match.Tag, request);
+            //}
         }
 
         public void OnSendMsg(EventCmd e) {

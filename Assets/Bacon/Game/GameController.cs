@@ -53,11 +53,10 @@ namespace Bacon.Game {
 
         //public override void OnEnter() {
         //    base.OnEnter();
+
         //    InitService service = (InitService)_ctx.QueryService("init");
-        //    if (service != null) {
-        //        SMActor actor = service.SMActor;
-        //        actor.LoadScene("game");
-        //    }
+        //    SMActor actor = service.SMActor;
+        //    actor.LoadScene("World");
         //}
 
 
@@ -103,7 +102,7 @@ namespace Bacon.Game {
         public override void OnEnter() {
             base.OnEnter();
             InitService service = _ctx.QueryService<InitService>(InitService.Name);
-            service.SMActor.LoadScene("world");
+            service.SMActor.LoadScene("World");
         }
 
         public void OnMoveStart() {

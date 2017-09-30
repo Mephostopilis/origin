@@ -16,7 +16,6 @@ public class ObjectSampler : MonoBehaviour {
 
     // Use this for initialization
     public void Start() {
-        Grid.current.RegisterObjectSampler(this);
     }
 
     // Update is called once per frame
