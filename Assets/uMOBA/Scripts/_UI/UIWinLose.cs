@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 public class UIWinLose : MonoBehaviour {
     [SerializeField] GameObject panel;

@@ -37,7 +37,7 @@ namespace Maria.Sharp {
 
         public static SharpObject cache = new SharpObject();
         public const int maxArgs = 8;
-        public const string DLL = "play";
+        public const string DLL = "mariac";
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr sharpc_create(pfunc func);

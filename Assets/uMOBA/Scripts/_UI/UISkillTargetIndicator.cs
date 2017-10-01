@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 public class UISkillTargetIndicator : MonoBehaviour {
     public GameObject indicator;

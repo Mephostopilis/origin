@@ -29,7 +29,7 @@ using UnityEngine.Networking;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 [RequireComponent(typeof(Animator))]
 public class Monster : Entity {

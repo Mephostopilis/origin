@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 public class UISkills : MonoBehaviour {
     [SerializeField] GameObject slotPrefab;

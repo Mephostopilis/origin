@@ -37,7 +37,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 // Team Enum (we use an enum instead of a string so that changing a team name
 // will force us to update the code in all places)

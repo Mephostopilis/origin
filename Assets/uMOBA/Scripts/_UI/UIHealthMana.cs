@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
+
 public class UIHealthMana : MonoBehaviour {
     [SerializeField] Slider hpBar;
     [SerializeField] Text hpStatus;

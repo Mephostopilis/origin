@@ -27,6 +27,6 @@ ExportedObj/
 sysinfo.txt
 
 *.sdf
-*.dll
+#*.dll
 
 .vs

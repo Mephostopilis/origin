@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 public class FogOfWar : MonoBehaviour {
     [SerializeField] Color color = Color.black;

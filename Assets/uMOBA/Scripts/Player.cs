@@ -28,7 +28,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 [RequireComponent(typeof(NetworkName))]
 [RequireComponent(typeof(PlayerChat))]

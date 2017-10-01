@@ -1,7 +1,7 @@
 ﻿// The Tower entity type. Automatically attacks entities from the opposite team.
 using UnityEngine;
 using UnityEngine.Networking;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 public class Tower : Entity {
     [Header("Health")]

@@ -2,7 +2,8 @@
 // always find it from other code. (GameObject.Find doesn't find inactive ones)
 using UnityEngine;
 using UnityEngine.UI;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
+
 public class UIRespawn : MonoBehaviour {
     [SerializeField] GameObject panel;
     [SerializeField] Text text;

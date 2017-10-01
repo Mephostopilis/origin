@@ -4,7 +4,7 @@
 // Note: we use the outline color alpha channel for visibility, which is easier
 // than saving the default strenghts and settings strengths to 0.
 using UnityEngine;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 [RequireComponent(typeof(Entity))]
 public class MouseoverOutline : MonoBehaviour {

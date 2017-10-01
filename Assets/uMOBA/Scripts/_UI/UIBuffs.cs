@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using Bacon.GL.Util;
 
 public class UIBuffs : MonoBehaviour {
     [SerializeField] GameObject slotPrefab;
 
     void Update() {
-        var player = uMoba.Utils.ClientLocalPlayer();
+        var player = Utils.ClientLocalPlayer();
         if (!player) return;
 
         // instantiate/destroy enough slots

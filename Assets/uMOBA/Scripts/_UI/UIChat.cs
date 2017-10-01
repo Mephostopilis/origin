@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
+
 public class UIChat : MonoBehaviour {
     public InputField messageInput;
     [SerializeField] Button sendButton;

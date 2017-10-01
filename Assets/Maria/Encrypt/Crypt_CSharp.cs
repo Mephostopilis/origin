@@ -8,7 +8,7 @@ namespace Maria.Encrypt
 {
     public class Crypt_CSharp
     {
-        public const string DLL = "play";
+        public const string DLL = "mariac";
 
         [StructLayout(LayoutKind.Sequential)]
         public struct PACKAGE

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 public class UIMinimap : MonoBehaviour, IPointerDownHandler, IDragHandler {
     [SerializeField] Camera minimapCamera;

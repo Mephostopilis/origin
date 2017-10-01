@@ -19,7 +19,7 @@ namespace Maria {
         /// <summary>
         /// ui 到框架的事件传递
         /// </summary>
-        
+
         private uint _cmd = 0;
         private GameObject _orgin = null;
         private Message _msg = null;

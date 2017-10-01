@@ -1,7 +1,7 @@
 ﻿// HealthBar via TextMesh of "_". This is a workaround for the following Unity
 // bug: https://issuetracker.unity3d.com/issues/destroy-gameobject-time-causes-unity-to-crash-in-sharedgfxbuffer-unshare-sharedgfxbuffer-star
 using UnityEngine;
-using Utils = uMoba.Utils;
+using Bacon.GL.Util;
 
 public class TextMeshHealthBar : MonoBehaviour {
     [SerializeField] Color teamColor = Color.green;
