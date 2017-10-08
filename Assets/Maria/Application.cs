@@ -208,6 +208,7 @@ namespace Maria {
             _luaenv.AddBuildin("cjson", Maria.Lua.BuildInInit.LoadCJson);
             _luaenv.AddBuildin("lpeg", Maria.Lua.BuildInInit.LoadLpeg);
             _luaenv.AddBuildin("sproto.core", Maria.Lua.BuildInInit.LoadSprotoCore);
+            _luaenv.AddBuildin("ball", Maria.Lua.BuildInInit.LoadBall);
             _luaenv.AddLoader((ref string filepath) => {
                 UnityEngine.Debug.LogFormat("LUA custom loader {0}", filepath);
 

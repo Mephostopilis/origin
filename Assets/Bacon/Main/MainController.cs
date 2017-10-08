@@ -8,6 +8,7 @@ using Bacon.Game;
 using Bacon.Helper;
 using Bacon.Event;
 using Maria.Res;
+using Bacon.Modules;
 
 namespace Bacon
 {
@@ -98,15 +99,9 @@ namespace Bacon
         }
 
         public void OnSendMatch(EventCmd e) {
-
-            _ctx.Push<Bacon.Game.GameController>();
-            //if (((AppConfig)_ctx.Config).VTYPE == AppConfig.VERSION_TYPE.TEST_WIN) {
-            //    _ctx.Push(typeof(GameController));
-            //} else {
-            //    C2sSprotoType.match.request request = new C2sSprotoType.match.request();
-            //    request.mode = 1;
-            //    _ctx.SendReq<C2sProtocol.match>(C2sProtocol.match.Tag, request);
-            //}
+            C2sSprotoType.match.request request = new C2sSprotoType.match.request();
+            request.mode = 1;
+            _ctx.SendReq<C2sProtocol.match>(C2sProtocol.match.Tag, request);          
         }
 
         public void OnSendMsg(EventCmd e) {
@@ -180,8 +175,11 @@ namespace Bacon
         #region request
         public SprotoTypeBase OnReqMatch(SprotoTypeBase requestObj) {
             S2cSprotoType.match.request obj = requestObj as S2cSprotoType.match.request;
-
-            _ctx.U.GetModule<Bacon.Modules.BattleScene>().RoomId = obj.roomid;
+            BattleScene M = _ctx.U.GetModule<BattleScene>();
+            M.RoomId = obj.roomid;
+            M.UdpHost = obj.udphost;
+            M.UdpPort = obj.udpport;
+            M.Session = obj.session;
 
             _ctx.Push<GameController>();
 

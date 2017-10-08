@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Maria.Util {
+
+    [RequireComponent(typeof(AudioSource))]
     public class SoundMgr : MonoBehaviour {
 
         public static SoundMgr current = null;

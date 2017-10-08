@@ -85,12 +85,9 @@ namespace Maria {
 
         }
 
-        public virtual void OnUdpSync() {
-            _authudp = true;
-        }
-
-        public virtual void OnUdpRecv(PackageSocketUdp.R r) {
+        public virtual void OnUdpRecv(byte[] data, int start, int size) {
             throw new NotImplementedException();
         }
+
     }
 }

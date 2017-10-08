@@ -59,7 +59,7 @@ namespace S2cSprotoType {
 	public class match {
 	
 		public class request : SprotoTypeBase {
-			private static int max_field_count = 1;
+			private static int max_field_count = 4;
 			
 			
 			private Int64 _roomid; // tag 0
@@ -69,6 +69,33 @@ namespace S2cSprotoType {
 			}
 			public bool HasRoomid {
 				get { return base.has_field.has_field (0); }
+			}
+
+			private string _udphost; // tag 1
+			public string udphost {
+				get { return _udphost; }
+				set { base.has_field.set_field (1, true); _udphost = value; }
+			}
+			public bool HasUdphost {
+				get { return base.has_field.has_field (1); }
+			}
+
+			private Int64 _udpport; // tag 2
+			public Int64 udpport {
+				get { return _udpport; }
+				set { base.has_field.set_field (2, true); _udpport = value; }
+			}
+			public bool HasUdpport {
+				get { return base.has_field.has_field (2); }
+			}
+
+			private Int64 _session; // tag 3
+			public Int64 session {
+				get { return _session; }
+				set { base.has_field.set_field (3, true); _session = value; }
+			}
+			public bool HasSession {
+				get { return base.has_field.has_field (3); }
 			}
 
 			public request () : base(max_field_count) {}
@@ -84,6 +111,15 @@ namespace S2cSprotoType {
 					case 0:
 						this.roomid = base.deserialize.read_integer ();
 						break;
+					case 1:
+						this.udphost = base.deserialize.read_string ();
+						break;
+					case 2:
+						this.udpport = base.deserialize.read_integer ();
+						break;
+					case 3:
+						this.session = base.deserialize.read_integer ();
+						break;
 					default:
 						base.deserialize.read_unknow_data ();
 						break;
@@ -96,6 +132,18 @@ namespace S2cSprotoType {
 
 				if (base.has_field.has_field (0)) {
 					base.serialize.write_integer (this.roomid, 0);
+				}
+
+				if (base.has_field.has_field (1)) {
+					base.serialize.write_string (this.udphost, 1);
+				}
+
+				if (base.has_field.has_field (2)) {
+					base.serialize.write_integer (this.udpport, 2);
+				}
+
+				if (base.has_field.has_field (3)) {
+					base.serialize.write_integer (this.session, 3);
 				}
 
 				return base.serialize.close ();

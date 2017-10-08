@@ -61,10 +61,6 @@ namespace Maria.Network {
 
         // udp
         private PackageSocketUdp _udp = null;
-        private long _udpsession = 0;
-        private string _udpip = null;
-        private int _udpport = 0;
-        private bool _udpflag = false;
 
         public ClientSocket(Context ctx, ProtocolBase s2c, ProtocolBase c2s) {
             _ctx = ctx;
@@ -91,7 +87,6 @@ namespace Maria.Network {
         public ConnectedCb OnConnected { get; set; }
         public DisconnectedCb OnDisconnected { get; set; }
         public PackageSocketUdp.RecvCB OnRecvUdp { get; set; }
-        public PackageSocketUdp.SyncCB OnSyncUdp { get; set; }
         public Lua.ClientSock ClintSockscript {
             get { return _clientSockScript; }
             set {
@@ -326,40 +321,27 @@ namespace Maria.Network {
 
 
         // UDP
-        public void UdpAuth(long session, string ip, int port) {
-            UnityEngine.Debug.Assert(_udpflag == false);
+        public void UdpAuth(long session, string host, int port) {
             UnityEngine.Debug.Assert(_udp == null);
-            _udpsession = session;
-            _udpip = ip;
-            _udpport = port;
 
-            TimeSync ts = _ctx.TiSync;
             _udp = new PackageSocketUdp(_ctx, _user.Secret, (uint)session);
             _udp.OnRecv = UdpRecv;
-            _udp.OnSync = UdpSync;
-            UnityEngine.Debug.Assert(_udp != null);
-            _udp.Connect(ip, port);
-            _udp.Sync();
+            _udp.Connect(host, port);
         }
 
-        private void UdpSync() {
-            _udpflag = true;
-            if (OnSyncUdp != null) {
-                OnSyncUdp();
-            }
-        }
-
-        private void UdpRecv(PackageSocketUdp.R r) {
+        private void UdpRecv(byte[] data, int start, int len) {
             if (OnRecvUdp != null) {
-                OnRecvUdp(r);
+                OnRecvUdp(data, start, len);
             }
         }
 
-        public void SendUdp(byte[] data) {
-            if (_udpflag) {
+        public void UdpSend(byte[] data) {
+            if (_udp != null) {
                 _udp.Send(data);
             }
         }
+
+        public bool UdpConnected { get { return _udp.Connected; } }
 
         public void StartScript() {
             _clientSockScript = _ctx.EnvScript.clientsock();

@@ -19,8 +19,7 @@ namespace Maria.Network {
             public byte[] Data { get; set; }
         }
 
-        public delegate void RecvCB(R r);
-        public delegate void SyncCB();
+        public delegate void RecvCB(byte[] data, int start, int len);
 
         private Socket _so = null;
         private string _host = String.Empty;
@@ -34,9 +33,8 @@ namespace Maria.Network {
         private uint _session;
         private TimeSync _timeSync;
 
-        private bool _connected = false;
+        private bool _connected = false;    // syn success
         private RecvCB _recvCb = null;
-        private SyncCB _syncCb = null;
         private Rudp.Rudp _u = null;
         private int _last = 0;
         private int _delta = 25; // 0.025s
@@ -49,7 +47,7 @@ namespace Maria.Network {
             _so = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             _secret = secret;
             _session = session;
-            
+
             _u = new Rudp.Rudp(_ctx.SharpC, 1, 5);
             _u.OnRecv = RRecv;
             _u.OnSend = RSend;
@@ -73,7 +71,8 @@ namespace Maria.Network {
         }
 
         public RecvCB OnRecv { get { return _recvCb; } set { _recvCb = value; } }
-        public SyncCB OnSync { get { return _syncCb; } set { _syncCb = value; } }
+
+        public bool Connected { get { return _connected; } }
 
         public void Connect(string host, int port) {
             _host = host;
@@ -81,21 +80,7 @@ namespace Maria.Network {
             IPAddress addr = IPAddress.Parse(_host);
             _remoteEP = new IPEndPoint(addr, _port);
             _connected = false;
-        }
-
-        public void Sync() {
-            int now = _timeSync.LocalTime();
-
-            byte[] buffer = new byte[12];
-            NetPack.PacklI(buffer, 0, (uint)now);
-            NetPack.PacklI(buffer, 4, 0xffffffff);
-            NetPack.PacklI(buffer, 8, (uint)_session);
-            byte[] head = Crypt.hmac_hash(_secret, buffer);
-            byte[] data = new byte[8 + buffer.Length];
-            Array.Copy(head, data, 8);
-            Array.Copy(buffer, 0, data, 8, buffer.Length);
-
-            _u.Send(data, 0, data.Length);
+            Sync();
         }
 
         public void Send(byte[] data) {
@@ -135,7 +120,7 @@ namespace Maria.Network {
             int now = _timeSync.LocalTime();
             if (now - _last >= _delta) {
                 _last += _delta;
-                tick = 1;   
+                tick = 1;
             }
 
             if (sz > 0) {
@@ -145,6 +130,21 @@ namespace Maria.Network {
                     _u.Update(null, 0, 0, tick);
                 }
             }
+        }
+
+        private void Sync() {
+            int now = _timeSync.LocalTime();
+
+            byte[] buffer = new byte[12];
+            NetPack.PacklI(buffer, 0, (uint)now);
+            NetPack.PacklI(buffer, 4, 0xffffffff);
+            NetPack.PacklI(buffer, 8, (uint)_session);
+            byte[] head = Crypt.hmac_hash(_secret, buffer);
+            byte[] data = new byte[8 + buffer.Length];
+            Array.Copy(head, data, 8);
+            Array.Copy(buffer, 0, data, 8, buffer.Length);
+
+            _u.Send(data, 0, data.Length);
         }
 
         private void RSend(byte[] buffer, int start, int len) {
@@ -171,20 +171,15 @@ namespace Maria.Network {
                 head += 16;
                 remaining -= 16;
                 UnityEngine.Debug.Log(string.Format("localtime:{0}, eventtime:{1}, session:{2}", localtime, eventtime, session));
+                if (session != _session) {
+                    return;
+                }
                 if (eventtime == 0xffffffff) {
-                    if (session == _session) {
-                        _timeSync.Sync((int)localtime, (int)globaltime);
-                        if (_syncCb != null) {
-                            _connected = true;
-                            _syncCb();
-                        }
-                        UnityEngine.Debug.Assert(remaining == 0);
-                        return;
-                    }
+                    _timeSync.Sync((int)localtime, (int)globaltime);
+                    _connected = true;
+                    UnityEngine.Debug.Assert(remaining == 0);
+                    return;
                 } else {
-                    if (session == _session) {
-                        //_timeSync.Sync((int)localtime, (int)globaltime);
-                    }
                     if (remaining > 0) {
                         R r = new R();
                         r.Globaltime = globaltime;
@@ -195,7 +190,7 @@ namespace Maria.Network {
                         Array.Copy(_buffer, head, data, 0, remaining);
                         r.Data = data;
                         if (_recvCb != null) {
-                            _recvCb(r);
+                            _recvCb(data, 0, data.Length);
                         }
                         head += remaining;
                         remaining -= remaining;

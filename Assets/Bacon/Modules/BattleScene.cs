@@ -12,5 +12,9 @@ namespace Bacon.Modules {
         }
 
         public long RoomId { get { return _roomid; } set { _roomid = value; } }
+        public long Session { get; set; }
+        public long UdpPort { get; set; }
+        public string UdpHost { get; set; }
+        
     }
 }

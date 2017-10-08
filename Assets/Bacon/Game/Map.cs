@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace Bacon.Game {
     public class Map : Maria.Actor {
-        private Scene _scene = null;
+        
         private AABB _aabb = null;
 
-        public Map(Context ctx, Controller controller, GameObject o, Scene scene) : base(ctx, controller, o) {
-            _scene = scene;
+        public Map(Context ctx, Controller controller, GameObject o) : base(ctx, controller, o) {
+            
             _aabb = new AABB(new Vector3(0, 0, 0), new Vector3(100, 0, 100));
         }
 

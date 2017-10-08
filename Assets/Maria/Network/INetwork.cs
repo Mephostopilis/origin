@@ -13,8 +13,7 @@ namespace Maria.Network {
         void OnGateConnected(bool connected);
         void OnGateDisconnected();
 
-        void OnUdpSync();
-        void OnUdpRecv(PackageSocketUdp.R r);
+        void OnUdpRecv(byte[] data, int start, int len);
 
     }
 }

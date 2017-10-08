@@ -30,7 +30,9 @@ namespace Maria.Network {
 
         public void match(uint session, SprotoTypeBase responseObj, object ud) {
             MainController controller = _ctx.Peek<MainController>();
-            controller.OnRspMatch(responseObj);
+            if (controller != null) {
+                controller.OnRspMatch(responseObj);
+            }
         }
 
         // 进入房间这个协议, authudp

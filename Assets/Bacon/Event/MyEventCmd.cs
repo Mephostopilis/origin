@@ -39,13 +39,15 @@ namespace Bacon.Event {
         public static uint EVENT_PRESSLEFT = 1203;
         public static uint EVENT_PRESSRIGHT = 1204;
 
-
+        public static uint EVENT_SETUP_MAP = 1205;
 
         public static uint EVENT_ANDROID_WX_LOGIN = 1500;
         public static uint EVENT_ANDROID_WX_SHARE_APPINFO = 1501;
         public static uint EVENT_ANDROID_WX_SHARE_ROOMID = 1502;
         public static uint EVENT_SETUP_LOGINPANEL = 1503;
         public static uint EVENT_LOGIN = 1504;
+
+
 
         public MyEventCmd(Context ctx, uint cmd) : base(ctx, cmd) {
         }

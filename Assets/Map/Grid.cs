@@ -22,12 +22,12 @@ namespace Map {
             Flat
         }
 
-        public class GridAStar {
+        public class GridWaypointHead {
 
             private int _current = 1;
             private int _pathid = 0;
 
-            public GridAStar(int pathid) {
+            public GridWaypointHead(int pathid) {
                 _pathid = pathid;
                 Free = true;
             }
@@ -35,8 +35,8 @@ namespace Map {
             public int Pathid { get { return _pathid; } }
             public bool Free { get; set; }
             public Tile Exit { get; set; }
-            public List<TileAStar> Open { get; set; }
-            public List<TileAStar> Closed { get; set; }
+            public List<TileWaypoint> Open { get; set; }
+            public List<TileWaypoint> Closed { get; set; }
 
             // read
             public int Current { get { return _current; } set { _current = value; } }
@@ -81,13 +81,7 @@ namespace Map {
             new Tile.CubeIndex(0, -1, 1)
             };
         private List<ObjectSampler> sampleres = new List<ObjectSampler>();
-        private GridAStar[] astars = new GridAStar[100];
-
-        public Grid() {
-            for (int i = 0; i < 100; i++) {
-                astars[i] = new GridAStar(i);
-            }
-        }
+        private GridWaypointHead[] astars = new GridWaypointHead[100];
 
         #region Getters and Setters
         public Dictionary<string, Tile> Tiles {
@@ -238,12 +232,12 @@ namespace Map {
             Vector3 pt = new Vector3(pos.x / hexRadius, 0.0f, pos.z / hexRadius);
             switch (hexOrientation) {
                 case HexOrientation.Pointy: {
-                        double q = Math.Sqrt(3.0f) * pos.x + (-1.0 / 3.0f) * pt.z;
+                        double q = Math.Sqrt(3.0f) / 3.0 * pos.x + (-1.0 / 3.0f) * pt.z;
                         double r = 0.0f * pt.x + (2.0 / 3.0) * pt.z;
                         Tile.FractionalIndex hex = new Tile.FractionalIndex(q, r, -q - r);
                         Tile.CubeIndex cube = Tile.FractionalIndex.HexRound(hex);
                         UnityEngine.Debug.Log(cube.ToString());
-                        return TileAt(cube.x, cube.y, cube.z);
+                        return TileAt(cube);
                     }
                 case HexOrientation.Flat: {
                         double q = 2.0 / 3.0f * pos.x + 0.0 * pt.z;
@@ -251,7 +245,7 @@ namespace Map {
                         Tile.FractionalIndex hex = new Tile.FractionalIndex(q, r, -q - r);
                         Tile.CubeIndex cube = Tile.FractionalIndex.HexRound(hex);
                         UnityEngine.Debug.Log(cube.ToString());
-                        return TileAt(cube.x, cube.y, cube.z);
+                        return TileAt(cube);
                     }
                 default:
                     break;
@@ -276,27 +270,27 @@ namespace Map {
                 exitTile.LineColour(Color.red, Color.red);
                 astars[i].Exit = exitTile;
                 if (astars[i].Open == null) {
-                    astars[i].Open = new List<TileAStar>();
+                    astars[i].Open = new List<TileWaypoint>();
                 }
                 if (astars[i].Open.Count > 0) {
                     astars[i].Open.Clear();
                 }
                 if (astars[i].Closed == null) {
-                    astars[i].Closed = new List<TileAStar>();
+                    astars[i].Closed = new List<TileWaypoint>();
                 }
                 if (astars[i].Closed.Count > 0) {
                     astars[i].Closed.Clear();
                 }
-                TileAStar star = new TileAStar();
+                TileWaypoint star = new TileWaypoint();
                 star.GCost = 0;
-                star.HCost = TileAStar.Cost(start, exit);
+                star.HCost = TileWaypoint.Cost(start, exit);
                 star.Tile = startTile;
 
                 astars[i].Open.Add(star);
                 astars[i].Open.Sort(star);
 
                 while (astars[i].Open.Count > 0) {
-                    TileAStar top = astars[i].Open[0];
+                    TileWaypoint top = astars[i].Open[0];
                     astars[i].Open.Remove(top);
                     astars[i].Closed.Add(top);
                     if (top.Tile == astars[i].Exit) {
@@ -307,9 +301,9 @@ namespace Map {
 
                     List<Tile> neighbours = Neighbours(top.Tile);
                     foreach (var item in neighbours) {
-                        star = new TileAStar();
+                        star = new TileWaypoint();
                         star.GCost = 0;
-                        star.HCost = TileAStar.Cost(start, exit);
+                        star.HCost = TileWaypoint.Cost(start, exit);
                         star.Tile = item;
 
                         if (astars[i].Open.Contains(star, star)) {
@@ -342,6 +336,21 @@ namespace Map {
         #endregion
 
         #region Private Methods
+
+        private void Start() {
+            for (int i = 0; i < 100; i++) {
+                astars[i] = new GridWaypointHead(i);
+            }
+        }
+
+        private void OnEnable() {
+            Tiles.Clear();
+            for (int i = 0; i < transform.childCount; i++) {
+                Transform t = transform.GetChild(i);
+                Tile tile = t.GetComponent<Tile>();
+                Tiles.Add(tile.index.ToString(), tile);
+            }
+        }
 
         private void GenHexShape() {
             Debug.Log("Generating hexagonal shaped grid...");

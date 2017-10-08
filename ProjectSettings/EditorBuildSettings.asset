@@ -6,6 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/start.unity
+    guid: 52abf8db1b152e0459338d2048f7346f
+  - enabled: 1
+    path: Assets/Scenes/login.unity
+    guid: af5d84a01864b794696487ea438ca2a5
+  - enabled: 1
+    path: Assets/Scenes/main.unity
+    guid: b2a9293adee8814418fd75444e811a24
+  - enabled: 1
     path: Assets/uMOBA/Scenes/Lobby.unity
+    guid: 3c0d76c55eed6214f9d3b070caede5d3
   - enabled: 1
     path: Assets/uMOBA/Scenes/World.unity
+    guid: a11831025daca24449ab977327654930

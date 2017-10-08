@@ -5,9 +5,9 @@ namespace Maria.Lua {
    
     public partial class BuildInInit {
 
-        const string LUADLL = "xlua";
+        const string DLL = "xlua";
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_cjson(System.IntPtr L);
 
         [MonoPInvokeCallback(typeof(XLua.LuaDLL.lua_CSFunction))]
@@ -15,7 +15,7 @@ namespace Maria.Lua {
             return luaopen_cjson(L);
         }
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_lpeg(System.IntPtr L);
 
         [MonoPInvokeCallback(typeof(XLua.LuaDLL.lua_CSFunction))]
@@ -23,12 +23,20 @@ namespace Maria.Lua {
             return luaopen_lpeg(L);
         }
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_sproto_core(System.IntPtr L);
 
         [MonoPInvokeCallback(typeof(XLua.LuaDLL.lua_CSFunction))]
         public static int LoadSprotoCore(System.IntPtr L) {
             return luaopen_sproto_core(L);
+        }
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int luaopen_ball(System.IntPtr L);
+
+        [MonoPInvokeCallback(typeof(XLua.LuaDLL.lua_CSFunction))]
+        public static int LoadBall(System.IntPtr L) {
+            return luaopen_ball(L);
         }
 
     }

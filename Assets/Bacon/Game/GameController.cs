@@ -1,4 +1,5 @@
-﻿using Bacon.Helper;
+﻿using Bacon.Event;
+using Bacon.Helper;
 using Bacon.Service;
 using Maria;
 using Maria.Network;
@@ -6,16 +7,16 @@ using Sproto;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Entitas;
 
 namespace Bacon.Game {
     class GameController : Controller {
 
         //private UIRootActor _ui = null;
 
-        private float _synccd1 = 0.03f;
+        
         private byte[] _syncmsg1 = null;
 
-        private long _mysession = 0;
         private Dictionary<long, Player> _playes = new Dictionary<long, Player>();
 
         private Map _map = null;
@@ -25,6 +26,8 @@ namespace Bacon.Game {
         private bool _moveflag = false;
         private int _lastK = 0;
 
+        private Entitas.Systems _systems;
+
         public GameController(Context ctx) : base(ctx) {
 
             //_ui = new UIRootActor(_ctx, this);
@@ -33,11 +36,8 @@ namespace Bacon.Game {
             _syncmsg1 = new byte[4];
             NetPack.Packli(_syncmsg1, 0, 1);
 
-            //EventListenerCmd listener1 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_SCENE, SetupScene);
-            //_ctx.EventDispatcher.AddCmdEventListener(listener1);
-
-            //EventListenerCmd listener2 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_MAP, SetupMap);
-            //_ctx.EventDispatcher.AddCmdEventListener(listener2);
+            EventListenerCmd listener2 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_MAP, SetupMap);
+            _ctx.EventDispatcher.AddCmdEventListener(listener2);
 
             //EventListenerCmd listener3 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_VIEW, SetupCamera);
             //_ctx.EventDispatcher.AddCmdEventListener(listener3);
@@ -50,15 +50,6 @@ namespace Bacon.Game {
         //    }
         //    Sync1(delta);
         //}
-
-        //public override void OnEnter() {
-        //    base.OnEnter();
-
-        //    InitService service = (InitService)_ctx.QueryService("init");
-        //    SMActor actor = service.SMActor;
-        //    actor.LoadScene("World");
-        //}
-
 
         //public void Sync1(float delta) {
         //    if (_authudp) {
@@ -88,11 +79,14 @@ namespace Bacon.Game {
         //    _view = _scene.SetupView(go);
         //}
 
-        //public void SetupMap(EventCmd e) {
-        //    GameObject map = e.Orgin;
-        //    UnityEngine.Debug.Assert(_scene != null);
-        //    _map = _scene.SetupMap(map);
-        //}
+        public void SetupMap(EventCmd e) {
+            GameObject map = e.Orgin;
+            _map = new Map(_ctx, this, map);
+            
+            Entitas.context
+            var contexts = Contexts.
+
+        }
 
         //public void SetupScene(EventCmd e) {
         //    GameObject word = e.Orgin;
@@ -103,6 +97,8 @@ namespace Bacon.Game {
             base.OnEnter();
             InitService service = _ctx.QueryService<InitService>(InitService.Name);
             service.SMActor.LoadScene("World");
+
+
         }
 
         public void OnMoveStart() {
@@ -304,8 +300,8 @@ namespace Bacon.Game {
             return null;
         }
 
-        public override void OnUdpRecv(PackageSocketUdp.R r) {
-            base.OnUdpRecv(r);
+        public override void OnUdpRecv(byte[] data, int start, int len) {
+            base.OnUdpRecv(data, start, len);
             //int protocol = NetUnpack.Unpackli(r.Data, 0);
             //if (protocol == 1) {
             //    _ctx.TiSync.Sync((int)r.Localtime, (int)r.Globaltime);

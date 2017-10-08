@@ -44,6 +44,8 @@ ios和osx需要在mac下编译。
 
 解决办法，确认XXX（类型名）加上CSharpCallLua后，清除代码后运行。
 
+如果编辑器下没问题，发布到手机报这错，表示你发布前没生成代码（执行“XLua/Generate Code”）。
+
 ## hotfix下怎么触发一个event
 
 首先通过xlua.private_accessible开启私有成员访问。
@@ -257,3 +259,67 @@ obj_has_TestDelegate.field = d1 + d2 --到时调用field的时候将会触发Foo
 
 ~~~
 
+## 为什么有时Lua错误直接中断了而没错误信息？
+
+一般两种情况：
+
+1、你的错误代码用协程跑，而标准的lua，协程出错是通过resume返回值来表示，可以查阅相关的lua官方文档。如果你希望协程出错直接抛异常，可以在你的resume调用那加个assert。
+
+把类似下面的代码：
+
+~~~lua
+coroutine.resume(co, ...)
+~~~
+
+改为：
+
+~~~lua
+assert(coroutine.resume(co, ...))
+~~~
+
+2、上层catch后，不打印
+
+比如某些sdk，在回调业务时，try-catch后把异常吃了。
+
+## 重载含糊如何处理
+
+比如由于忽略out参数导致的Physics.Raycast其中一个重载调用不了，比如short，int无法区分的问题。
+
+首先out参数导致重载含糊比较少见，目前只反馈（截至2017-9-22）过Physics.Raycast一个，建议通过自行封装来解决（short，int这种情况也适用）：静态函数的直接封装个另外名字的，如果是成员方法则通过Extension method来封装。
+
+如果是hotfix场景，我们之前并没有提前封装，又希望调用指定重载怎么办？
+
+可以通过xlua.tofunction结合反射来处理，xlua.tofunction输入一个MethodBase对象，返回一个lua函数。比如下面的C#代码：
+
+~~~csharp
+class TestOverload
+{
+    public int Add(int a, int b)
+    {
+        Debug.Log("int version");
+        return a + b;
+    }
+
+    public short Add(short a, short b)
+    {
+        Debug.Log("short version");
+        return (short)(a + b);
+    }
+}
+~~~
+
+我们可以这么调用指定重载：
+
+~~~lua
+local m1 = typeof(CS.TestOverload):GetMethod('Add', {typeof(CS.System.Int16), typeof(CS.System.Int16)})
+local m2 = typeof(CS.TestOverload):GetMethod('Add', {typeof(CS.System.Int32), typeof(CS.System.Int32)})
+local f1 = xlua.tofunction(m1) --切记对于同一个MethodBase，只tofunction一次，然后重复使用
+local f2 = xlua.tofunction(m2)
+
+local obj = CS.TestOverload()
+
+f1(obj, 1, 2) --调用short版本，成员方法，所以要传对象，静态方法则不需要
+f2(obj, 1, 2) --调用int版本
+~~~
+
+注意：xlua.tofunction由于使用不太方便，以及使用了反射，所以建议做作为临时方案，尽量用封装的方法来解决。

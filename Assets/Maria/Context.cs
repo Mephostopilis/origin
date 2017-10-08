@@ -21,8 +21,7 @@ namespace Maria {
         protected Config _config = null;
         protected TimeSync _ts = null;
         protected SharpC _sharpc = null;
-        protected Debug _logger = null;
-
+        
         protected EventDispatcher _dispatcher = null;
         
         protected List<Timer> _timer = new List<Timer>();
@@ -34,7 +33,6 @@ namespace Maria {
         protected User _user = new User();
         protected bool _logined = false;
         protected bool _authtcp = false;
-        protected bool _authudp = false;
         
         protected Lua.Env _envScript = null;
         protected System.Random _rand = new System.Random();
@@ -55,7 +53,6 @@ namespace Maria {
             _client.OnAuthed = OnGateAuthed;
             _client.OnConnected = OnGateConnected;
             _client.OnDisconnected = OnGateDisconnected;
-            _client.OnSyncUdp = OnUdpSync;
             _client.OnRecvUdp = OnUdpRecv;
         }
 
@@ -112,6 +109,7 @@ namespace Maria {
                     controller.Update(delta);
                 }
             }
+
         }
 
         public Config Config { get { return _config; } }
@@ -122,7 +120,6 @@ namespace Maria {
         public ClientSocket Client { get { return _client; } }
         public User U { get { return _user; } }
         public bool AuthTcp { get { return _authtcp; } }
-        public bool AuthUdp { get { return _authudp; } }
         public bool Logined { get { return _logined; } }
         
         public Lua.Env EnvScript { get { return _envScript; } set { _envScript = value; } }
@@ -349,23 +346,16 @@ namespace Maria {
             _client.UdpAuth(session, ip, port);
         }
 
-        public void SendUdp(byte[] data) {
-            if (_authudp) {
-                _client.SendUdp(data);
+        public void SendUdp(byte[] data, int start, int len) {
+            if (_client.UdpConnected) {
+                _client.UdpSend(data);
             }
         }
 
-        public void OnUdpSync() {
+        public void OnUdpRecv(byte[] data, int start, int len) {
             var controller = Peek();
             if (controller != null) {
-                controller.OnUdpSync();
-            }
-        }
-
-        public void OnUdpRecv(PackageSocketUdp.R r) {
-            var controller = Peek();
-            if (controller != null) {
-                controller.OnUdpRecv(r);
+                controller.OnUdpRecv(data, 0, data.Length);
             }
         }
 
@@ -383,6 +373,8 @@ namespace Maria {
 
             _client.StartScript();
         }
+
+        
     }
 }
 

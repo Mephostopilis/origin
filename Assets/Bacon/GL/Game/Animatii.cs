@@ -16,12 +16,20 @@ namespace Bacon.GL.Game {
         void Update() {
             if (Input.GetMouseButtonDown(0)) {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                int layerMask = 1 << 12;
+                Plane plane = new Plane(Vector3.up, 0);
                 RaycastHit hitInfo;
-                if (Physics.Raycast(ray, out hitInfo, 1000, layerMask)) {
+                if (Bacon.GL.Util.Utils.Raycast(ray, 1000000, plane, out hitInfo)) {
                     Vector3 worldPos = hitInfo.point;
                     GetComponent<DynamicObjectSampler>().FindPath(worldPos);
                 }
+
+                //Physics.Raycast()
+                //int layerMask = LayerMask.GetMask("Grid");
+                //RaycastHit hitInfo;
+                //if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, layerMask)) {
+                //    Vector3 worldPos = hitInfo.point;
+                //    GetComponent<DynamicObjectSampler>().FindPath(worldPos);
+                //}
             }
         }
     }
