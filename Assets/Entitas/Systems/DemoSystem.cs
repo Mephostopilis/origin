@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bacon.Game.Systems {
+    [Game]
     class DemoSystem : Entitas.ISystem, Entitas.IInitializeSystem, Entitas.IExecuteSystem {
 
 

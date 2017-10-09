@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using Entitas;
 
-namespace Bacon.Game.Components {
-    class ActorComponent : IComponent {
-        
-    }
+public sealed class ActorComponent : IComponent {
 }
+

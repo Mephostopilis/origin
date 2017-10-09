@@ -16,12 +16,12 @@ namespace Maria {
         public delegate void OnEventCustomHandler(EventCustom e);
 
         private string _name;
-        private OnEventCustomHandler _callback;
+        private event OnEventCustomHandler _callback;
         private object _addition;
 
         public EventListenerCustom(string name, OnEventCustomHandler callback, object addition) {
             _name = name;
-            _callback = callback;
+            _callback += callback;
             _addition = addition;
         }
 

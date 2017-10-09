@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Entitas;
+using Bacon.Game.Systems;
 
 namespace Bacon.Game {
     class GameController : Controller {
@@ -26,9 +27,19 @@ namespace Bacon.Game {
         private bool _moveflag = false;
         private int _lastK = 0;
 
+        private Entitas.Context<Entitas.Entity> _context;
         private Entitas.Systems _systems;
+        private IndexSystem _indexsystem;
+        private MapSystem _mapsystem;
 
         public GameController(Context ctx) : base(ctx) {
+
+            _context = new Context<Entitas.Entity>(3);
+            _systems = new Entitas.Systems();
+            _indexsystem = new IndexSystem(_context);
+            _mapsystem = new MapSystem(_context);
+            _systems.Add(_indexsystem)
+                .Add(_mapsystem);
 
             //_ui = new UIRootActor(_ctx, this);
 
@@ -41,6 +52,8 @@ namespace Bacon.Game {
 
             //EventListenerCmd listener3 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_VIEW, SetupCamera);
             //_ctx.EventDispatcher.AddCmdEventListener(listener3);
+
+
         }
 
         //public override void Update(float delta) {
@@ -83,9 +96,6 @@ namespace Bacon.Game {
             GameObject map = e.Orgin;
             _map = new Map(_ctx, this, map);
             
-            Entitas.context
-            var contexts = Contexts.
-
         }
 
         //public void SetupScene(EventCmd e) {
@@ -98,6 +108,7 @@ namespace Bacon.Game {
             InitService service = _ctx.QueryService<InitService>(InitService.Name);
             service.SMActor.LoadScene("World");
 
+            _systems.Initialize();
 
         }
 

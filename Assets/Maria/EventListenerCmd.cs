@@ -16,11 +16,11 @@ namespace Maria {
         public delegate void OnEventCmdHandler(EventCmd e);
 
         private uint _cmd;
-        private OnEventCmdHandler _callback;
+        private event OnEventCmdHandler _callback;
 
         public EventListenerCmd(uint cmd, OnEventCmdHandler callback) {
             _cmd = cmd;
-            _callback = callback;
+            _callback += callback;
         }
 
         public uint Cmd { get { return _cmd; } }
