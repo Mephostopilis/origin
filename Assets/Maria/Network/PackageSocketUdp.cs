@@ -164,12 +164,15 @@ namespace Maria.Network {
             int head = 0;
             do {
                 UnityEngine.Debug.Assert(len >= 16);
-                uint globaltime = NetUnpack.UnpacklI(buffer, head);
-                uint localtime = NetUnpack.UnpacklI(buffer, head + 4);
-                uint eventtime = NetUnpack.UnpacklI(buffer, head + 8);
-                uint session = NetUnpack.UnpacklI(buffer, head + 12);
-                head += 16;
-                remaining -= 16;
+                uint globaltime = 0, localtime = 0, eventtime = 0, session = 0;
+                int offset = head;
+                offset = NetUnpack.UnpacklI(buffer, offset, out globaltime);
+                offset = NetUnpack.UnpacklI(buffer, offset, out localtime);
+                offset = NetUnpack.UnpacklI(buffer, offset, out eventtime);
+                offset = NetUnpack.UnpacklI(buffer, offset, out session);
+                head += offset;
+                remaining -= offset;
+
                 UnityEngine.Debug.Log(string.Format("localtime:{0}, eventtime:{1}, session:{2}", localtime, eventtime, session));
                 if (session != _session) {
                     return;

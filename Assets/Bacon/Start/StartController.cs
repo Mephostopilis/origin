@@ -25,5 +25,10 @@ namespace Bacon.Start {
             _startActor.UpdateRes();
         }
 
+        public override void OnCreateLua() {
+        }
+
+        public override void OnDestroyLua() {
+        }
     }
 }

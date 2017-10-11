@@ -11,37 +11,34 @@ using Entitas;
 using Bacon.Game.Systems;
 
 namespace Bacon.Game {
-    class GameController : Controller {
+
+    [XLua.Hotfix]
+    [XLua.LuaCallCSharp]
+    partial class GameController : Controller {
 
         //private UIRootActor _ui = null;
-
-        
         private byte[] _syncmsg1 = null;
 
-        private Dictionary<long, Player> _playes = new Dictionary<long, Player>();
-
-        private Map _map = null;
-        private View _view = null;
-        private Scene _scene = null;
-
-        private bool _moveflag = false;
-        private int _lastK = 0;
-
-        private Entitas.Context<Entitas.Entity> _context;
+        private NetFrameQueue _queue = new NetFrameQueue();
         private Entitas.Systems _systems;
         private IndexSystem _indexsystem;
         private MapSystem _mapsystem;
+        private JoinSystem _joinsystem;
+        private MyPlayerSystem _myplayersystem;
+        private Lua.ILuaGameController _luaBinding;
+
 
         public GameController(Context ctx) : base(ctx) {
-
-            _context = new Context<Entitas.Entity>(3);
             _systems = new Entitas.Systems();
-            _indexsystem = new IndexSystem(_context);
-            _mapsystem = new MapSystem(_context);
+            _indexsystem = new IndexSystem(Contexts.sharedInstance.game);
+            _mapsystem = new MapSystem(Contexts.sharedInstance.game);
+            _joinsystem = new JoinSystem(Contexts.sharedInstance.game);
+            _myplayersystem = new MyPlayerSystem(Contexts.sharedInstance.game);
             _systems.Add(_indexsystem)
-                .Add(_mapsystem);
+                .Add(_mapsystem)
+                .Add(_joinsystem)
+                .Add(_myplayersystem);
 
-            //_ui = new UIRootActor(_ctx, this);
 
             // 4, protocol
             _syncmsg1 = new byte[4];
@@ -53,16 +50,31 @@ namespace Bacon.Game {
             //EventListenerCmd listener3 = new EventListenerCmd(MyEventCmd.EVENT_SETUP_VIEW, SetupCamera);
             //_ctx.EventDispatcher.AddCmdEventListener(listener3);
 
+        }
+
+        public override void OnEnter() {
+            base.OnEnter();
+            InitService service = _ctx.QueryService<InitService>(InitService.Name);
+            service.SMActor.LoadScene("World");
+
+            _systems.Initialize();
+
+            // udp sync
+            Modules.BattleScene m = _ctx.U.GetModule<Modules.BattleScene>();
+            long session = m.Session;
+            string host = m.UdpHost;
+            int port = (int)m.UdpPort;
+            _ctx.UdpAuth(session, host, port);
 
         }
 
-        //public override void Update(float delta) {
-        //    base.Update(delta);
-        //    if (_scene != null) {
-        //        _scene.Update(delta);
-        //    }
-        //    Sync1(delta);
-        //}
+        public override void Update(float delta) {
+            base.Update(delta);
+        }
+
+        public override void OnCreateLua() {
+            _luaBinding = Maria.Lua.LuaPool.Instance.Cache<Lua.ILuaPool>(null).CreateGameController();
+        }
 
         //public void Sync1(float delta) {
         //    if (_authudp) {
@@ -94,8 +106,7 @@ namespace Bacon.Game {
 
         public void SetupMap(EventCmd e) {
             GameObject map = e.Orgin;
-            _map = new Map(_ctx, this, map);
-            
+            _ctx.SendReq<C2sProtocol.setupmap>(C2sProtocol.setupmap.Tag, null);
         }
 
         //public void SetupScene(EventCmd e) {
@@ -103,101 +114,38 @@ namespace Bacon.Game {
         //    _scene = new Scene(_ctx, this, word);
         //}
 
-        public override void OnEnter() {
-            base.OnEnter();
-            InitService service = _ctx.QueryService<InitService>(InitService.Name);
-            service.SMActor.LoadScene("World");
 
-            _systems.Initialize();
 
-        }
+        //public void OnMoveStart() {
+        //    _moveflag = true;
+        //}
 
-        public void OnMoveStart() {
-            _moveflag = true;
-        }
+        //public void OnMove(Vector2 d) {
+        //    if (_moveflag) {
+        //        UnityEngine.Debug.Log(string.Format("move: x {0}, y {1}", d.x, d.y));
+        //        _moveflag = false;
 
-        public void OnMove(Vector2 d) {
-            if (_moveflag) {
-                UnityEngine.Debug.Log(string.Format("move: x {0}, y {1}", d.x, d.y));
-                _moveflag = false;
+        //        ////Vector2 dir = d.normalized;
+        //        //Vector2 dir = d;
+        //        //float speed = 10f;
+        //        //Vector2 shift = dir * speed;
+        //        //_myball.MoveBy(shift);
+        //    }
+        //}
 
-                ////Vector2 dir = d.normalized;
-                //Vector2 dir = d;
-                //float speed = 10f;
-                //Vector2 shift = dir * speed;
-                //_myball.MoveBy(shift);
-            }
-        }
+        //public void OnMoveSpeed(Vector2 s) {
+        //    if (_moveflag) {
+        //        UnityEngine.Debug.Log(string.Format("speed: x {0}, y {1}", s.x, s.y));
+        //    }
+        //}
 
-        public void OnMoveSpeed(Vector2 s) {
-            if (_moveflag) {
-                UnityEngine.Debug.Log(string.Format("speed: x {0}, y {1}", s.x, s.y));
-            }
-        }
 
-       
-
+        #region response
         // 游戏协议
         // 主要是同步场景中已经加入的其他玩家
         public void Join(SprotoTypeBase responseObj) {
-            //if (responseObj != null) {
-            //    C2sSprotoType.join.response o = responseObj as C2sSprotoType.join.response;
-            //    _mysession = o.session;
-            //    //string host = o.host;
-            //    //int port = (int)o.port;
-
-            //    if (_playes.ContainsKey(_mysession)) {
-            //    } else {
-            //        Player player = new Player((uint)_mysession);
-            //        _playes[_mysession] = player;
-            //    }
-
-            //    foreach (var item in o.players) {
-            //        Player player = null;
-            //        if (_playes.ContainsKey(item.session)) {
-            //            player = _playes[item.session];
-            //        } else {
-            //            player = new Player((uint)item.session);
-            //            _playes[item.session] = player;
-            //        }
-            //        if (player != null) {
-            //            foreach (var b in item.balls) {
-            //                uint session = (uint)b.session;
-            //                long ballid = b.ballid;
-            //                float radis = b.radis;
-            //                float length = b.length;
-            //                float width = b.width;
-            //                float height = b.height;
-            //                float pos_x = (float)BitConverter.Int64BitsToDouble(b.px);
-            //                float pos_y = (float)BitConverter.Int64BitsToDouble(b.py);
-            //                float pos_z = (float)BitConverter.Int64BitsToDouble(b.pz);
-            //                Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-            //                float dir_x = (float)BitConverter.Int64BitsToDouble(b.dx);
-            //                float dir_y = (float)BitConverter.Int64BitsToDouble(b.dy);
-            //                float dir_z = (float)BitConverter.Int64BitsToDouble(b.dz);
-            //                Vector3 dir = new Vector3(dir_x, dir_y, dir_z);
-            //                float vel = (float)BitConverter.Int64BitsToDouble(b.vel);
-            //                var ball = SetupBall(ballid, session, radis, length, width, height, pos, dir, vel);
-            //                player.Add(ball);
-            //            }
-            //        }
-            //    }
-            //}
-        }
-
-        public SprotoTypeBase OnJoin(SprotoTypeBase requestObj) {
-            //S2cSprotoType.join.request obj = requestObj as S2cSprotoType.join.request;
-            //if (obj != null) {
-            //    if (_playes.ContainsKey(obj.session)) {
-            //    } else {
-            //        Player player = new Player((uint)obj.session);
-            //        _playes[obj.session] = player;
-            //    }
-            //}
-            //S2cSprotoType.join.response responseObj = new S2cSprotoType.join.response();
-            //responseObj.errorcode = Errorcode.SUCCESS;
-            //return responseObj;
-            return null;
+            C2sSprotoType.join.response obj = responseObj as C2sSprotoType.join.response;
+            UnityEngine.Debug.Assert(obj.errorcode == Errorcode.SUCCESS);
         }
 
         public void Born(SprotoTypeBase responseObj) {
@@ -311,37 +259,82 @@ namespace Bacon.Game {
             return null;
         }
 
+        #endregion
+
+        #region requeset
+        public SprotoTypeBase OnJoin(SprotoTypeBase requestObj) {
+            S2cSprotoType.join.request obj = requestObj as S2cSprotoType.join.request;
+            if (obj != null) {
+                if (obj.uid == _ctx.U.Uid) {
+                    _myplayersystem.Join(obj.index);
+                    _queue.InitK((int)obj.k);
+                }
+                _joinsystem.Join((int)obj.index);
+            }
+            S2cSprotoType.join.response responseObj = new S2cSprotoType.join.response();
+            responseObj.errorcode = Errorcode.SUCCESS;
+            return responseObj;
+        }
+
+
+        #endregion
+
+        // [ protocol : 4
+        //   k : 4
+        //   len : 4
+        //   index : 4
+        //   len : 4
+        //   opcode : 4
+        //   value : 
+        //   ...
+        //   index : 4
+        private void ExecFrame() {
+            int k;
+            NetFrame frame;
+            if (_queue.Dequeue(out k, out frame) == 1) {
+                try {
+                    int offset = 0;
+                    int index = 0, len = 0;
+                    offset = NetUnpack.Unpackli(frame.buffer, offset, out index);
+                    offset = NetUnpack.Unpackli(frame.buffer, offset, out len);
+                    OpCodeParse(index, frame.buffer, offset, len);
+                } catch (Exception ex) {
+                    k = _queue.BackK();
+                    int len = 8;
+                    byte[] msg = new byte[len];
+                    int offset = 0;
+                    offset = NetPack.Packli(msg, offset, (int)ProtocolType.PT_FETCHK);
+                    offset = NetPack.Packli(msg, offset, k);
+                    _ctx.SendUdp(msg, 0, len);
+                }
+            } else {
+                int len = 8;
+                byte[] msg = new byte[len];
+                int offset = 0;
+                offset = NetPack.Packli(msg, offset, (int)ProtocolType.PT_FETCHK);
+                offset = NetPack.Packli(msg, offset, k);
+                _ctx.SendUdp(msg, 0, len);
+            }
+        }
+
         public override void OnUdpRecv(byte[] data, int start, int len) {
             base.OnUdpRecv(data, start, len);
-            //int protocol = NetUnpack.Unpackli(r.Data, 0);
-            //if (protocol == 1) {
-            //    _ctx.TiSync.Sync((int)r.Localtime, (int)r.Globaltime);
-            //} else if (protocol == 2) {
-            //    Debug.Log(string.Format("{0}, {1}", r.Session, protocol));
-            //    int k = NetUnpack.Unpackli(r.Data, 4);
-            //    if (_lastK == 0) {
-            //        _lastK = k;
-            //    } else if (k > _lastK) {
-            //        _lastK = k;
-            //        if (r.Data.Length > 4) {
-            //            int ball_sz = NetUnpack.Unpackli(r.Data, 8);
-            //            for (int i = 0; i < ball_sz; i++) {
-            //                long ballid = NetUnpack.Unpackll(r.Data, 12 + (i * 32) + 0);
-            //                float px = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 8);
-            //                float py = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 12);
-            //                float pz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 16);
-            //                float dx = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 20);
-            //                float dy = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 24);
-            //                float dz = NetUnpack.Unpacklf(r.Data, 12 + (i * 32) + 28);
-            //                _scene.UpdateBall(ballid, new Vector3(px, py, pz), new Vector3(dx, dy, dz));
-            //            }
-            //            var player = _playes[_mysession];
-            //            var pivot = player.GetPivot();
-            //            _view.MoveTo(new Vector2(pivot.x, pivot.z));
-            //        }
-            //    } else {
-            //    }
-            //}
+            int protocol;
+            int offset = NetUnpack.Unpackli(data, 0, out protocol);
+            if (protocol == ProtocolType.PT_DATA) {
+                for (int i = 0; i < 3; i++) {
+                    int k, sz;
+                    offset = NetUnpack.Unpackli(data, offset, out k);
+                    offset = NetUnpack.Unpackli(data, offset, out sz);
+                    byte[] buffer = new byte[sz];
+                    Array.Copy(data, offset, buffer, 0, sz);
+                    NetFrame frame = new NetFrame();
+                    frame.k = k;
+                    frame.buffer = buffer;
+                    _queue.Enqueue(frame);
+                }
+                ExecFrame();
+            }
         }
     }
 }

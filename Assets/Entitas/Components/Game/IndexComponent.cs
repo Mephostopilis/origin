@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using Entitas;
 
-namespace Bacon.Game.Components {
-    
-    class IndexComponent : Entitas.IComponent {
-        public int index;
-    }
+[Game]
+public sealed class IndexComponent : Entitas.IComponent {
+    public int index;
 }
+

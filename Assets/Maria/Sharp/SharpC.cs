@@ -33,7 +33,7 @@ namespace Maria.Sharp {
             public Double f;
         }
 
-        public delegate int pfunc(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = maxArgs)] CSObject[] argv, int args, int res);
+        public delegate int pfunc(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = maxArgs)] CSObject[] argv);
 
         public static SharpObject cache = new SharpObject();
         public const int maxArgs = 8;
@@ -48,15 +48,11 @@ namespace Maria.Sharp {
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void sharpc_release(IntPtr self);
 
-        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void sharpc_callc(IntPtr self, int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 2)] CSObject[] argv, int res);
-
         private IntPtr _sharpc = IntPtr.Zero;
 
         public SharpC() {
             try {
                 _sharpc = sharpc_create(SharpC.CallCSharp);
-                CacheLog();
             } catch (DllNotFoundException ex) {
                 UnityEngine.Debug.LogException(ex);
             }
@@ -76,12 +72,12 @@ namespace Maria.Sharp {
         }
 
         [MonoPInvokeCallback(typeof(pfunc))]
-        public static int CallCSharp(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = maxArgs)] CSObject[] argv, int args, int res) {
+        public static int CallCSharp(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = maxArgs)] CSObject[] argv) {
             UnityEngine.Debug.Assert(argc > 0);
             CSObject o = argv[0];
             if (o.type == CSType.SHARPFUNCTION) {
                 pfunc f = (pfunc)cache.Get(o.v32);
-                return f(argc, argv, args, res);
+                return f(argc, argv);
             }
             return 0;
         }
@@ -99,35 +95,8 @@ namespace Maria.Sharp {
             o.v32 = cache.AddKey(obj);
             return o;
         }
-
-        public static int Log(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 8)] SharpC.CSObject[] argv, int args, int res) {
-            UnityEngine.Debug.Assert(args + res + 1 <= 8);
-
-            UnityEngine.Debug.Assert(argv[1].type == CSType.INT32);
-            UnityEngine.Debug.Assert(argv[2].type == CSType.STRING);
-
-            string msg = Marshal.PtrToStringAnsi(argv[2].ptr);
-
-            if (argv[1].v32 == 1) {
-                UnityEngine.Debug.Log(msg);
-            } else if (argv[1].v32 == 2) {
-                UnityEngine.Debug.LogWarning(msg);
-            } else if (argv[1].v32 == 3) {
-                UnityEngine.Debug.LogError(msg);
-            }
-            
-            return 0;
-        }
-
-        protected void CacheLog() {
-            CSObject[] args = new CSObject[2];
-            CSObject cso = CacheFunc(Log);
-            args[0] = cso;
-            args[1] = new CSObject();
-            args[1].type = CSType.NIL;
-
-            //sharpc_log(_sharpc, args);
-        }
-
+        
+        public IntPtr CPtr { get { return _sharpc; } }
+       
     }
 }

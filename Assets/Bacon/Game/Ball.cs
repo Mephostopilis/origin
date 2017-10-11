@@ -4,14 +4,11 @@ using UnityEngine;
 using Maria;
 
 namespace Bacon.Game {
-    public class Ball : Maria.Component
+    public class Ball
     {
         public enum BallId {
 
         }
-
-
-        protected Scene _scene = null;
 
         protected long _id = 0;
         protected uint _uid = 0;
@@ -31,8 +28,8 @@ namespace Bacon.Game {
 
         protected AABB _aabb = null;
 
-        public Ball(Maria.Entity entity, float radis, float length, float width, float height)
-            : base(entity)
+        public Ball( float radis, float length, float width, float height)
+            
         {
             //_scene = scene;
 

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Maria {
 
+    [XLua.Hotfix]
     [XLua.LuaCallCSharp]
     public class EventDispatcher {
 

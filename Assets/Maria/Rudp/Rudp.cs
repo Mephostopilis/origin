@@ -21,8 +21,9 @@ namespace Maria.Rudp {
             SharpC.CSObject cso0 = sharpc.CacheObj(this);
             SharpC.CSObject cso1 = sharpc.CacheFunc(RSend);
             SharpC.CSObject cso2 = sharpc.CacheFunc(RRecv);
+            SharpC.CSObject cso3 = sharpc.CacheObj(_sharpc.CPtr);
 
-            _u = Rudp_CSharp.rudpaux_alloc(send_delay, expired_time, cso0, cso1, cso2);
+            _u = Rudp_CSharp.rudpaux_alloc(send_delay, expired_time, cso3, cso0, cso1, cso2);
 
             _buffer = Marshal.AllocHGlobal(3072);
 
@@ -64,8 +65,7 @@ namespace Maria.Rudp {
             }
         }
 
-        public static int RSend(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 8)] SharpC.CSObject[] argv, int args, int res) {
-            UnityEngine.Debug.Assert(args >= 3);
+        public static int RSend(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = SharpC.maxArgs)] SharpC.CSObject[] argv) {
             UnityEngine.Debug.Assert(argv[1].type == SharpC.CSType.SHARPOBJECT);
             Rudp u = (Rudp)SharpC.cache.Get(argv[1].v32);
             IntPtr buffer = argv[2].ptr;
@@ -77,8 +77,7 @@ namespace Maria.Rudp {
             return 0;
         }
 
-        public static int RRecv(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 8)] SharpC.CSObject[] argv, int args, int res) {
-            UnityEngine.Debug.Assert(args >= 3);
+        public static int RRecv(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = SharpC.maxArgs)] SharpC.CSObject[] argv) {
             UnityEngine.Debug.Assert(argv[1].type == SharpC.CSType.SHARPOBJECT);
             Rudp u = (Rudp)SharpC.cache.Get(argv[1].v32);
             IntPtr buffer = argv[2].ptr;

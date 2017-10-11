@@ -9,6 +9,10 @@ public class S2cProtocol : ProtocolBase {
 		Protocol.SetProtocol<handshake> (handshake.Tag);
 		Protocol.SetResponse<S2cSprotoType.handshake.response> (handshake.Tag);
 
+		Protocol.SetProtocol<join> (join.Tag);
+		Protocol.SetRequest<S2cSprotoType.join.request> (join.Tag);
+		Protocol.SetResponse<S2cSprotoType.join.response> (join.Tag);
+
 		Protocol.SetProtocol<match> (match.Tag);
 		Protocol.SetRequest<S2cSprotoType.match.request> (match.Tag);
 		Protocol.SetResponse<S2cSprotoType.match.response> (match.Tag);
@@ -17,6 +21,10 @@ public class S2cProtocol : ProtocolBase {
 
 	public class handshake {
 		public const int Tag = 1;
+	}
+
+	public class join {
+		public const int Tag = 3;
 	}
 
 	public class match {

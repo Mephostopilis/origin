@@ -6,20 +6,20 @@ using Maria;
 using Bacon.Event;
 
 namespace Bacon.Game {
-    class MyPlayer : Player {
-        public MyPlayer(Context ctx, GameController controller, uint session) : base(ctx, controller, session) {
+    class MyPlayer {
+        public MyPlayer(Context ctx, GameController controller, uint session) {
 
             EventListenerCmd listener4 = new EventListenerCmd(MyEventCmd.EVENT_PRESSDOWN, OnPressDown);
-            _ctx.EventDispatcher.AddCmdEventListener(listener4);
+            ctx.EventDispatcher.AddCmdEventListener(listener4);
 
             EventListenerCmd listener5 = new EventListenerCmd(MyEventCmd.EVENT_PRESSUP, OnPressUp);
-            _ctx.EventDispatcher.AddCmdEventListener(listener5);
+            ctx.EventDispatcher.AddCmdEventListener(listener5);
 
             EventListenerCmd listener6 = new EventListenerCmd(MyEventCmd.EVENT_PRESSLEFT, OnPressLeft);
-            _ctx.EventDispatcher.AddCmdEventListener(listener6);
+            ctx.EventDispatcher.AddCmdEventListener(listener6);
 
             EventListenerCmd listener7 = new EventListenerCmd(MyEventCmd.EVENT_PRESSRIGHT, OnPressRight);
-            _ctx.EventDispatcher.AddCmdEventListener(listener7);
+            ctx.EventDispatcher.AddCmdEventListener(listener7);
         }
 
         public void OnPressUp(EventCmd e) {

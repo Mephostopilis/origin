@@ -4623,7 +4623,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1040272924384642}
-  m_LocalRotation: {x: -0.44614878, y: 0.81693625, z: -0.184958, w: 0.31520918}
+  m_LocalRotation: {x: -0.4461488, y: 0.8169363, z: -0.18495801, w: 0.3152092}
   m_LocalPosition: {x: -0.41737646, y: 0.88835144, z: -0.091130614}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -6306,8 +6306,8 @@ Animator:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1794070700755320}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: c83a642a4d0a8ff41a6664d4cede1338, type: 3}
-  m_Controller: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: 76fa4807969bef44c8a79ac22768ece7, type: 3}
+  m_Controller: {fileID: 9100000, guid: 4a8440f7eb83b104d94595a966926839, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -6323,12 +6323,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1794070700755320}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e80dbb921f0c0f4f86d828104ff8c0a, type: 3}
+  m_Script: {fileID: 11500000, guid: 1ad6d7b469d57a84e94ed6008772b82c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _grid: {fileID: 0}
-  _start: {x: 0, y: 0, z: 0}
-  _exit: {x: 0, y: 0, z: 0}
 --- !u!114 &114798775860559698
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6337,9 +6334,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1794070700755320}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66fa71bad6ea01c438bfefd0fa0c0940, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f4518e7caff8e64b95340bcacc02ecc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _grid: {fileID: 0}
+  _start: {x: 0, y: 0, z: 0}
+  _exit: {x: 0, y: 0, z: 0}
 --- !u!137 &137045780441295306
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -6353,7 +6353,7 @@ SkinnedMeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: fe938954a1a776540ae8f20e685b5a45, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

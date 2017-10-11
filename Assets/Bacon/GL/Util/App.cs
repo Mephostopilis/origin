@@ -1,11 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using XLua;
 using Maria.Util;
 using Bacon.GL.Start;
-using Bacon.Event;
+using Maria.Res;
 
 namespace Bacon.GL.Util {
 
@@ -13,6 +12,9 @@ namespace Bacon.GL.Util {
     [RequireComponent(typeof(Maria.Util.SoundMgr))]
     [RequireComponent(typeof(Maria.Res.ABLoader))]
     public class App : MonoBehaviour {
+
+        [XLua.CSharpCallLua]
+        public delegate Bacon.Lua.ILuaPool Main();
 
         [CSharpCallLua]
         public static List<Type> CSCallLuaModule {
@@ -26,6 +28,8 @@ namespace Bacon.GL.Util {
         public static App current = null;
 
         public StartBehaviour _start = null;
+
+        private XLua.LuaEnv _luaenv = null;
         private Bacon.App _app = null;
 
         void Awake() {
@@ -37,7 +41,9 @@ namespace Bacon.GL.Util {
         // Use this for initialization
         void Start() {
             DontDestroyOnLoad(this);
-            _app = new Bacon.App();
+            StartScript();
+
+            _app = new Bacon.App(_luaenv);
             _start.SetupRoot();
         }
 
@@ -82,6 +88,43 @@ namespace Bacon.GL.Util {
         // android call c#
         public void Pipe(string code, string msg) {
             NotificationCenter.current.PostNotification(code, this, msg);
+        }
+
+
+        // second step
+        public virtual void StartScript() {
+            _luaenv = new XLua.LuaEnv();
+            _luaenv.AddBuildin("cjson", Maria.Lua.BuildInInit.LoadCJson);
+            _luaenv.AddBuildin("lpeg", Maria.Lua.BuildInInit.LoadLpeg);
+            _luaenv.AddBuildin("sproto.core", Maria.Lua.BuildInInit.LoadSprotoCore);
+            _luaenv.AddBuildin("ball", Maria.Lua.BuildInInit.LoadBall);
+            _luaenv.AddLoader((ref string filepath) => {
+                UnityEngine.Debug.LogFormat("LUA custom loader {0}", filepath);
+
+                string[] xpaths = filepath.Split(new char[] { '.' });
+                string path = "xlua/src";
+                int idx = 0;
+                while (idx + 1 < xpaths.Length) {
+                    path += "/";
+                    path += xpaths[idx];
+                    idx++;
+                }
+
+                TextAsset file = ABLoader.current.LoadAsset<TextAsset>(path, xpaths[idx] + ".lua");
+                if (file != null) {
+                    return file.bytes;
+                } else {
+                    file = ABLoader.current.LoadAsset<TextAsset>(path + "/lualib", xpaths[idx] + ".lua");
+                    if (file != null) {
+                        return file.bytes;
+                    }
+                    return null;
+                }
+            });
+            _luaenv.DoString(@" require 'main' ");
+            Main main = _luaenv.Global.Get<Main>("main");
+            Bacon.Lua.ILuaPool pool = main();
+            Maria.Lua.LuaPool.Instance.Cache<Bacon.Lua.ILuaPool>(pool);
         }
     }
 }

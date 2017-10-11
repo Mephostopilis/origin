@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using XLua;
 using Maria.Network;
 using Maria.Util;
 using Maria.Res;
@@ -11,8 +10,8 @@ using Maria.Res;
 namespace Maria {
 
     [XLua.Hotfix]
-    [LuaCallCSharp]
-    public class Application : DisposeObject {
+    [XLua.LuaCallCSharp]
+    public class Application : DisposeObject, Lua.ILuaApplication {
 
         protected enum CoType {
             NONE = 0,
@@ -31,7 +30,8 @@ namespace Maria {
         protected CoType _cotype = CoType.THREAD;
         protected XLua.LuaEnv _luaenv = null;
 
-        public Application() {
+        public Application(XLua.LuaEnv env) {
+            _luaenv = env;
             _tiSync = new TimeSync();
             _tiSync.LocalTime();
             _lastTi = _tiSync.LocalTime();
@@ -47,9 +47,9 @@ namespace Maria {
                 _worker = new Thread(new ThreadStart(Worker));
                 _worker.IsBackground = true;
                 _worker.Start();
-                UnityEngine.Debug.LogWarning("create thread success.");
+                UnityEngine.Debug.Log("create thread success.");
             } else {
-                UnityEngine.Debug.LogWarning("create co success.");
+                UnityEngine.Debug.Log("create co success.");
             }
         }
 
@@ -165,7 +165,7 @@ namespace Maria {
             if (_luaenv != null) {
                 _luaenv.Tick();
             }
-            
+
             if (_cotype == CoType.CO) {
                 CoWorker();
                 while (_renderQueue.Count > 0) {
@@ -200,39 +200,6 @@ namespace Maria {
                     Enqueue(cmd2);
                 });
             }
-        }
-
-        // second step
-        public virtual void StartScript() {
-            _luaenv = new XLua.LuaEnv();
-            _luaenv.AddBuildin("cjson", Maria.Lua.BuildInInit.LoadCJson);
-            _luaenv.AddBuildin("lpeg", Maria.Lua.BuildInInit.LoadLpeg);
-            _luaenv.AddBuildin("sproto.core", Maria.Lua.BuildInInit.LoadSprotoCore);
-            _luaenv.AddBuildin("ball", Maria.Lua.BuildInInit.LoadBall);
-            _luaenv.AddLoader((ref string filepath) => {
-                UnityEngine.Debug.LogFormat("LUA custom loader {0}", filepath);
-
-                string[] xpaths = filepath.Split(new char[] { '.' });
-                string path = "xlua/src";
-                int idx = 0;
-                while (idx + 1 < xpaths.Length) {
-                    path += "/";
-                    path += xpaths[idx];
-                    idx++;
-                }
-
-                TextAsset file = ABLoader.current.LoadAsset<TextAsset>(path, xpaths[idx] + ".lua");
-                if (file != null) {
-                    return file.bytes;
-                } else {
-                    file = ABLoader.current.LoadAsset<TextAsset>(path + "/lualib", xpaths[idx] + ".lua");
-                    if (file != null) {
-                        return file.bytes;
-                    }
-                    return null;
-                }
-            });
-            _luaenv.DoString(@" require 'main' ");
         }
 
         public void OnApplicationFocus(bool hasFocus) {

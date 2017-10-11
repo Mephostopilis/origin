@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using XLua;
 
 namespace Maria.Lua {
-   
+
     public partial class BuildInInit {
 
         const string DLL = "xlua";

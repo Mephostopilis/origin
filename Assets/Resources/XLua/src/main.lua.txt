@@ -15,24 +15,24 @@ local sproto = require "lualib.sproto"
 local parser = require "lualib.sprotoparser"
 local core = require "sproto.core"
 
-local env = require "env"
+local pool = require "pool"
+local context = require "context"
 local main_controller = require "maincontroller"
 
 -- xlua.hotfix(CS.Maria.Application, 'XluaTest', function (self) 
 -- 	CS.UnityEngine.Debug.Log('xlua hello world')
 -- end)
 
-function main(ctx, ... )
+function main( ... )
 	-- body
 	print("test main")
 
-	ctx.EventDispatcher:AddCustomEventListener("abc", function (e, ... )
-		-- body
-		print("test event")
-	end, nil)
+	-- ctx.EventDispatcher:AddCustomEventListener("abc", function (e, ... )
+	-- 	-- body
+	-- 	print("test event")
+	-- end, nil)
 
-	ctx.EventDispatcher:FireCustomEvent("abc", "hello")
+	-- ctx.EventDispatcher:FireCustomEvent("abc", "hello")
 
-	env:ctor(ctx)
-	return env
+	return pool.new(ctx)
 end

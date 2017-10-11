@@ -17,6 +17,9 @@ public class C2sProtocol : ProtocolBase {
 		Protocol.SetRequest<C2sSprotoType.match.request> (match.Tag);
 		Protocol.SetResponse<C2sSprotoType.match.response> (match.Tag);
 
+		Protocol.SetProtocol<setupmap> (setupmap.Tag);
+		Protocol.SetResponse<C2sSprotoType.setupmap.response> (setupmap.Tag);
+
 	}
 
 	public class handshake {
@@ -29,6 +32,10 @@ public class C2sProtocol : ProtocolBase {
 
 	public class match {
 		public const int Tag = 2;
+	}
+
+	public class setupmap {
+		public const int Tag = 4;
 	}
 
 }

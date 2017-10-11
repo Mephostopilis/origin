@@ -9,7 +9,7 @@ using Maria.Encrypt;
 namespace Maria.Network {
 
     [XLua.LuaCallCSharp]
-    public class ClientSocket : DisposeObject {
+    public class ClientSocket : DisposeObject, Lua.ILua {
 
         public delegate void AuthedCb(int ok);
         public delegate void ConnectedCb(bool connected);
@@ -56,8 +56,8 @@ namespace Maria.Network {
 
         private Dictionary<string, ReqPg> _reqPg = new Dictionary<string, ReqPg>();
         private Dictionary<string, RspPg> _rspPg = new Dictionary<string, RspPg>();
-        private Lua.ClientSock _clientSockScript = null;
-        private bool _clientSockScriptEnable = false;
+        private Lua.ILuaClientSock _luaBinding = null;
+        private bool _luaEnable = false;
 
         // udp
         private PackageSocketUdp _udp = null;
@@ -87,11 +87,11 @@ namespace Maria.Network {
         public ConnectedCb OnConnected { get; set; }
         public DisconnectedCb OnDisconnected { get; set; }
         public PackageSocketUdp.RecvCB OnRecvUdp { get; set; }
-        public Lua.ClientSock ClintSockscript {
-            get { return _clientSockScript; }
+        public Lua.ILuaClientSock LuaClintSock {
+            get { return _luaBinding; }
             set {
-                _clientSockScript = value;
-                _clientSockScriptEnable = _clientSockScript.enable();
+                _luaBinding = value;
+                _luaEnable = _luaBinding.enable();
             }
         }
 
@@ -265,8 +265,8 @@ namespace Maria.Network {
             } else {
                 byte[] buffer = new byte[length];
                 Array.Copy(data, start, buffer, 0, length);
-                if (_clientSockScriptEnable) {
-                    if (_clientSockScript.recv(Encoding.ASCII.GetString(buffer))) {
+                if (_luaEnable) {
+                    if (_luaBinding.recv(Encoding.ASCII.GetString(buffer))) {
                         return;
                     }
                 }
@@ -343,9 +343,15 @@ namespace Maria.Network {
 
         public bool UdpConnected { get { return _udp.Connected; } }
 
-        public void StartScript() {
-            _clientSockScript = _ctx.EnvScript.clientsock();
-            _clientSockScriptEnable = _clientSockScript.enable();
+        public void OnCreateLua() {
+            Bacon.Lua.ILuaPool pool = Maria.Lua.LuaPool.Instance.Cache<Bacon.Lua.ILuaPool>(null);
+            Lua.ILuaClientSock bind = pool.CreateClientSock();
+            _luaBinding = bind;
+            _luaEnable = _luaBinding.enable();
+        }
+
+        public void OnDestroyLua() {
+            throw new NotImplementedException();
         }
     }
 }

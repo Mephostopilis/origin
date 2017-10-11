@@ -5,12 +5,11 @@ local request = require "request"
 local response = require "response"
 local assert = assert
 
-local cls = {}
+local cls = class("clientsock")
 
-function cls:ctor(env, ... )
+function cls:ctor(up, ... )
 	-- body
-	self._env = env
-	self._g = env._ctx.Client
+	self.up = up
 	
 	-- sproto
 	local proto = {}
@@ -34,7 +33,7 @@ function cls:send_request(name, args, ... )
 	local session = self._g:genSession()
 	self._RESPONSE_SESSION_NAME[self._response_session] = name
 	local v = self._send_request(name, args, self._response_session)
-	self._g:Send(v)
+	self.up:Send(v)
 end
 
 function cls:response(session, args, ... )
@@ -61,7 +60,7 @@ function cls:request(name, args, response, ... )
 		local ok, err = pcall(f, env, args)
 		if ok then
 			local resp = response(err)
-			self._g:send(resp)
+			self.up:send(resp)
 		else
 			print(err)
 		end

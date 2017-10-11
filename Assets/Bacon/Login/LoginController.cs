@@ -81,5 +81,11 @@ namespace Bacon.Login {
         public override void OnGateDisconnected() {
             base.OnGateDisconnected();
         }
+
+        public override void OnCreateLua() {
+        }
+
+        public override void OnDestroyLua() {
+        }
     }
 }

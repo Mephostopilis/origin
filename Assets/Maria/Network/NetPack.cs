@@ -2,112 +2,127 @@
 using UnityEngine;
 
 namespace Maria.Network {
-   public class NetPack {
-        public static void Packlh(byte[] buffer, int start, short n) {
+    public class NetPack {
+        public static int Packlh(byte[] buffer, int start, short n) {
             try {
                 int len = 2;
-                UnityEngine.Debug.Assert(start + len <= buffer.Length);
-                for (int i = 0; i < len; i++) {
+                int i = 0;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)((n >> (8 * i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void PacklH(byte[] buffer, int start, ushort n) {
+        public static int PacklH(byte[] buffer, int start, ushort n) {
             try {
                 int len = 2;
-                UnityEngine.Debug.Assert(start + len <= buffer.Length);
-                for (int i = 0; i < len; i++) {
+                int i = 0;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)((n >> (8 * i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void Packli(byte[] buffer, int start, int n) {
+        public static int Packli(byte[] buffer, int start, int n) {
             try {
                 int len = 4;
-                UnityEngine.Debug.Assert(start + len <= buffer.Length);
-                for (int i = 0; i < len; i++) {
+                int i = 0;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)((n >> (8 * i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void PacklI(byte[] buffer, int start, uint n) {
+        public static int PacklI(byte[] buffer, int start, uint n) {
             try {
-                int len = 4;
-                UnityEngine.Debug.Assert(start + len <= buffer.Length);
-                for (int i = 0; i < len; i++) {
+                int i = 0, len = 4;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)((n >> (8 * i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void Packbi(byte[] buffer, int start, int n) {
+        public static int Packbi(byte[] buffer, int start, int n) {
             try {
-                UnityEngine.Debug.Assert(start + 4 <= buffer.Length);
-                for (int i = 0; i < 4; i++) {
+                int i = 0, len = 4;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)(n >> (8 * (3 - i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void PackbI(byte[] buffer, int start, uint n) {
+        public static int PackbI(byte[] buffer, int start, uint n) {
             try {
                 // 左移右移就是进位与降维，跟物理存储无关，因为左移右移是在寄存器里九三
-                UnityEngine.Debug.Assert(start + 4 <= buffer.Length);
-                for (int i = 0; i < 4; i++) {
+                int i = 0, len = 4;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)(n >> (8 * (3 - i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void Packll(byte[] buffer, int start, long n) {
+        public static int Packll(byte[] buffer, int start, long n) {
             try {
-                int len = 8;
-                UnityEngine.Debug.Assert(start + len <= buffer.Length);
-                for (int i = 0; i < len; i++) {
+                int i = 0, len = 8;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)((n >> (8 * i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void PacklL(byte[] buffer, int start, ulong n) {
+        public static int PacklL(byte[] buffer, int start, ulong n) {
             try {
-                int len = 8;
-                UnityEngine.Debug.Assert(start + len <= buffer.Length);
-                for (int i = 0; i < len; i++) {
+                int i = 0, len = 8;
+                for (; i < len; i++) {
                     buffer[start + i] = (byte)((n >> (8 * i)) & 0xff);
                 }
+                return (start + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogError(ex.Message);
             }
+            return start;
         }
 
-        public static void Packlf(byte[] buffer, int start, float n) {
+        public static int Packlf(byte[] buffer, int start, float n) {
             byte[] res = BitConverter.GetBytes(n);
             UnityEngine.Debug.Assert(BitConverter.ToSingle(res, 0) == n);
             Array.Copy(res, 0, buffer, start, res.Length);
+            return (start + res.Length);
         }
 
-        public static void Packld(byte[] buffer, int start, double n) {
+        public static int Packld(byte[] buffer, int start, double n) {
             UnityEngine.Debug.Assert(buffer.Length >= (start + 8));
             long nn = BitConverter.DoubleToInt64Bits(n);
             Packll(buffer, start, nn);
+            return (start + 8);
         }
     }
 }

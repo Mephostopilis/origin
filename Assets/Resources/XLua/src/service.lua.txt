@@ -1,0 +1,17 @@
+local _M = {}
+
+function _M.ctor(self ... )
+	-- body
+end
+
+function _M.new( ... )
+	-- body
+	local inst = {}
+	inst.ctor = _M.ctor
+
+	inst:ctor( ... )
+
+	return inst
+end
+
+return _M

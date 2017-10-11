@@ -5,38 +5,34 @@ using Maria.Network;
 using System;
 using Sproto;
 using System.Text;
-using XLua;
 using Maria.Sharp;
 
 namespace Maria {
 
-    [CSharpCallLua]
-    [LuaCallCSharp]
-    public class Context : DisposeObject, INetwork {
-        [CSharpCallLua]
-        public delegate Maria.Lua.Env Main(Context ctx);
-
+    [XLua.Hotfix]
+    [XLua.LuaCallCSharp]
+    public class Context : DisposeObject, INetwork, Lua.ILua {
 
         protected Application _application = null;
         protected Config _config = null;
         protected TimeSync _ts = null;
         protected SharpC _sharpc = null;
-        
+
         protected EventDispatcher _dispatcher = null;
-        
+
         protected List<Timer> _timer = new List<Timer>();
         protected Stack<Controller> _stack = new Stack<Controller>();
         protected Dictionary<string, Service> _services = new Dictionary<string, Service>();
 
-        protected ClientLogin  _login = null;
+        protected ClientLogin _login = null;
         protected ClientSocket _client = null;
         protected User _user = new User();
         protected bool _logined = false;
         protected bool _authtcp = false;
-        
-        protected Lua.Env _envScript = null;
+
+        protected Lua.ILuaContext _luaContext = null;
         protected System.Random _rand = new System.Random();
-        
+
         public Context(Application application, Config config, TimeSync ts) {
             _application = application;
             _config = config;
@@ -73,13 +69,12 @@ namespace Maria {
         public virtual void Update(float delta) {
             _login.Update();
             _client.Update();
-            if (_envScript != null) {
-                _envScript.update();
+            if (_luaContext != null) {
+                _luaContext.Update(delta);
             }
-            //_env.update();
 
             //int now = _ts.LocalTime();
-            for (int i = _timer.Count -1; i >= 0; i--) {
+            for (int i = _timer.Count - 1; i >= 0; i--) {
                 Timer tm = _timer[i];
                 if (tm.CD <= 0) {
                     if (tm.Enable && tm.CB != null) {
@@ -121,9 +116,9 @@ namespace Maria {
         public User U { get { return _user; } }
         public bool AuthTcp { get { return _authtcp; } }
         public bool Logined { get { return _logined; } }
-        
-        public Lua.Env EnvScript { get { return _envScript; } set { _envScript = value; } }
-        
+
+        public Lua.ILuaContext LuaContext { get { return _luaContext; } }
+
         public int Range(int min, int max) {
             return _rand.Next(min, max);
         }
@@ -133,7 +128,7 @@ namespace Maria {
 
             _logined = false;
             _authtcp = false;
-            
+
             _user.Server = s;
             _user.Username = u;
             _user.Password = pwd;
@@ -208,7 +203,7 @@ namespace Maria {
 
             if (code == 200) {
                 _authtcp = true;
-                
+
                 string dummy = string.Empty;
                 //
                 EventDispatcher.FireCustomEvent(EventCustom.OnGateAuthed, null);
@@ -249,7 +244,7 @@ namespace Maria {
         }
 
         public Controller Push(Type type) {
-            Controller controller = (Controller)Activator.CreateInstance(type, this);
+            Controller controller = Lua.LuaPool.Instance.Create(type, this) as Controller;
             if (_stack.Count > 0) {
                 _stack.Peek().OnExit();
             }
@@ -259,7 +254,7 @@ namespace Maria {
         }
 
         public T Push<T>() where T : Controller {
-            T controller = Activator.CreateInstance(typeof(T), this) as T;
+            T controller = Lua.LuaPool.Instance.Create<T>(this) as T;
             if (_stack.Count > 0) {
                 _stack.Peek().OnExit();
             }
@@ -365,16 +360,17 @@ namespace Maria {
         }
 
         public void StartScript() {
-            // enter for lua
-            XLua.LuaEnv env = _application.LuaEnv;
-            Main main = env.Global.Get<Main>("main");
-            _envScript = main(this);
-            _envScript.update();
 
-            _client.StartScript();
         }
 
-        
+        public void OnCreateLua() {
+            Bacon.Lua.ILuaPool pool = Maria.Lua.LuaPool.Instance.Cache<Bacon.Lua.ILuaPool>(null);
+            _luaContext = pool.CreateContext();
+        }
+
+        public void OnDestroyLua() {
+            throw new NotImplementedException();
+        }
     }
 }
 

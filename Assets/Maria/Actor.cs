@@ -7,9 +7,9 @@ using UnityEngine;
 /// 游戏对象的抽象
 /// </summary>
 namespace Maria {
-
+    [XLua.Hotfix]
     [XLua.LuaCallCSharp]
-    public class Actor : DisposeObject {
+    public class Actor : DisposeObject, Lua.ILuaActor {
 
         [XLua.CSharpCallLua]
         [XLua.LuaCallCSharp]

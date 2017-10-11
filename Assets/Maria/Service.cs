@@ -5,7 +5,10 @@ using System.Linq;
 using System.Text;
 
 namespace Maria {
-    public class Service {
+
+    [XLua.Hotfix]
+    [XLua.LuaCallCSharp]
+    public class Service : Lua.ILuaService {
 
         protected Context _ctx = null;
         protected List<Actor> _actors = new List<Actor>();

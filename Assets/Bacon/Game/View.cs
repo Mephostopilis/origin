@@ -5,7 +5,6 @@ namespace Bacon.Game
 {
     public class View : Maria.Actor {
 
-        private Scene _scene = null;
         private GameObject _camera = null;
 
         private Matrix4x4 _centerMat = Matrix4x4.identity;
@@ -21,9 +20,8 @@ namespace Bacon.Game
         private Vector3 _min = Vector3.zero;
         private Vector3 _max = Vector3.zero;
 
-        public View(Context ctx, Controller controller, GameObject go, Scene scene) : base(ctx, controller, go) {
-            _scene = scene;
-
+        public View(Context ctx, Controller controller, GameObject go) : base(ctx, controller, go) {
+            
             _ctx.EnqueueRenderQueue(RenderInitView);
         }
 

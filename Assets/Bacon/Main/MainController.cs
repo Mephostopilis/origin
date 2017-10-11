@@ -2,7 +2,6 @@
 using Maria.Util;
 using Sproto;
 using UnityEngine;
-using XLua;
 using Bacon.Service;
 using Bacon.Game;
 using Bacon.Helper;
@@ -10,11 +9,10 @@ using Bacon.Event;
 using Maria.Res;
 using Bacon.Modules;
 
-namespace Bacon
-{
+namespace Bacon {
 
-    [Hotfix]
-    [LuaCallCSharp]
+    [XLua.Hotfix]
+    [XLua.LuaCallCSharp]
     class MainController : Controller {
         
         private GameObject _uiroot = null;
@@ -85,6 +83,14 @@ namespace Bacon
 
         public override void Logout() {
             _ctx.Pop();
+        }
+
+        public override void OnCreateLua() {
+            
+        }
+
+        public override void OnDestroyLua() {
+            
         }
 
         #region event
