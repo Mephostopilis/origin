@@ -7,12 +7,13 @@ using System.Text;
 namespace Maria.Sharp {
     public class Logger : DisposeObject {
         private SharpC _sharpc = null;
+        private SharpC.CSObject _log;
         private IntPtr _ptr = IntPtr.Zero;
 
         public Logger(SharpC sc) {
             _sharpc = sc;
-            SharpC.CSObject log = _sharpc.CacheFunc(Log);
-            _ptr = Logger_CSharp.log_create(sc.CPtr, log);
+            _log = _sharpc.CacheFunc(Log);
+            _ptr = Logger_CSharp.log_create(sc.CPtr, _log);
         }
 
         protected override void Dispose(bool disposing) {
@@ -23,9 +24,10 @@ namespace Maria.Sharp {
                 // 清理托管资源，调用自己管理的对象的Dispose方法
             }
             // 清理非托管资源
-            if (_ptr != IntPtr.Zero) {
-                Logger_CSharp.log_release(_ptr);
-            }
+
+            Logger_CSharp.log_release(_ptr);
+
+            _sharpc.ReleaseFunc(_log);
             _disposed = true;
         }
 

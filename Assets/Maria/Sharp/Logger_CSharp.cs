@@ -12,9 +12,6 @@ namespace Maria.Sharp {
         public static extern IntPtr log_create(IntPtr sc, [In, MarshalAs(UnmanagedType.Struct)]SharpC.CSObject log);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void log_retain(IntPtr logger);
-
-        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void log_release(IntPtr logger);
 
     }

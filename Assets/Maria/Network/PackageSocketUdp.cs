@@ -133,10 +133,10 @@ namespace Maria.Network {
         }
 
         private void Sync() {
-            int now = _timeSync.LocalTime();
+            int localtime = _timeSync.LocalTime();
 
             byte[] buffer = new byte[12];
-            NetPack.PacklI(buffer, 0, (uint)now);
+            NetPack.PacklI(buffer, 0, (uint)localtime);
             NetPack.PacklI(buffer, 4, 0xffffffff);
             NetPack.PacklI(buffer, 8, (uint)_session);
             byte[] head = Crypt.hmac_hash(_secret, buffer);
@@ -144,6 +144,7 @@ namespace Maria.Network {
             Array.Copy(head, data, 8);
             Array.Copy(buffer, 0, data, 8, buffer.Length);
 
+            UnityEngine.Debug.LogFormat("localtime: {0}, eventtime: {1}, session: {2}", localtime, 0xffffffff, _session);
             _u.Send(data, 0, data.Length);
         }
 
@@ -181,6 +182,7 @@ namespace Maria.Network {
                     _timeSync.Sync((int)localtime, (int)globaltime);
                     _connected = true;
                     UnityEngine.Debug.Assert(remaining == 0);
+                    UnityEngine.Debug.Log("package socket udp sync");
                     return;
                 } else {
                     if (remaining > 0) {

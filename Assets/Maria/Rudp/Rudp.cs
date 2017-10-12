@@ -21,11 +21,13 @@ namespace Maria.Rudp {
             SharpC.CSObject cso0 = sharpc.CacheObj(this);
             SharpC.CSObject cso1 = sharpc.CacheFunc(RSend);
             SharpC.CSObject cso2 = sharpc.CacheFunc(RRecv);
-            SharpC.CSObject cso3 = sharpc.CacheObj(_sharpc.CPtr);
+            SharpC.CSObject cso3 = new SharpC.CSObject();
+            cso3.type = SharpC.CSType.INTPTR;
+            cso3.ptr = _sharpc.CPtr;
 
             _u = Rudp_CSharp.rudpaux_alloc(send_delay, expired_time, cso3, cso0, cso1, cso2);
 
-            _buffer = Marshal.AllocHGlobal(3072);
+            _buffer = Marshal.AllocHGlobal(3072); // 单线程
 
             _sendBuffer = new byte[3072];
             _recvBuffer = new byte[3072];
@@ -48,12 +50,9 @@ namespace Maria.Rudp {
         public Callback OnRecv { get; set; }
 
         public void Send(byte[] buf, int start, int len) {
-            UnityEngine.Debug.Assert(len > 0);
-
-            IntPtr buffer = Marshal.AllocHGlobal(len);
-            Marshal.Copy(buf, 0, buffer, len);
-            Rudp_CSharp.rudpaux_send(_u, buffer, len);
-            Marshal.FreeHGlobal(buffer);
+            UnityEngine.Debug.Assert(len <= 3072);
+            Marshal.Copy(buf, start, _buffer, len);
+            Rudp_CSharp.rudpaux_send(_u, _buffer, len);
         }
 
         public void Update(byte[] buf, int start, int len, int tick) {

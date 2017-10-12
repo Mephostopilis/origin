@@ -43,16 +43,15 @@ namespace Maria.Sharp {
         public static extern IntPtr sharpc_create(pfunc func);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void sharpc_retain(pfunc func);
-
-        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void sharpc_release(IntPtr self);
 
         private IntPtr _sharpc = IntPtr.Zero;
+        private Logger _logger = null;
 
         public SharpC() {
             try {
                 _sharpc = sharpc_create(SharpC.CallCSharp);
+                _logger = new Logger(this);
             } catch (DllNotFoundException ex) {
                 UnityEngine.Debug.LogException(ex);
             }
@@ -64,6 +63,7 @@ namespace Maria.Sharp {
             }
             if (disposing) {
                 // 清理托管资源，调用自己管理的对象的Dispose方法
+                _logger.Dispose();
             }
             // 清理非托管资源
             sharpc_release(_sharpc);
@@ -89,14 +89,24 @@ namespace Maria.Sharp {
             return o;
         }
 
+        public void ReleaseFunc(CSObject o) {
+            UnityEngine.Debug.Assert(o.type == CSType.SHARPFUNCTION);
+            cache.Remove(o.v32);
+        }
+
         public CSObject CacheObj(object obj) {
             CSObject o = new CSObject();
             o.type = CSType.SHARPOBJECT;
             o.v32 = cache.AddKey(obj);
             return o;
         }
-        
+
+        public void ReleaseObj(CSObject o) {
+            UnityEngine.Debug.Assert(o.type == CSType.SHARPOBJECT);
+            cache.Remove(o.v32);
+        }
+
         public IntPtr CPtr { get { return _sharpc; } }
-       
+
     }
 }
