@@ -6,46 +6,38 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Maria.Sharp {
-    public class Package { 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct package {
-            public IntPtr buffer;
-            public int size;
-            public int cap;
+    public class Package {
+
+        public const string DLL = "mariac";
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr package_alloc(IntPtr src, int size);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int package_size(IntPtr self);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void package_memcpy(IntPtr self, IntPtr dst, int len);
+
+        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void package_free(IntPtr self);
+
+        public static IntPtr package_packarray(byte[] buffer) {
+            IntPtr ptr = Marshal.AllocHGlobal(buffer.Length);
+            Marshal.Copy(buffer, 0, ptr, buffer.Length);
+            IntPtr package = package_alloc(ptr, buffer.Length);
+            Marshal.FreeHGlobal(ptr);
+            return package;
         }
 
-        public static void init(package self, int cap) {
-            self.buffer = Marshal.AllocHGlobal(cap);
-            self.size = 0;
-            self.cap = cap;
-        }
-
-        public static void exit(package self) {
-            Marshal.FreeHGlobal(self.buffer);
-        }
-
-        public static void clear(package self) {
-            self.size = 0;
-        }
-
-        public static int write(package self, byte[] buffer) {
-            if (buffer.Length > (self.cap - self.size)) {
-                return 0;
-            }
-            UnityEngine.Debug.Assert(self.size == 0);
-            Marshal.Copy(buffer, 0, self.buffer, buffer.Length);
-            self.size += buffer.Length;
-            return 1;
-        }
-
-        public static int write(package self, byte[] buffer, int start, int len) {
-            if (len > (self.cap - self.size)) {
-                return 0;
-            }
-            UnityEngine.Debug.Assert(self.size == 0);
-            Marshal.Copy(buffer, start, self.buffer, len);
-            self.size += len;
-            return 1;
+        public static byte[] package_unpackarray(IntPtr ptr) {
+            int size = package_size(ptr);
+            IntPtr h = Marshal.AllocHGlobal(size);
+            byte[] buffer = new byte[size];
+            package_memcpy(ptr, h, size);
+            Marshal.Copy(h, buffer, 0, size);
+            Marshal.FreeHGlobal(h);
+            return buffer;
         }
     }
 }

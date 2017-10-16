@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Xml;
+using static Maria.Sharp.ObjectPool;
+using System.Runtime.InteropServices;
+using static Maria.Sharp.SharpC;
 
 namespace Map {
 
@@ -80,8 +83,11 @@ namespace Map {
             new Tile.CubeIndex(-1, 0, 1),
             new Tile.CubeIndex(0, -1, 1)
             };
+
         private List<ObjectSampler> sampleres = new List<ObjectSampler>();
-        private GridWaypointHead[] astars = new GridWaypointHead[100];
+
+        private Maria.Sharp.SharpC _sharpc = new Maria.Sharp.SharpC();
+        private IntPtr _hexmap = IntPtr.Zero;
 
         #region Getters and Setters
         public Dictionary<string, Tile> Tiles {
@@ -252,95 +258,23 @@ namespace Map {
             }
             return null;
         }
-
-        public int FindPath(Vector3 start, Vector3 exit) {
-            int i = 0;
-            for (; i < 100; i++) {
-                if (astars[i].Free) {
-                    break;
-                }
-            }
-            if (i >= 0 && i < 100) {
-                Tile startTile = ToTile(start);
-                Tile exitTile = ToTile(exit);
-                if (exitTile == null) {
-                    Debug.Log("exit tile is null");
-                    return -1;
-                }
-                exitTile.LineColour(Color.red, Color.red);
-                astars[i].Exit = exitTile;
-                if (astars[i].Open == null) {
-                    astars[i].Open = new List<TileWaypoint>();
-                }
-                if (astars[i].Open.Count > 0) {
-                    astars[i].Open.Clear();
-                }
-                if (astars[i].Closed == null) {
-                    astars[i].Closed = new List<TileWaypoint>();
-                }
-                if (astars[i].Closed.Count > 0) {
-                    astars[i].Closed.Clear();
-                }
-                TileWaypoint star = new TileWaypoint();
-                star.GCost = 0;
-                star.HCost = TileWaypoint.Cost(start, exit);
-                star.Tile = startTile;
-
-                astars[i].Open.Add(star);
-                astars[i].Open.Sort(star);
-
-                while (astars[i].Open.Count > 0) {
-                    TileWaypoint top = astars[i].Open[0];
-                    astars[i].Open.Remove(top);
-                    astars[i].Closed.Add(top);
-                    if (top.Tile == astars[i].Exit) {
-                        break;
-                    }
-
-                    UnityEngine.Debug.Log(top.Tile.index.ToString());
-
-                    List<Tile> neighbours = Neighbours(top.Tile);
-                    foreach (var item in neighbours) {
-                        star = new TileWaypoint();
-                        star.GCost = 0;
-                        star.HCost = TileWaypoint.Cost(start, exit);
-                        star.Tile = item;
-
-                        if (astars[i].Open.Contains(star, star)) {
-                            continue;
-                        }
-
-                        if (astars[i].Closed.Contains(star, star)) {
-                            continue;
-                        }
-
-                        astars[i].Open.Add(star);
-                        astars[i].Open.Sort(star);
-                    }
-                }
-                // finish
-                return i;
-            }
-            return -1;
-        }
-
-        public bool NextPoint(int pathid, ref Vector3 pos) {
-            if (astars[pathid].Current < astars[pathid].Closed.Count) {
-                pos = astars[pathid].Closed[astars[pathid].Current].Tile.position;
-                astars[pathid].Current = astars[pathid].Current + 1;
-                return true;
-            } else {
-                return false;
-            }
-        }
-        #endregion
-
         #region Private Methods
 
+        private static int initposition(int argc, [In, Out, MarshalAs(UnmanagedType.LPArray, SizeConst = maxArgs)] CSObject[] argv) {
+            CSObject slef = argv[1];
+            CSObject args = argv[2];
+
+            tile = CreateHexGO(pos, ("Hex[" + q + "," + r + "," + (-q - r).ToString() + "]"));
+            tile.index = new Tile.CubeIndex(q, r, -q - r);
+            tile.position = pos;
+            grid.Add(tile.index.ToString(), tile);
+
+            return 0;
+        }
+
         private void Start() {
-            for (int i = 0; i < 100; i++) {
-                astars[i] = new GridWaypointHead(i);
-            }
+            CSObject cb = _sharpc.CacheFunc(initposition);
+            _hexmap = HexMap_CSharp.hexmapaux_create(_sharpc.CPtr, (int)hexOrientation, hexRadius, (int)mapShape, mapWidth, mapHeight, cb);
         }
 
         private void OnEnable() {
@@ -354,6 +288,7 @@ namespace Map {
 
         private void GenHexShape() {
             Debug.Log("Generating hexagonal shaped grid...");
+
 
             Tile tile;
             Vector3 pos = Vector3.zero;

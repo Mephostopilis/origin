@@ -10,60 +10,51 @@ namespace Maria.Encrypt
     {
         public const string DLL = "mariac";
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct PACKAGE
-        {
-            public IntPtr src;
-            public Int32 len;
-        }
-
         /// <summary>
         /// string str = Marshal.PtrToStringAnsi(intPtr)
         /// </summary>
         /// <returns></returns>
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE randomkey();
+        public static extern IntPtr randomkey();
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE desencode(PACKAGE key, PACKAGE src);
+        public static extern IntPtr desencode(IntPtr key, IntPtr src);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE desdecode(PACKAGE key, PACKAGE encrypted);
+        public static extern IntPtr desdecode(IntPtr key, IntPtr encrypted);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE hashkey(PACKAGE src);
+        public static extern IntPtr hashkey(IntPtr src);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "tohex")]
-        public static extern PACKAGE hexencode(PACKAGE src);
+        public static extern IntPtr hexencode(IntPtr src);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "fromhex")]
-        public static extern PACKAGE hexdecode(PACKAGE encrypted);
+        public static extern IntPtr hexdecode(IntPtr encrypted);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE hmac64(PACKAGE key1, PACKAGE key2);
+        public static extern IntPtr hmac64(IntPtr key1, IntPtr key2);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE hmac_hash(PACKAGE key, PACKAGE src);
+        public static extern IntPtr hmac_hash(IntPtr key, IntPtr src);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE dhsecret(PACKAGE key, PACKAGE src);
+        public static extern IntPtr dhsecret(IntPtr key, IntPtr src);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE dhexchange(PACKAGE key);
+        public static extern IntPtr dhexchange(IntPtr key);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "b64encode")]
-        public static extern PACKAGE base64encode(PACKAGE src);
+        public static extern IntPtr base64encode(IntPtr src);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "b64decode")]
-        public static extern PACKAGE base64decode(PACKAGE encrypted);
+        public static extern IntPtr base64decode(IntPtr encrypted);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE sha1(PACKAGE src);
+        public static extern IntPtr sha1(IntPtr src);
 
         [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PACKAGE hmac_sha1(PACKAGE src);
+        public static extern IntPtr hmac_sha1(IntPtr src);
 
-        [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void pfree(PACKAGE src);
     }
 }

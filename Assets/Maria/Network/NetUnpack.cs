@@ -10,7 +10,7 @@ namespace Maria.Network {
                 res = 0;
                 res |= (short)(buffer[offset] << (0 * 8));
                 res |= (short)(buffer[offset + 1] << (1 * 8));
-                return (offset + 1);
+                return (offset + 2);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogException(ex);
             } finally {
@@ -23,7 +23,7 @@ namespace Maria.Network {
             res = 0;
             res |= (ushort)(buffer[offset] << (0 * 8));
             res |= (ushort)(buffer[offset + 1] << (1 * 8));
-            return (offset + 1);
+            return (offset + 2);
         }
 
         public static int Unpackli(byte[] buffer, int offset, out int res) {
@@ -33,7 +33,7 @@ namespace Maria.Network {
                 res |= buffer[offset + 1] << (1 * 8);
                 res |= buffer[offset + 2] << (2 * 8);
                 res |= buffer[offset + 3] << (3 * 8);
-                return offset + 3;
+                return offset + 4;
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.Log(ex.Message);
                 throw;
@@ -47,7 +47,7 @@ namespace Maria.Network {
                 res |= (uint)(buffer[offset + 1] << (1 * 8));
                 res |= (uint)(buffer[offset + 2] << (2 * 8));
                 res |= (uint)(buffer[offset + 3] << (3 * 8));
-                return (offset + 3);
+                return (offset + 4);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogException(ex);
             } finally {
@@ -63,7 +63,7 @@ namespace Maria.Network {
                 res |= buffer[offset + 1] << (2 * 8);
                 res |= buffer[offset + 2] << (1 * 8);
                 res |= buffer[offset + 3] << (0 * 8);
-                return (offset + 3);
+                return (offset + 4);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogException(ex);
             } finally {
@@ -79,7 +79,7 @@ namespace Maria.Network {
                 res |= (uint)buffer[offset + 1] << (2 * 8);
                 res |= (uint)buffer[offset + 2] << (1 * 8);
                 res |= (uint)buffer[offset + 3] << (0 * 8);
-                return (offset + 3);
+                return (offset + 4);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogException(ex);
             } finally {
@@ -91,9 +91,11 @@ namespace Maria.Network {
         public static int Unpackll(byte[] buffer, int offset, out long res) {
             try {
                 res = 0;
-                for (int i = 0; i < 8; i++) {
+                int i = 0;
+                for (; i < 8; i++) {
                     res |= ((long)buffer[offset + i]) << (i * 8);
                 }
+                return (offset + i);
             } catch (IndexOutOfRangeException ex) {
                 UnityEngine.Debug.LogException(ex);
             } finally {
